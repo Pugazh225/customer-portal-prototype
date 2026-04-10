@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+customer-portal-prototype<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -1457,21 +1457,30 @@
       margin-top: 16px;
     }
     .map-selected-bay-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 16px; background: var(--grey-50);
+      display: grid; grid-template-columns: 1fr auto auto auto;
+      align-items: center; gap: 16px;
+      padding: 14px 16px; background: var(--grey-50);
       border: 1px solid var(--grey-200); border-radius: var(--radius-input);
       margin-bottom: 8px; font-size: 14px;
     }
-    .map-selected-bay-item .bay-detail { flex: 1; }
+    .map-selected-bay-item.no-price {
+      grid-template-columns: 1fr auto auto;
+    }
+    .map-selected-bay-item .bay-detail { min-width: 0; }
     .map-selected-bay-item .bay-detail strong { display: block; font-size: 14px; font-weight: 500; }
     .map-selected-bay-item .bay-detail span { font-size: 12px; color: var(--text-secondary); }
+    .map-selected-bay-item .bay-spaces-col { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .map-selected-bay-item .bay-spaces-col label { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
     .map-selected-bay-item .bay-spaces-input {
       width: 80px; text-align: center; padding: 8px; font-size: 14px;
       border: 1px solid var(--grey-400); border-radius: var(--radius-input);
     }
+    .map-selected-bay-item .bay-price-col { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; min-width: 80px; }
+    .map-selected-bay-item .bay-price-col label { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
+    .map-selected-bay-item .bay-price-col .bay-price-value { font-weight: 600; font-size: 16px; padding: 8px 0; white-space: nowrap; }
     .map-selected-bay-item .bay-remove-btn {
       background: none; border: none; color: var(--error); cursor: pointer;
-      font-size: 16px; padding: 4px 8px; border-radius: var(--radius-input);
+      font-size: 18px; padding: 4px 8px; border-radius: var(--radius-input);
     }
     .map-selected-bay-item .bay-remove-btn:hover { background: rgba(211,47,47,.08); }
     .map-availability-badge {
@@ -1608,7 +1617,7 @@
       .map-canvas { height: 260px; }
       .map-legend { flex-direction: column; gap: 8px; }
       .map-toolbar { flex-wrap: wrap; }
-      .map-selected-bay-item { flex-wrap: wrap; gap: 8px; }
+      .map-selected-bay-item {\n        grid-template-columns: 1fr;\n        grid-template-rows: auto auto;\n        gap: 8px;\n      }\n      .map-selected-bay-item .bay-spaces-col,\n      .map-selected-bay-item .bay-price-col { flex-direction: row; align-items: center; }\n      .map-selected-bay-item .bay-price-col .bay-price-value { padding: 0 !important; font-size: 14px !important; }
 
       .map-click-popup { min-width: 240px; max-width: 280px; }
       .map-hover-tooltip { min-width: 150px; }
@@ -1720,18 +1729,24 @@
       <hr style="border:none; border-top:1px solid var(--grey-300); margin:16px 0 16px;">
 
       <!-- Pricing Rule Switcher + Map Config (for reviewer/demo purposes) -->
-      <div class="notice notice-warning" style="margin-bottom:16px;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-        <span style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-          <strong>Demo:</strong> Pricing Rule &mdash;
-          <select id="pricing-rule-select" onchange="switchPricingRule(this.value)" style="padding:4px 8px; border-radius:4px; border:1px solid var(--grey-400); font-size:13px;">
-            <option value="P1" selected>P1 — Standard Pricing (Bay Price &times; Spaces &times; Duration)</option>
-            <option value="P2">P2 — Min + Incremental (Min Charge &times; Spaces + Rate &times; Spaces &times; Extra Units)</option>
-            <option value="P3-UC1">P3 — Flexible Duration with Fixed Price (Flat fee per duration)</option>
-            <option value="P3-UC2">P3 — Single Fixed Price (No Duration)</option>
+      <div class="demo-config-bar" style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; padding:10px 24px; background:repeating-linear-gradient(45deg, #FFF3E0, #FFF3E0 10px, #FFE0B2 10px, #FFE0B2 20px); border:1px solid var(--warning); border-radius:var(--radius-card); margin-bottom:16px; font-size:13px;">
+        <span style="display:inline-flex; align-items:center; gap:6px;">
+          <span style="width:10px; height:10px; border-radius:50%; border:2px solid var(--warning); display:inline-block;"></span>
+          <strong style="color:var(--text-primary);">Demo:</strong>
+        </span>
+        <span style="display:inline-flex; align-items:center; gap:8px;">
+          <span style="color:var(--text-secondary);">Pricing Rule &mdash;</span>
+          <select id="pricing-rule-select" onchange="switchPricingRule(this.value)" style="padding:6px 12px; border-radius:6px; border:1px solid var(--grey-400); font-size:13px; background:#fff; min-width:320px; cursor:pointer;">
+            <option value="P1" selected>P1 &mdash; Standard Pricing (Bay Price &times; Spaces &times; Duration)</option>
+            <option value="P2">P2 &mdash; Min + Incremental (Min Charge &times; Spaces + Rate &times; Extra)</option>
+            <option value="P3-UC1">P3 &mdash; Flexible Duration with Fixed Price (Flat fee)</option>
+            <option value="P3-UC2">P3 &mdash; Single Fixed Price (No Duration)</option>
           </select>
-          &nbsp; | &nbsp; Multi Bay Type &mdash;
-          <select id="multi-bay-toggle" onchange="toggleMultiBayType(this.value === 'true')" style="padding:4px 8px; border-radius:4px; border:1px solid var(--grey-400); font-size:13px;">
+        </span>
+        <span style="color:var(--grey-400);">|</span>
+        <span style="display:inline-flex; align-items:center; gap:8px;">
+          <span style="color:var(--text-secondary);">Multi Bay Type &mdash;</span>
+          <select id="multi-bay-toggle" onchange="toggleMultiBayType(this.value === 'true')" style="padding:6px 12px; border-radius:6px; border:1px solid var(--grey-400); font-size:13px; background:#fff; cursor:pointer;">
             <option value="true" selected>Enabled</option>
             <option value="false">Disabled</option>
           </select>
@@ -2121,6 +2136,22 @@
               <!-- ===== MAP SELECTION MODE ===== -->
               <div id="map-selection-panel">
 
+                <!-- Map Instruction (moved above map) -->
+                <div class="map-selection-info" id="map-select-prompt">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                  <span class="info-text"><strong>Hover</strong> over a red-highlighted street to see available bay types. <strong>Click</strong> a street to select bays for your suspension.</span>
+                </div>
+
+                <!-- Search Address to Zoom -->
+                <div class="form-group" style="margin-bottom:12px;">
+                  <label for="map-address-search">Search street to zoom</label>
+                  <div class="address-search-wrapper">
+                    <input type="text" id="map-address-search" placeholder="Start typing a street name or postcode&hellip;"
+                           autocomplete="off" aria-expanded="false" aria-controls="map-address-results" />
+                    <div id="map-address-results" class="address-search-results" role="listbox"></div>
+                  </div>
+                </div>
+
                 <!-- Map Container with Leaflet + TRO/TMO Data -->
                 <div class="map-container">
                   <div style="display:flex; align-items:center; gap:8px; padding:8px 16px; background:#fff; border-bottom:1px solid var(--grey-200); font-size:12px; color:var(--text-secondary);">
@@ -2163,14 +2194,16 @@
                   <div class="popup-body" id="popup-body"></div>
                 </div>
 
-                <!-- Map Selection Info / Instruction -->
-                <div class="map-selection-info" id="map-select-prompt">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-                  <span class="info-text"><strong>Hover</strong> over a red-highlighted street to see available bay types. <strong>Click</strong> a street to select bays for your suspension.</span>
+                <!-- Bay Selection heading -->
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-top:16px; margin-bottom:8px;">
+                  <h3 style="font-size:16px; font-weight:500; letter-spacing:0.15px; margin:0;">Bay Selection</h3>
+                  <span id="bay-selection-rule-hint" style="font-size:12px; color:var(--text-secondary); font-style:italic;"></span>
                 </div>
+
+                <!-- Map Selection Info / Instruction (moved to top of map panel) -->
                 <div class="error-msg" id="map-bay-error">Please select a bay from the map</div>
 
-                <!-- Selected Bays from Map (auto-populated, read-only street & bay type) -->
+                <!-- Selected Bays from Map (auto-populated from map click) -->
                 <div class="map-selected-bays" id="map-selected-bays">
                   <!-- Dynamically populated -->
                 </div>
@@ -4475,6 +4508,17 @@ function clearMapError () {
 function renderMapSelectedBays () {
   var container = document.getElementById('map-selected-bays');
   container.innerHTML = '';
+  var rule = pricingConfig.rule;
+  var hidePrice = (rule === 'P3-UC2' || rule === 'P3-UC1');
+
+  // Update rule hint
+  var hintEl = document.getElementById('bay-selection-rule-hint');
+  if (hintEl) {
+    if (rule === 'P1') hintEl.textContent = 'Bay Price \u00D7 Spaces \u00D7 Duration';
+    else if (rule === 'P2') hintEl.textContent = 'Min Charge \u00D7 Spaces + Rate \u00D7 Spaces \u00D7 Extra Units';
+    else if (rule === 'P3-UC1') hintEl.textContent = 'Flat fee per selected duration (price not affected by spaces)';
+    else if (rule === 'P3-UC2') hintEl.textContent = 'Single fixed price (\u00A3' + pricingConfig.p3FixedPrice.toFixed(2) + ')';
+  }
 
   if (mapConfig.selectedBays.length === 0) {
     container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-disabled); font-size:14px;">No bays selected. Click a street on the map to select bays.</div>';
@@ -4485,19 +4529,40 @@ function renderMapSelectedBays () {
     var availBadgeClass = bay.availableSpaces > 3 ? 'available' : bay.availableSpaces > 0 ? 'limited' : 'unavailable';
     var availText = bay.availableSpaces + ' of ' + bay.maxSpaces + ' available';
 
+    // Calculate price per bay based on pricing rule
+    var bayPrice = calculateBayPrice(bay.bayType, bay.baySpaces, appState.duration || 1);
+    var priceDisplay = '';
+    if (rule === 'P3-UC1') {
+      var selDur = pricingConfig.p3SelectedDuration;
+      if (selDur !== null && pricingConfig.p3Durations[selDur]) {
+        priceDisplay = '\u00A3' + pricingConfig.p3Durations[selDur].price.toFixed(2);
+      } else {
+        priceDisplay = '\u00A30.00';
+      }
+    } else if (rule === 'P3-UC2') {
+      priceDisplay = '\u00A3' + pricingConfig.p3FixedPrice.toFixed(2);
+    } else {
+      priceDisplay = '\u00A3' + bayPrice.toFixed(2);
+    }
+
     var item = document.createElement('div');
-    item.className = 'map-selected-bay-item';
+    item.className = 'map-selected-bay-item' + (hidePrice ? ' no-price' : '');
     item.innerHTML =
       '<div class="bay-detail">' +
         '<strong>' + sanitize(bayTypeNames[bay.bayType] || bay.bayType) + '</strong>' +
-        '<span>' + sanitize(bay.street) + '<span class="map-availability-badge ' + availBadgeClass + '">' + availText + '</span></span>' +
+        '<span>' + sanitize(bay.street) + ' &nbsp; <span class="map-availability-badge ' + availBadgeClass + '">' + availText + '</span></span>' +
       '</div>' +
-      '<div style="display:flex; flex-direction:column; align-items:center; gap:2px;">' +
-        '<label style="font-size:11px; color:var(--text-secondary);">Spaces</label>' +
+      '<div class="bay-spaces-col">' +
+        '<label>Spaces</label>' +
         '<input type="number" class="bay-spaces-input" min="1" max="' + bay.availableSpaces + '" value="' + bay.baySpaces + '" ' +
           'onchange="updateMapBaySpaces(' + idx + ', this)" oninput="updateMapBaySpaces(' + idx + ', this)" />' +
       '</div>' +
-      '<button class="bay-remove-btn" onclick="removeMapBay(' + idx + ')" title="Remove bay" aria-label="Remove ' + sanitize(bayTypeNames[bay.bayType]) + '">&times;</button>';
+      (hidePrice ? '' :
+        '<div class="bay-price-col">' +
+          '<label>Price</label>' +
+          '<div class="bay-price-value">' + priceDisplay + '</div>' +
+        '</div>') +
+      '<button class="bay-remove-btn" onclick="removeMapBay(' + idx + ')" title="Remove bay" aria-label="Remove ' + sanitize(bayTypeNames[bay.bayType]) + '">\u00D7</button>';
 
     container.appendChild(item);
   });
@@ -4527,6 +4592,18 @@ function updateMapBaySpaces (index, inputEl) {
   }
 
   syncMapBaysToAppState();
+  // Update price display in-place (avoid full re-render which loses input focus)
+  var rule = pricingConfig.rule;
+  if (rule !== 'P3-UC1' && rule !== 'P3-UC2') {
+    var item = inputEl.closest('.map-selected-bay-item');
+    if (item) {
+      var priceVal = item.querySelector('.bay-price-value');
+      if (priceVal) {
+        var newPrice = calculateBayPrice(bay.bayType, bay.baySpaces, appState.duration || 1);
+        priceVal.textContent = '\u00A3' + newPrice.toFixed(2);
+      }
+    }
+  }
 }
 
 /* === Remove bay from map selection === */
@@ -4661,9 +4738,94 @@ function initLeafletMap () {
 
     // Bay markers removed — selection happens via street click popup
   });
+
+  // Setup map address search
+  setupMapAddressSearch();
 }
 
-/* === Update Leaflet marker style on select/deselect === */
+/* === Map Address Search — zoom to street on selection === */
+function setupMapAddressSearch () {
+  var input = document.getElementById('map-address-search');
+  var results = document.getElementById('map-address-results');
+  if (!input || !results) return;
+  var debounceTimer;
+
+  // Build searchable list: streets with geo data + sample addresses
+  var streetNames = Object.keys(streetGeoData);
+
+  input.addEventListener('input', function () {
+    clearTimeout(debounceTimer);
+    var query = this.value.trim().toLowerCase();
+    if (query.length < 2) { results.classList.remove('open'); input.setAttribute('aria-expanded', 'false'); return; }
+    debounceTimer = setTimeout(function () {
+      // Match streets from geo data
+      var streetMatches = streetNames.filter(function (s) { return s.toLowerCase().indexOf(query) !== -1; });
+      // Match from sample addresses
+      var addrMatches = sampleAddresses.filter(function (a) {
+        return a.text.toLowerCase().indexOf(query) !== -1 && streetMatches.indexOf(a.street) === -1;
+      });
+
+      results.innerHTML = '';
+
+      if (streetMatches.length === 0 && addrMatches.length === 0) {
+        results.innerHTML = '<div class="no-results">No matching streets found.</div>';
+      } else {
+        // Show matched streets (with bays on map)
+        streetMatches.forEach(function (streetName) {
+          var div = document.createElement('div');
+          div.className = 'result-item';
+          div.setAttribute('role', 'option');
+          div.innerHTML = '<strong>' + streetName + '</strong> <span style="color:var(--text-secondary); font-size:12px;">\u2014 bays available on map</span>';
+          div.addEventListener('click', function () { zoomToStreet(streetName); results.classList.remove('open'); input.value = streetName; });
+          results.appendChild(div);
+        });
+        // Show matched addresses (zoom to street if it exists on map)
+        addrMatches.forEach(function (addr) {
+          var div = document.createElement('div');
+          div.className = 'result-item';
+          div.setAttribute('role', 'option');
+          div.textContent = addr.text;
+          var hasGeo = !!streetGeoData[addr.street];
+          if (!hasGeo) {
+            div.innerHTML = addr.text + ' <span style="color:var(--grey-500); font-size:11px;">(not on map)</span>';
+          }
+          div.addEventListener('click', function () {
+            if (hasGeo) { zoomToStreet(addr.street); }
+            results.classList.remove('open');
+            input.value = addr.street;
+          });
+          results.appendChild(div);
+        });
+      }
+      results.classList.add('open');
+      input.setAttribute('aria-expanded', 'true');
+    }, 200);
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('#map-selection-panel .address-search-wrapper')) {
+      results.classList.remove('open');
+      input.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
+
+function zoomToStreet (streetName) {
+  if (!leafletMap || !streetGeoData[streetName]) return;
+  var geo = streetGeoData[streetName];
+  var bounds = L.latLngBounds(geo.coords);
+  leafletMap.fitBounds(bounds.pad(0.3), { maxZoom: 18 });
+
+  // Highlight the street briefly
+  var polyline = leafletStreetLayers[streetName];
+  if (polyline) {
+    polyline.setStyle({ weight: 10, opacity: 1, color: '#1565C0' });
+    setTimeout(function () {
+      polyline.setStyle({ weight: 6, opacity: 0.85, color: '#D32F2F' });
+    }, 1500);
+  }
+}
 function updateLeafletMarkerStyle (streetName, bayType, selected) {
   var key = streetName + '|' + bayType;
   var cm = leafletBayMarkers[key];
