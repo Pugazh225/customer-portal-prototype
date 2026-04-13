@@ -1,0 +1,2847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dispensation Application</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ===== DESIGN TOKENS (from Theme_and_Design_Guidelines.md + Figma) ===== */
+    :root {
+      --primary-main: #3276CF;
+      --primary-dark: #2560A8;
+      --primary-800: #22497D;
+      --primary-25: #F2F5FA;
+      --primary-100: #A2C1EA;
+      --primary-200: #84ADE4;
+      --text-primary: #212121;
+      --text-secondary: #757575;
+      --text-disabled: #9E9E9E;
+      --grey-50: #FAFAFA;
+      --grey-100: #F5F5F5;
+      --grey-200: #EEEEEE;
+      --grey-300: #E0E0E0;
+      --grey-400: #BDBDBD;
+      --neutral-100: #CBCCCD;
+      --neutral-300: #8E9092;
+      --success: #2E7D32;
+      --warning: #ED6C02;
+      --error: #D32F2F;
+      --info: #0288D1;
+      --avatar-bg: #DC4A11;
+      --bg-page: #FFFFFF;
+      --yellow-500: #FFEB3B;
+      --shadow-card: 0px 4px 6px rgba(0,0,0,0.1), 0px 2px 4px rgba(0,0,0,0.1);
+      --shadow-toast: 0 4px 12px rgba(0,0,0,0.15);
+      --radius-btn: 10px;
+      --radius-card: 10px;
+      --radius-input: 8px;
+      --radius-chip: 16px;
+      --radius-nav: 8px;
+      --font-size-base: 16px;
+    }
+
+    /* ===== RESET ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    body {
+      font-size: var(--font-size-base);
+      font-family: 'Roboto', Helvetica, Arial, sans-serif;
+      color: var(--text-primary);
+      background: var(--bg-page);
+      line-height: 1.5;
+      letter-spacing: 0.15px;
+      min-height: 100vh;
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+    body.font-large { zoom: 1.15; }
+    body.font-xl    { zoom: 1.3; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; }
+    }
+
+    /* ===== SKIP LINK ===== */
+    .skip-link {
+      position: absolute; left: -999px; top: 0;
+      background: var(--primary-main); color: #fff; padding: 8px 16px;
+      z-index: 1000; border-radius: 0 0 var(--radius-input) 0;
+      font-size: 14px;
+    }
+    .skip-link:focus { left: 0; }
+
+    /* ===== HEADER ===== */
+    .site-header {
+      background: var(--primary-800);
+      border-bottom: 4px solid var(--primary-main);
+      padding: 0 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 56px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 24px; }
+    .site-header .logo { display: flex; align-items: center; gap: 12px; }
+    .site-header .logo-icon {
+      width: 36px; height: 36px; background: var(--yellow-500);
+      border-radius: 4px; display: flex; align-items: center; justify-content: center;
+      font-weight: 500; font-size: 14px; color: var(--primary-800);
+    }
+    .header-divider { width: 1px; height: 24px; background: rgba(255,255,255,.3); }
+    .header-nav { display: flex; align-items: center; gap: 0; }
+    .header-nav a {
+      text-decoration: none; color: #fff; font-size: 14px;
+      font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px;
+      padding: 16px 20px; display: flex; align-items: center; gap: 8px;
+      transition: background 150ms ease; line-height: 24px;
+    }
+    .header-nav a:hover { background: rgba(255,255,255,.08); }
+    .header-nav a.active { color: var(--yellow-500); }
+    .header-nav a svg { width: 20px; height: 20px; }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .header-bell {
+      background: none; border: none; color: #fff; cursor: pointer;
+      padding: 8px; border-radius: var(--radius-nav); transition: background 150ms;
+    }
+    .header-bell:hover { background: rgba(255,255,255,.1); }
+    .header-bell svg { width: 24px; height: 24px; }
+    .header-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--avatar-bg); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 500; letter-spacing: 0.16px;
+    }
+    .font-toggle {
+      display: flex; gap: 2px; align-items: center;
+      border: 1px solid rgba(255,255,255,.4); border-radius: var(--radius-input);
+      padding: 2px; background: rgba(255,255,255,.08);
+    }
+    .font-toggle button {
+      background: none; border: none; padding: 3px 8px; cursor: pointer;
+      font-weight: 500; border-radius: 6px; color: rgba(255,255,255,.6);
+      font-size: 12px; transition: all 150ms; font-family: inherit;
+    }
+    .font-toggle button.active { background: rgba(255,255,255,.2); color: #fff; }
+    .font-toggle button:focus-visible { outline: 2px solid var(--primary-main); outline-offset: 1px; }
+    .header-search {
+      display: flex; gap: 6px; align-items: center;
+      border: 1px solid rgba(255,255,255,.4); border-radius: var(--radius-input);
+      padding: 8px 12px; width: 240px; height: 40px; opacity: .7; color: #fff;
+    }
+    .header-search svg { width: 24px; height: 24px; flex-shrink: 0; }
+    .header-search span { font-size: 16px; color: rgba(255,255,255,.7); letter-spacing: 0.15px; white-space: nowrap; }
+
+    /* ===== MAIN LAYOUT ===== */
+    .page-wrapper { margin: 0 180px; padding: 24px 0 100px; }
+    .page-layout { display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; }
+    .page-heading {
+      font-size: 24px; font-weight: 400; line-height: 1.33;
+      color: var(--text-primary); margin-bottom: 24px;
+    }
+
+    /* ===== STEPPER ===== */
+    .stepper { display: flex; align-items: flex-start; margin-bottom: 24px; padding: 0 0 8px; }
+    .step-item { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 80px; position: relative; }
+    .step-item .step-num {
+      width: 24px; height: 24px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 400; letter-spacing: 0.4px;
+      background: var(--grey-400); color: #fff;
+      transition: background 200ms ease; flex-shrink: 0; line-height: 1.66;
+    }
+    .step-item .step-label {
+      font-size: 14px; color: var(--text-secondary); line-height: 1.43;
+      letter-spacing: 0.17px; text-align: center; white-space: nowrap;
+    }
+    .step-item.active .step-num { background: var(--primary-main); color: #fff; }
+    .step-item.active .step-label { color: var(--primary-main); font-weight: 500; letter-spacing: 0.1px; }
+    .step-item.completed .step-num { background: var(--primary-main); color: #fff; }
+    .step-item.completed .step-num::after { content: '\2713'; font-size: 14px; font-weight: 500; }
+    .step-item.completed .step-num span { display: none; }
+    .step-item.completed .step-label { color: var(--text-primary); font-weight: 500; letter-spacing: 0.1px; }
+    .step-connector { flex: 1; height: 1px; background: var(--grey-300); margin: 12px 8px 0; min-width: 24px; }
+    .step-connector.completed { background: var(--primary-main); }
+
+    /* ===== CARD ===== */
+    .card {
+      background: #fff; border: 1px solid var(--grey-300);
+      border-radius: var(--radius-card); padding: 24px; margin-bottom: 20px;
+    }
+    .card h2 {
+      font-size: 20px; font-weight: 500; line-height: 1.6;
+      letter-spacing: 0.15px; margin-bottom: 4px; color: var(--text-primary);
+    }
+    .card .subtitle {
+      color: var(--text-secondary); font-size: 14px;
+      line-height: 1.43; letter-spacing: 0.17px; margin-bottom: 20px;
+    }
+
+    /* ===== SUMMARY SIDEBAR ===== */
+    .summary-sidebar { position: sticky; top: 80px; }
+    .summary-card {
+      background: #fff; border: 1px solid var(--primary-25);
+      border-radius: var(--radius-card); padding: 0;
+      box-shadow: 0px 1px 21.4px 0px rgba(81,85,110,0.12); overflow: hidden;
+    }
+    .summary-card h3 {
+      font-size: 20px; font-weight: 500; line-height: 1.6;
+      letter-spacing: 0.15px; margin: 0; padding: 12px 16px;
+      color: var(--text-primary); border-bottom: 1px solid var(--grey-400);
+    }
+    .summary-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; line-height: 1.43; letter-spacing: 0.17px; }
+    .summary-row .s-label { color: var(--text-secondary); }
+    .summary-row .s-value { font-weight: 500; color: var(--text-primary); text-align: right; max-width: 55%; }
+    .summary-divider { height: 1px; background: var(--grey-200); margin: 8px 0; }
+    .summary-total { display: flex; justify-content: space-between; padding: 12px 0 0; font-size: 16px; font-weight: 500; }
+    .summary-total .s-value { color: var(--primary-main); font-size: 20px; }
+
+    /* ===== FORMS ===== */
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block; font-size: 14px; font-weight: 400;
+      line-height: 1.43; letter-spacing: 0.17px; margin-bottom: 6px; color: var(--text-primary);
+    }
+    .form-group .hint {
+      font-size: 12px; color: var(--text-disabled);
+      line-height: 1.66; letter-spacing: 0.4px; margin-bottom: 6px;
+    }
+    input[type="text"], input[type="number"], input[type="date"],
+    input[type="time"], input[type="email"], input[type="tel"],
+    select, textarea {
+      width: 100%; padding: 10px 14px;
+      border: 1px solid var(--grey-400); border-radius: var(--radius-input);
+      font-size: 16px; line-height: 24px; letter-spacing: 0.15px;
+      color: var(--text-primary); background: #fff;
+      font-family: 'Roboto', Helvetica, Arial, sans-serif;
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+    select {
+      padding-right: 36px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center;
+      -webkit-appearance: none; -moz-appearance: none; appearance: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none; border-color: var(--primary-main);
+      box-shadow: 0 0 0 1px var(--primary-main);
+    }
+    input.error, select.error { border-color: var(--error) !important; box-shadow: 0 0 0 1px var(--error) !important; }
+    .error-msg {
+      color: var(--error); font-size: 12px; line-height: 1.66;
+      letter-spacing: 0.4px; margin-top: 4px; display: none;
+    }
+    .error-msg.visible { display: block; }
+    textarea { resize: vertical; min-height: 80px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+    /* Date + Time inline row (stays inline on all screens) */
+    .date-time-row {
+      display: grid; grid-template-columns: 1fr auto; gap: 8px;
+    }
+    .date-time-row select { max-width: 120px; }
+    .date-time-row input[readonly] {
+      background: var(--grey-50); color: var(--text-secondary); cursor: default;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      padding: 8px 22px; border-radius: var(--radius-btn); font-size: 14px;
+      font-weight: 500; cursor: pointer; border: none;
+      text-transform: uppercase; letter-spacing: 0.4px; line-height: 24px;
+      transition: background 150ms ease, border-color 150ms ease;
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: 'Roboto', Helvetica, Arial, sans-serif;
+    }
+    .btn:focus-visible { outline: 2px solid var(--primary-main); outline-offset: 2px; }
+    .btn-primary { background: var(--primary-main); color: #fff; border: none; font-size: 15px; line-height: 26px; letter-spacing: 0.46px; padding: 10px 24px; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-primary:disabled { background: var(--grey-400); cursor: not-allowed; }
+    .btn-secondary { background: transparent; color: var(--primary-main); border: 1px solid var(--primary-main); }
+    .btn-secondary:hover { background: var(--primary-25); }
+    .btn-text { background: transparent; color: var(--primary-main); border: none; }
+    .btn-text:hover { background: var(--primary-25); }
+    .btn-sm { padding: 4px 10px; font-size: 13px; line-height: 22px; letter-spacing: 0.46px; }
+
+    /* ===== ADDRESS MODE CARDS ===== */
+    .address-mode-cards { display: flex; gap: 12px; padding: 0 8px; margin-bottom: 20px; }
+    .address-mode-card {
+      flex: 1; display: flex; align-items: center; gap: 8px;
+      padding: 12px; border-radius: var(--radius-input);
+      border: 1px solid var(--grey-400); background: #fff;
+      cursor: pointer; transition: border-color 200ms, background 200ms;
+      font-size: 16px; user-select: none;
+    }
+    .address-mode-card:hover { border-color: var(--primary-200); }
+    .address-mode-card.selected { border-color: #4B87D6; background: var(--primary-25); }
+
+    /* ===== ADDRESS SEARCH INPUT ===== */
+    .address-search-wrapper { position: relative; }
+    .address-search-results {
+      position: absolute; top: 100%; left: 0; right: 0;
+      background: #fff; border: 1px solid var(--grey-300);
+      border-radius: 0 0 var(--radius-input) var(--radius-input);
+      box-shadow: var(--shadow-card); max-height: 220px; overflow-y: auto;
+      z-index: 50; display: none;
+    }
+    .address-search-results.open { display: block; }
+    .address-search-results .result-item {
+      padding: 10px 14px; cursor: pointer; font-size: 14px;
+      line-height: 1.5; letter-spacing: 0.15px;
+      border-bottom: 1px solid var(--grey-200); transition: background 150ms;
+    }
+    .address-search-results .result-item:hover,
+    .address-search-results .result-item[aria-selected="true"] {
+      background: var(--primary-25);
+    }
+    .address-search-results .no-results {
+      padding: 12px 14px; color: var(--text-secondary); font-size: 14px;
+    }
+
+    /* ===== ADDRESS FIELDS (auto-fill) ===== */
+    .address-detail-fields { margin-top: 16px; }
+
+    /* ===== MANUAL ENTRY CHECKBOX ===== */
+    .manual-check-label {
+      display: inline-flex; align-items: center; gap: 8px;
+      cursor: pointer; font-size: 14px; color: var(--text-secondary);
+      margin-top: 16px; user-select: none;
+    }
+    .manual-check-label input[type="checkbox"] {
+      accent-color: var(--primary-main); width: 18px; height: 18px;
+    }
+
+    /* ===== PERMIT MODE TOGGLE ===== */
+    .permit-mode-toggle { display: flex; gap: 12px; padding: 0 8px; }
+    .permit-mode-option {
+      flex: 1; display: flex; align-items: center; gap: 0;
+      padding: 12px; border-radius: var(--radius-input);
+      border: 1px solid var(--grey-400); background: #fff;
+      cursor: pointer; transition: border-color 200ms, background 200ms; position: relative;
+    }
+    .permit-mode-option:hover { border-color: var(--primary-200); }
+    .permit-mode-option.selected { border-color: #4B87D6; background: var(--primary-25); }
+    .permit-mode-icon {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .permit-mode-info { flex: 1; padding-left: 8px; }
+    .permit-mode-label { display: block; font-size: 16px; font-weight: 400; color: var(--text-primary); letter-spacing: 0.15px; line-height: 1.5; }
+    .permit-mode-desc { display: block; font-size: 14px; color: #616161; letter-spacing: 0.17px; line-height: 1.43; }
+    .permit-mode-check { flex-shrink: 0; margin-left: 8px; }
+
+    /* ===== BAY ROW ENTRY ===== */
+    .bay-row-entry {
+      margin-bottom: 8px; padding: 12px;
+      background: var(--grey-50); border-radius: var(--radius-input);
+      border: 1px solid var(--grey-300);
+      display: grid; grid-template-columns: 2fr 1fr auto; gap: 12px; align-items: end;
+    }
+    .bay-row-entry .form-group { margin-bottom: 0; }
+    .bay-row-remove { align-self: flex-end; margin-bottom: 2px; }
+
+    /* ===== PRICING DURATION TABLE ===== */
+    .pricing-duration-table { width: 100%; border-collapse: collapse; margin-bottom: 0; }
+    .pricing-duration-table thead th {
+      text-align: left; font-size: 14px; font-weight: 500; color: var(--text-secondary);
+      padding: 10px 16px; border-bottom: 1px solid var(--grey-300); letter-spacing: 0.17px;
+    }
+    .pricing-duration-table thead th:not(:first-child) { text-align: right; }
+    .pricing-duration-table tbody td {
+      padding: 14px 16px; font-size: 14px; line-height: 1.43; letter-spacing: 0.17px;
+      border-bottom: 1px solid var(--grey-200); color: var(--text-primary);
+    }
+    .pricing-duration-table tbody td:not(:first-child) { text-align: right; font-weight: 500; }
+    .pricing-duration-table tbody tr { cursor: pointer; transition: background 150ms; }
+    .pricing-duration-table tbody tr:hover { background: var(--grey-50); }
+    .pricing-duration-table tbody tr.selected-duration { background: var(--primary-25); }
+    .pricing-duration-table tbody tr.selected-duration td { color: var(--primary-main); }
+    .pricing-duration-table .duration-radio {
+      width: 20px; height: 20px; accent-color: var(--primary-main); cursor: pointer; vertical-align: middle; margin-right: 8px;
+    }
+    .pricing-duration-table .duration-label { cursor: pointer; vertical-align: middle; }
+
+    /* ===== DISCOUNT SECTION ===== */
+    .discount-section { margin-top: 24px; }
+    .discount-section h3 { font-size: 16px; font-weight: 500; margin-bottom: 12px; letter-spacing: 0.15px; }
+    .discount-toggle-row {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 16px 0; border-bottom: 1px solid var(--grey-200);
+    }
+    .discount-toggle-row:last-child { border-bottom: none; }
+    .discount-toggle-info { flex: 1; }
+    .discount-toggle-info .toggle-title { font-size: 14px; font-weight: 500; color: var(--text-primary); display: block; margin-bottom: 2px; }
+    .discount-toggle-info .toggle-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.43; display: block; }
+    /* MUI-style toggle switch */
+    .toggle-switch { position: relative; width: 42px; height: 24px; flex-shrink: 0; margin-top: 2px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-switch .slider {
+      position: absolute; cursor: pointer; inset: 0;
+      background: var(--grey-400); border-radius: 12px; transition: background 200ms;
+    }
+    .toggle-switch .slider::before {
+      content: ''; position: absolute; height: 18px; width: 18px;
+      left: 3px; bottom: 3px; background: #fff; border-radius: 50%;
+      transition: transform 200ms; box-shadow: 0 1px 3px rgba(0,0,0,.2);
+    }
+    .toggle-switch input:checked + .slider { background: var(--primary-main); }
+    .toggle-switch input:checked + .slider::before { transform: translateX(18px); }
+    .toggle-switch input:focus-visible + .slider { outline: 2px solid var(--primary-main); outline-offset: 2px; }
+
+    /* ===== PRICING BREAKDOWN ===== */
+    .section-divider { height: 1px; background: var(--grey-300); }
+    .price-card {
+      background: var(--grey-50); border: 1px solid var(--grey-300);
+      border-radius: var(--radius-card); padding: 20px 24px;
+    }
+    .price-line { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; line-height: 1.43; letter-spacing: 0.17px; }
+    .price-line .p-label { color: var(--text-secondary); }
+    .price-line .p-value { font-weight: 500; text-align: right; }
+    .price-line.discount .p-value { color: var(--success); }
+    .price-line.total { font-size: 16px; font-weight: 500; border-top: 1px solid var(--grey-300); padding-top: 12px; margin-top: 4px; }
+    .price-line.total .p-label { font-weight: 500; }
+
+    /* ===== UPLOAD ZONE ===== */
+    .upload-zone {
+      border: 2px dashed var(--grey-300); border-radius: var(--radius-input);
+      padding: 32px; text-align: center; cursor: pointer;
+      transition: border-color 150ms, background 150ms;
+    }
+    .upload-zone:hover, .upload-zone.dragover { border-color: var(--primary-main); background: var(--primary-25); }
+    .upload-zone svg { width: 40px; height: 40px; color: var(--grey-400); margin-bottom: 8px; }
+    .upload-zone p { color: var(--text-secondary); font-size: 14px; }
+    .upload-zone .formats { font-size: 12px; color: var(--text-disabled); margin-top: 4px; letter-spacing: 0.4px; }
+    .file-list { margin-top: 12px; }
+    .file-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; background: var(--grey-50);
+      border: 1px solid var(--grey-200); border-radius: var(--radius-input);
+      margin-bottom: 8px; font-size: 14px;
+    }
+    .file-item .file-info { display: flex; align-items: center; gap: 8px; }
+    .file-item .file-size { color: var(--text-disabled); font-size: 12px; }
+
+    /* ===== VEHICLE CHIPS ===== */
+    .vehicle-chips {
+      display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 12px;
+      border: 1px solid var(--neutral-100); border-radius: var(--radius-input);
+      min-height: 44px; align-items: center;
+    }
+    .vehicle-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--primary-25); color: var(--primary-main);
+      border-radius: var(--radius-chip); padding: 2px 10px 2px 12px;
+      font-size: 13px; line-height: 18px; letter-spacing: 0.16px;
+    }
+    .vehicle-chip .chip-close {
+      background: none; border: none; color: var(--primary-main);
+      cursor: pointer; font-size: 14px; padding: 2px; border-radius: 50%;
+    }
+    .vehicle-chip .chip-close:hover { background: rgba(50,118,207,.15); }
+    .vehicle-dropdown {
+      display: none; position: absolute; left: 0; right: 0;
+      background: #fff; border: 1px solid var(--grey-300); border-top: none;
+      border-radius: 0 0 var(--radius-input) var(--radius-input);
+      box-shadow: 0 4px 12px rgba(0,0,0,.1); z-index: 50;
+      max-height: 200px; overflow-y: auto;
+    }
+    .vehicle-dropdown.open { display: block; }
+    .vehicle-dropdown-item {
+      display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+      cursor: pointer; font-size: 14px; color: var(--text-primary); transition: background .15s;
+    }
+    .vehicle-dropdown-item:hover { background: var(--primary-25); }
+    .vehicle-dropdown-item .vd-badge {
+      font-size: 11px; padding: 1px 6px; border-radius: 4px; font-weight: 500;
+      background: var(--primary-25); color: var(--primary-main);
+    }
+
+
+
+    /* ===== PAYMENT OPTIONS ===== */
+    .payment-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .payment-option {
+      border: 1px solid var(--grey-300); border-radius: var(--radius-card);
+      padding: 16px 20px; cursor: pointer;
+      transition: border-color 200ms ease, background 200ms ease;
+      background: #fff; display: flex; align-items: center; gap: 14px; position: relative;
+    }
+    .payment-option:hover { border-color: var(--primary-200); }
+    .payment-option.selected { border-color: var(--primary-main); background: var(--primary-25); }
+    .payment-option .pay-icon {
+      width: 40px; height: 40px; border-radius: 50%; background: var(--grey-100);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0; color: var(--text-secondary);
+    }
+    .payment-option.selected .pay-icon { background: var(--primary-25); color: var(--primary-main); }
+    .payment-option .pay-info { flex: 1; }
+    .payment-option .pay-label { font-size: 14px; font-weight: 500; color: var(--text-primary); display: block; }
+    .payment-option .pay-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; display: block; }
+    .payment-option .pay-amount { font-size: 16px; font-weight: 500; color: var(--text-primary); margin-left: auto; white-space: nowrap; }
+    .payment-option .pay-check {
+      position: absolute; top: 12px; right: 12px;
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 2px solid var(--grey-400); display: flex;
+      align-items: center; justify-content: center; transition: all 150ms;
+    }
+    .payment-option.selected .pay-check { border-color: var(--primary-main); background: var(--primary-main); color: #fff; }
+    .payment-option.selected .pay-check::after { content: '\2713'; font-size: 12px; font-weight: 700; }
+
+    /* More payment options expandable list */
+    .more-payment-list { margin-bottom: 20px; display: none; }
+    .more-payment-list.open { display: block; }
+    .more-payment-list h4 { font-size: 14px; font-weight: 500; color: var(--text-secondary); margin-bottom: 10px; }
+    .more-pay-item {
+      border: 1px solid var(--grey-300); border-radius: var(--radius-card);
+      padding: 16px 20px; cursor: pointer; margin-bottom: 8px;
+      transition: border-color 200ms ease, background 200ms ease;
+      background: #fff; display: flex; align-items: center; gap: 14px;
+      position: relative;
+    }
+    .more-pay-item:hover { border-color: var(--primary-200); }
+    .more-pay-item.selected { border-color: var(--primary-main); background: var(--primary-25); }
+    .more-pay-item .pay-info { flex: 1; }
+    .more-pay-item .pay-label { font-size: 14px; font-weight: 500; color: var(--text-primary); display: block; }
+    .more-pay-item .pay-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; display: block; }
+    .more-pay-item .pay-badge {
+      font-size: 11px; font-weight: 500; color: var(--text-secondary);
+      border: 1px solid var(--grey-300); border-radius: var(--radius-chip);
+      padding: 2px 10px; white-space: nowrap;
+    }
+    .more-pay-item .pay-check {
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 2px solid var(--grey-400); display: flex;
+      align-items: center; justify-content: center; transition: all 150ms; flex-shrink: 0;
+    }
+    .more-pay-item.selected .pay-check {
+      border-color: var(--primary-main); background: var(--primary-main); color: #fff;
+    }
+    .more-pay-item.selected .pay-check::after { content: '\2713'; font-size: 12px; font-weight: 700; }
+
+    /* ===== REVIEW SECTIONS ===== */
+    .review-section { border: 1px solid var(--grey-300); border-radius: var(--radius-card); margin-bottom: 16px; overflow: hidden; }
+    .review-section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; background: var(--grey-50); border-bottom: 1px solid var(--grey-200);
+    }
+    .review-section-header h3 { font-size: 14px; font-weight: 500; letter-spacing: 0.1px; }
+    .review-section-header .edit-link {
+      color: var(--primary-main); font-size: 13px; cursor: pointer;
+      text-transform: uppercase; letter-spacing: 0.46px; font-weight: 500;
+      background: none; border: none; font-family: inherit;
+    }
+    .review-section-body { padding: 16px; }
+    .review-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 14px; line-height: 1.43; }
+    .review-row .label { color: var(--text-secondary); }
+    .review-row .value { font-weight: 500; text-align: right; max-width: 55%; }
+
+    /* ===== CONFIRMATION ===== */
+    .confirmation-box { text-align: center; padding: 40px 24px; }
+    .confirmation-box .check-icon {
+      width: 64px; height: 64px; background: rgba(46,125,50,.1);
+      border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; margin: 0 auto 20px;
+    }
+    .confirmation-box .check-icon svg { width: 32px; height: 32px; color: var(--success); }
+    .confirmation-box h2 { font-size: 24px; font-weight: 400; margin-bottom: 8px; }
+    .confirmation-box .ref-number {
+      background: var(--primary-25); display: inline-block;
+      padding: 8px 20px; border-radius: var(--radius-input);
+      font-weight: 500; font-size: 16px; margin: 12px 0;
+      letter-spacing: 1px; color: var(--primary-main);
+    }
+    .timeline {
+      text-align: left; max-width: 400px; margin: 24px auto 0;
+    }
+    .timeline-item {
+      display: flex; gap: 12px; padding-bottom: 20px;
+      position: relative;
+    }
+    .timeline-item:not(:last-child)::after {
+      content: ''; position: absolute; left: 11px; top: 28px;
+      bottom: 0; width: 2px; background: var(--grey-300);
+    }
+    .timeline-dot {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--primary-25); display: flex;
+      align-items: center; justify-content: center; flex-shrink: 0;
+      font-size: 12px; font-weight: 500; color: var(--primary-main);
+    }
+    .timeline-content h4 { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+    .timeline-content p { font-size: 12px; color: var(--text-secondary); letter-spacing: 0.4px; }
+
+    /* ===== NOTICES ===== */
+    .notice {
+      display: flex; gap: 12px; padding: 12px 16px;
+      border-radius: var(--radius-input); font-size: 14px;
+      line-height: 1.43; letter-spacing: 0.17px; margin-bottom: 16px;
+    }
+    .notice-info { background: #E3F2FD; color: var(--info); }
+    .notice-warning { background: #FFF3E0; color: var(--warning); }
+    .notice-error { background: rgba(211,47,47,.06); color: var(--error); border: 1px solid rgba(211,47,47,.2); }
+    .notice-success { background: rgba(46,125,50,.08); color: var(--success); border: 1px solid var(--success); }
+    .notice svg { width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px; }
+    .notice span { color: var(--text-primary); }
+
+    /* ===== STICKY BOTTOM NAV ===== */
+    .sticky-nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: #fff; border-top: 1px solid var(--grey-300);
+      padding: 12px 180px; display: none; align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 -2px 8px rgba(0,0,0,.08); z-index: 90;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .sticky-nav-bar.visible { display: flex; }
+    .sticky-nav-bar .nav-left { display: flex; gap: 12px; align-items: center; position: relative; }
+    .sticky-nav-bar .nav-right { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+
+    /* Kebab menu — hidden on desktop, shown on mobile */
+    .kebab-menu-btn {
+      display: none;
+      background: none; border: none; cursor: pointer;
+      padding: 8px; min-width: auto; border-radius: 50%;
+    }
+    .kebab-menu-btn:hover { background: var(--grey-100); }
+    .kebab-dropdown {
+      display: none; position: absolute; bottom: 100%; left: 0;
+      background: #fff; border: 1px solid var(--grey-300);
+      border-radius: 8px; box-shadow: 0 -4px 12px rgba(0,0,0,.12);
+      min-width: 140px; z-index: 100; margin-bottom: 8px;
+      overflow: hidden;
+    }
+    .kebab-dropdown.open { display: block; }
+    .kebab-dropdown-item {
+      display: block; width: 100%; padding: 12px 16px;
+      background: none; border: none; text-align: left;
+      font-size: 14px; color: var(--text-primary); cursor: pointer;
+      font-family: 'Roboto', sans-serif;
+    }
+    .kebab-dropdown-item:hover { background: var(--grey-100); }
+    /* Cancel text — shown on desktop, hidden on mobile */
+    .cancel-text-btn { display: inline-flex; }
+
+    /* ===== INSTRUCTION ALERT ===== */
+    .instruction-alert {
+      display: flex; gap: 0; align-items: flex-start;
+      background: var(--primary-25); border-radius: var(--radius-input);
+      padding: 6px 16px; margin-bottom: 24px; color: #275798;
+    }
+    .instruction-alert-icon { padding: 7px 12px 7px 0; flex-shrink: 0; }
+    .instruction-alert-content { flex: 1; min-width: 0; }
+    .instruction-alert-title {
+      display: block; width: 100%; background: none; border: none;
+      font-family: inherit; font-size: 16px; font-weight: 500;
+      color: #275798; text-align: left; cursor: pointer;
+      padding: 7px 0 4px; letter-spacing: 0.15px; line-height: 1.5;
+    }
+    .instruction-alert-body {
+      font-size: 14px; line-height: 1.43; letter-spacing: 0.17px;
+      color: #275798; overflow: hidden;
+      max-height: 300px; transition: max-height 250ms ease, padding 250ms ease;
+      padding-bottom: 8px;
+    }
+    .instruction-alert-body.collapsed { max-height: 0; padding-bottom: 0; }
+    .instruction-alert-toggle {
+      background: none; border: none; cursor: pointer;
+      padding: 4px; margin-top: 4px; flex-shrink: 0;
+      color: #275798; border-radius: 50%;
+    }
+    .instruction-alert-toggle:hover { background: rgba(39,87,152,.08); }
+    .instruction-alert-toggle svg { transition: transform 200ms ease; }
+    .instruction-alert-toggle.flipped svg { transform: rotate(180deg); }
+
+    /* ===== FOOTER ===== */
+    .site-footer {
+      background: var(--primary-800); border-top: 4px solid var(--primary-main);
+      padding: 24px; text-align: center;
+    }
+    .site-footer p { font-size: 14px; line-height: 24px; letter-spacing: 0.07px; color: #fff; }
+    .site-footer a { color: #fff; text-decoration: none; }
+    .site-footer a:hover { text-decoration: underline; }
+
+    /* ===== HIDDEN ===== */
+    .hidden { display: none !important; }
+
+    /* ===== HAMBURGER ===== */
+    .hamburger-btn {
+      display: none; background: none; border: none; color: #fff;
+      cursor: pointer; padding: 8px; border-radius: var(--radius-nav);
+      transition: background 150ms; flex-shrink: 0;
+    }
+    .hamburger-btn:hover { background: rgba(255,255,255,.1); }
+    .hamburger-btn svg { width: 24px; height: 24px; }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+      padding: 12px 24px; border-radius: 8px; color: #fff;
+      font-size: 14px; font-weight: 500; z-index: 300;
+      box-shadow: var(--shadow-toast); opacity: 0; transition: opacity 250ms ease;
+    }
+    .toast.show { opacity: 1; }
+    .toast-success { background: var(--success); }
+    .toast-error { background: var(--error); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .page-wrapper { margin: 0 24px; }
+      .page-layout { grid-template-columns: 1fr; }
+      .summary-sidebar { display: none; }
+      .mobile-summary-toggle { display: none; }
+      .summary-sidebar {
+        display: block; position: static; margin-bottom: 16px; order: 99;
+      }
+      .sticky-nav-bar { padding: 12px 24px; }
+    }
+
+    @media (max-width: 640px) {
+      /* Header — Figma mobile: hamburger, logo, action icons, avatar */
+      .site-header { padding: 0 0; height: auto; min-height: 48px; }
+      .header-left { gap: 8px; flex: 1; min-width: 0; }
+      .header-divider { display: none; }
+      .header-nav { display: none; }
+      .hamburger-btn { display: flex; align-items: center; justify-content: center; }
+      .header-right { gap: 0; }
+      .font-toggle { display: none; }
+      .header-search { display: none; }
+      .header-bell { padding: 8px; }
+      .header-bell svg { width: 24px; height: 24px; }
+      .header-avatar { width: 32px; height: 32px; font-size: 12px; }
+
+      /* Page layout — Figma: content padded 16px inside scrollable area */
+      .page-wrapper { margin: 0; padding: 8px 16px 88px; }
+      .page-layout { gap: 16px; }
+
+      /* Page heading — Figma: 14px in title bar */
+      .page-heading { font-size: 14px; font-weight: 400; line-height: 1.43; letter-spacing: 0.17px; }
+
+      /* FAQ/Help — icon only on mobile */
+      .heading-action-label { display: none; }
+      .heading-action-btn {
+        padding: 6px !important; min-width: auto !important; border-radius: 50% !important;
+        width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
+      }
+      .heading-action-btn svg { width: 20px; height: 20px; }
+
+      /* Stepper — Figma: 24px circles, no labels, wider connector spacing */
+      .stepper { gap: 0; margin-bottom: 0; padding: 8px 0 0; }
+      .step-item { min-width: 0; flex: 0 0 auto; }
+      .step-item .step-label { display: none; }
+      .step-item .step-num { width: 24px; height: 24px; font-size: 12px; }
+      .step-connector { flex: 1; margin: 12px 4px 0; min-width: 16px; height: 2px; }
+
+      /* Summary — always visible at bottom on mobile */
+      .mobile-summary-toggle { display: none !important; }
+      .summary-sidebar {
+        display: block !important; position: static !important;
+        margin-bottom: 16px; order: 99;
+      }
+
+      /* Cards — Figma: 16px content padding */
+      .card { padding: 16px; margin-bottom: 16px; }
+      .card h2 { font-size: 18px; font-weight: 500; }
+      .card .subtitle { font-size: 14px; margin-bottom: 16px; }
+
+      /* Forms — Figma: label 14px, input 16px, rounded 8px */
+      .form-group { margin-bottom: 16px; }
+      .form-group label { font-size: 14px; }
+      .form-row { grid-template-columns: 1fr; gap: 0; }
+      input[type="text"], input[type="number"], input[type="date"],
+      input[type="time"], input[type="email"], input[type="tel"],
+      select, textarea { font-size: 16px; padding: 8px 12px; border-radius: 8px; }
+      select { padding-right: 36px; }
+
+      /* Address toggle */
+      .address-mode-toggle { flex-direction: column; }
+      .address-mode-option + .address-mode-option { border-left: none; border-top: 1px solid var(--grey-300); }
+      .address-mode-option { padding: 12px 14px; font-size: 14px; }
+      .address-mode-cards { flex-direction: column; padding: 0; gap: 12px; }
+      .address-mode-card { font-size: 16px; padding: 12px; border-radius: 8px; }
+
+      /* Permit mode */
+      .permit-mode-toggle { flex-direction: column; padding: 0; gap: 12px; }
+      .permit-mode-option { padding: 12px; border-radius: 8px; }
+      .permit-mode-icon { width: 36px; height: 36px; }
+      .permit-mode-label { font-size: 16px; }
+      .permit-mode-desc { font-size: 14px; }
+
+      /* Town+Street — single column on mobile */
+      .street-town-row { grid-template-columns: 1fr !important; gap: 12px !important; }
+      #town-select, #street-select { font-size: 16px; }
+
+      /* Bay rows — 2-row mobile: Row 1 Bay Type | Row 2 Spaces+Close */
+      .bay-row-entry {
+        padding: 12px;
+        grid-template-columns: 1fr auto;
+        grid-template-rows: auto auto;
+        gap: 8px;
+      }
+      .bay-row-entry > .form-group:first-child { grid-column: 1 / -1; grid-row: 1; }
+      .bay-row-entry > .form-group:nth-child(2) { grid-column: 1; grid-row: 2; }
+      .bay-row-entry .bay-row-remove {
+        grid-column: 2; grid-row: 2;
+        align-self: end; margin-bottom: 2px;
+      }
+      .bay-row-entry .bay-row-remove::before { display: none; }
+      .bay-table th, .bay-table td { padding: 6px 8px; font-size: 13px; }
+      .bay-table th:nth-child(4), .bay-table td:nth-child(4) { padding: 6px 4px; }
+
+      /* Duration pricing table */
+      .pricing-duration-table thead th, .pricing-duration-table tbody td { padding: 10px 10px; font-size: 13px; }
+
+      /* Date-time row — keep inline but shrink time select */
+      .date-time-row select { max-width: 100px; font-size: 14px; }
+
+      /* Pricing card */
+      .price-card { padding: 16px; }
+      .price-line { font-size: 14px; }
+      .price-line.total { font-size: 16px; }
+
+      /* Payment options — single column */
+      .payment-options { grid-template-columns: 1fr; gap: 10px; }
+      .payment-option { padding: 12px 16px; }
+      .payment-option .pay-icon { width: 36px; height: 36px; }
+      .payment-option .pay-label { font-size: 14px; }
+      .payment-option .pay-desc { font-size: 12px; }
+      .payment-option .pay-amount { font-size: 14px; }
+
+      /* Vehicle chips */
+      .vehicle-chips { padding: 6px 10px; min-height: 40px; }
+      .vehicle-chip { font-size: 12px; padding: 2px 8px 2px 10px; }
+
+      /* Notices — Figma: 16px px, 6px py */
+      .notice { padding: 6px 16px; font-size: 14px; gap: 12px; border-radius: 8px; }
+      .notice svg { width: 22px; height: 22px; }
+      .notice-warning span { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .notice-warning select { width: 100%; font-size: 14px; }
+
+      /* Sticky nav — Figma: 72px, 16px padding, kebab on mobile */
+      .sticky-nav-bar { padding: 12px 16px; min-height: 72px; height: auto; }
+      .sticky-nav-bar .btn { padding: 8px 16px; font-size: 14px; }
+      .kebab-menu-btn { display: inline-flex !important; }
+      .cancel-text-btn { display: none !important; }
+
+      /* Footer */
+      .site-footer { padding: 24px 16px; }
+      .site-footer p { font-size: 14px; }
+
+      /* Help panel — full width on mobile */
+      .help-panel { width: 100%; max-width: 100vw; right: -100%; }
+      .help-panel.open { right: 0; }
+
+      /* Hero (if ever shown) */
+      .hero { padding: 24px 16px; }
+      .hero h1 { font-size: 20px; }
+      .hero p { font-size: 14px; }
+
+      /* Confirmation */
+      .confirmation-box { padding: 24px 16px; }
+      .confirmation-box h2 { font-size: 20px; }
+      .confirmation-box .ref-number { font-size: 14px; padding: 6px 16px; }
+
+      /* Summary sidebar when toggled open on mobile */
+      .summary-card { padding: 16px; }
+      .summary-card h3 { font-size: 20px; font-weight: 500; margin-bottom: 12px; }
+      .summary-row { font-size: 14px; }
+      .summary-total { font-size: 16px; }
+      .summary-total .s-value { font-size: 20px; }
+
+      /* T&C modal */
+      #tc-modal > div:first-child { width: 95%; max-height: 85vh; }
+
+      /* Same-street checkbox */
+      .manual-check-label { font-size: 14px; }
+
+      /* Bay heading row */
+      [style*="justify-content:space-between"][style*="margin-top:8px"] {
+        flex-wrap: wrap;
+      }
+
+      /* Demo pricing rule switcher */
+      .notice-warning span { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .notice-warning select { width: 100%; font-size: 14px; }
+
+      /* More payment items */
+      .more-pay-item { padding: 12px 14px; gap: 10px; }
+      .more-pay-item .pay-label { font-size: 13px; }
+      .more-pay-item .pay-desc { font-size: 11px; }
+
+      /* Review sections */
+      .review-section-body { padding: 12px; }
+      .review-row { flex-direction: column; gap: 2px; }
+      .review-row .value { text-align: left; max-width: 100%; }
+
+      /* Instruction alert */
+      .instruction-alert { padding: 6px 16px; border-radius: 8px; }
+      .instruction-alert-title { font-size: 16px; font-weight: 500; }
+      .instruction-alert-body { font-size: 14px; }
+
+      /* Global overflow prevention */
+      body { overflow-x: hidden; }
+    }
+
+    @media (max-width: 400px) {
+      /* Header — Figma: hamburger + logo + icons + avatar, py:8px */
+      .site-header { padding: 0; height: auto; min-height: 48px; }
+      .header-left { gap: 8px; flex: 1; min-width: 0; }
+      .site-header .logo-icon { width: 32px; height: 32px; font-size: 12px; }
+      .font-toggle { display: none; }
+      .header-bell { padding: 8px; }
+      .header-bell svg { width: 24px; height: 24px; }
+      .header-avatar { width: 32px; height: 32px; font-size: 12px; }
+      .header-right { gap: 0; }
+      .header-search { display: none; }
+
+      /* Page layout — Figma: 16px horizontal padding, 8px top, 16px bottom */
+      .page-wrapper { margin: 0; padding: 8px 16px 88px; }
+      .page-layout { gap: 16px; padding: 0; }
+
+      /* Page heading — Figma: 14px body2 in title bar */
+      .page-heading { font-size: 14px; font-weight: 400; line-height: 1.43; letter-spacing: 0.17px; }
+
+      /* FAQ/Help — icon only on small mobile */
+      .heading-action-label { display: none; }
+      .heading-action-btn {
+        padding: 6px !important; min-width: auto !important; border-radius: 50% !important;
+        width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
+      }
+      .heading-action-btn svg { width: 20px; height: 20px; }
+
+      /* Stepper — Figma: 24px circles, NO labels, wider connector spacing */
+      .stepper {
+        gap: 0; margin-bottom: 0; padding: 8px 0 16px;
+        align-items: center;
+      }
+      .step-item { min-width: 0; flex: 0 0 auto; gap: 0; flex-direction: column; align-items: center; }
+      .step-item .step-label { display: none; }
+      .step-item .step-num {
+        width: 24px; height: 24px; font-size: 12px;
+        border-radius: 100px; min-width: 24px; min-height: 24px;
+      }
+      .step-connector {
+        flex: 1; margin: 4px 4px 0; min-width: 16px; height: 2px;
+      }
+
+      /* Summary — always visible at bottom on small mobile */
+      .mobile-summary-toggle { display: none !important; }
+      .summary-sidebar {
+        display: block !important; position: static !important;
+        margin-bottom: 16px; order: 99;
+      }
+
+      /* Section headings — Figma: 18px Medium */
+      .card h2 { font-size: 18px; font-weight: 500; line-height: 1.6; }
+      .card .subtitle { font-size: 14px; margin-bottom: 16px; line-height: 1.43; }
+
+      /* Cards — Figma: content inside 16px padded area */
+      .card { padding: 16px; margin-bottom: 16px; }
+
+      /* Forms — Figma: label 14px, inputs 16px, 8px padding around each field */
+      .form-group { margin-bottom: 16px; }
+      .form-group label { font-size: 14px; margin-bottom: 6px; line-height: 1; letter-spacing: 0.15px; }
+      .form-group .hint { font-size: 12px; line-height: 1.66; letter-spacing: 0.4px; }
+      input[type="text"], input[type="number"], input[type="date"],
+      input[type="time"], input[type="email"], input[type="tel"],
+      select, textarea {
+        font-size: 16px; padding: 8px 12px; line-height: 24px;
+        letter-spacing: 0.15px; border-radius: 8px;
+      }
+      select { padding-right: 36px; background-position: right 12px center; }
+      .form-row { grid-template-columns: 1fr !important; gap: 0 !important; }
+
+      /* Buttons — Figma: 14px Medium uppercase, px:16px py:8px, min-w:100px */
+      .btn {
+        font-size: 14px; padding: 8px 16px; letter-spacing: 0.4px;
+        min-width: 100px; border-radius: 8px;
+      }
+      .btn-primary { padding: 8px 16px; font-size: 14px; }
+      .btn-secondary { padding: 8px 16px; font-size: 14px; }
+      .btn-sm { font-size: 13px; padding: 4px 10px; min-width: auto; }
+      .btn-text { min-width: auto; }
+
+      /* Sticky nav bar — Figma: 72px, 16px padding, kebab on mobile */
+      .sticky-nav-bar {
+        padding: 12px 16px; min-height: 72px; height: auto;
+        align-items: center; justify-content: space-between;
+      }
+      .sticky-nav-bar .btn {
+        padding: 8px 16px; font-size: 14px; min-width: auto;
+      }
+      .sticky-nav-bar .nav-left,
+      .sticky-nav-bar .nav-right { gap: 8px; }
+      .kebab-menu-btn { display: inline-flex !important; }
+      .cancel-text-btn { display: none !important; }
+      .sticky-nav-bar .btn-secondary { min-width: 80px; }
+      .sticky-nav-bar .btn-primary { min-width: 0; white-space: nowrap; }
+
+      /* Pricing card — Figma: 16px padding */
+      .price-card { padding: 16px; }
+      .price-line { font-size: 14px; }
+      .price-line .p-label { min-width: 0; }
+      .price-line.total { font-size: 16px; }
+
+      /* Payment options */
+      .payment-option { padding: 12px 16px; }
+      .payment-option .pay-icon { width: 36px; height: 36px; }
+      .payment-option .pay-label { font-size: 14px; }
+      .payment-option .pay-desc { font-size: 12px; }
+      .payment-option .pay-amount { font-size: 14px; }
+
+      /* Vehicle chips */
+      .vehicle-chips { padding: 6px 10px; min-height: 40px; gap: 6px; }
+      .vehicle-chip { font-size: 12px; padding: 2px 8px 2px 10px; }
+
+      /* Vehicle dropdown */
+      .vehicle-dropdown { max-height: 180px; }
+      .vehicle-dropdown-item { padding: 10px 12px; font-size: 14px; }
+      .vehicle-dropdown-item .vd-badge { font-size: 11px; padding: 1px 6px; }
+
+      /* Notices — Figma: 16px px, 6px py, rounded 8px */
+      .notice { padding: 6px 16px; font-size: 14px; gap: 12px; border-radius: 8px; }
+      .notice svg { width: 22px; height: 22px; }
+      .notice-warning span { flex-direction: column; align-items: stretch !important; gap: 8px !important; }
+      .notice-warning select { width: 100%; font-size: 14px; padding: 8px 12px; }
+
+      /* Bay selection heading */
+      [style*="justify-content:space-between"][style*="margin-top:8px"] {
+        flex-wrap: wrap; gap: 8px;
+      }
+
+      /* Bay rows */
+      .bay-row-entry { padding: 12px; }
+      .bay-row-price { font-size: 14px !important; }
+
+      /* Duration pricing table */
+      .pricing-duration-table thead th, .pricing-duration-table tbody td { padding: 8px 8px; font-size: 12px; }
+
+      /* Date-time row — stack vertically at 360px */
+      .date-time-row { grid-template-columns: 1fr; gap: 8px; }
+      .date-time-row select { max-width: 100%; }
+
+      /* Summary card — Figma: border #dee8f7, rounded 8px, shadow, h3:20px */
+      .summary-card {
+        padding: 16px; border-radius: 8px;
+        border: 1px solid var(--primary-25);
+        box-shadow: 0 1px 21.4px rgba(81,85,110,.12);
+      }
+      .summary-card h3 { font-size: 20px; font-weight: 500; margin-bottom: 12px; }
+      .summary-row { font-size: 14px; }
+      .summary-total { font-size: 16px; }
+      .summary-total .s-value { font-size: 20px; }
+      .mobile-summary-toggle { display: none !important; }
+
+      /* Footer — Figma: py:24px, 14px text */
+      .site-footer { padding: 24px 16px; }
+      .site-footer p { font-size: 14px; }
+
+      /* Help panel — full width */
+      #help-panel { width: 100% !important; max-width: 100vw; }
+
+      /* Confirmation */
+      .confirmation-box { padding: 24px 16px; }
+      .confirmation-box h2 { font-size: 20px; }
+      .confirmation-box .ref-number { font-size: 14px; padding: 6px 16px; }
+
+      /* T&C modal */
+      #tc-modal > div:first-child { width: 95%; max-height: 85vh; padding: 16px; }
+
+      /* Instruction alert — Figma: px:16px py:6px, rounded 8px */
+      .instruction-alert { padding: 6px 16px; border-radius: 8px; }
+      .instruction-alert-title { font-size: 16px; font-weight: 500; }
+      .instruction-alert-body { font-size: 14px; }
+      .instruction-docs-grid { grid-template-columns: 1fr; gap: 12px; }
+
+      /* Permit mode cards — Figma: 12px padding, 8px rounded, 12px gap, stacked */
+      .permit-mode-toggle { flex-direction: column; padding: 0; gap: 12px; }
+      .permit-mode-option { padding: 12px; border-radius: 8px; }
+      .permit-mode-icon { width: 36px; height: 36px; }
+      .permit-mode-label { font-size: 16px; }
+      .permit-mode-desc { font-size: 14px; }
+
+      /* Address mode cards — stacked */
+      .address-mode-cards { flex-direction: column; padding: 0; gap: 12px; }
+      .address-mode-card { font-size: 16px; padding: 12px; border-radius: 8px; }
+
+      /* Address mode toggle (if still used) */
+      .address-mode-toggle { flex-direction: column; }
+      .address-mode-option { padding: 12px 14px; font-size: 14px; }
+
+      /* Same-street checkbox */
+      .manual-check-label { font-size: 14px; }
+
+      /* FAQ */
+      .faq-question { font-size: 14px; padding: 12px 16px; }
+      .faq-answer { padding: 0 16px 16px; font-size: 14px; }
+
+      /* Review sections */
+      .review-section-body { padding: 12px; }
+      .review-row { flex-direction: column; gap: 2px; font-size: 14px; }
+
+      /* Global overflow prevention */
+      body { overflow-x: hidden; }
+      select { text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Skip Navigation -->
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<!-- ===== HEADER ===== -->
+<header class="site-header" role="banner">
+  <div class="header-left">
+    <button class="hamburger-btn" aria-label="Open navigation menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+    <div class="logo">
+      <div class="logo-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" width="20" height="20"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor" opacity=".9"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+      </div>
+    </div>
+    <div class="header-divider"></div>
+    <nav class="header-nav" aria-label="Main navigation">
+      <a href="#" class="active"><span class="nav-text">My Applications</span></a>
+      <a href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        <span class="nav-text">Vehicles</span>
+      </a>
+      <a href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+        <span class="nav-text">Documents</span>
+      </a>
+      <a href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+        <span class="nav-text">Payment</span>
+      </a>
+    </nav>
+  </div>
+  <div class="header-right">
+    <div class="header-search" aria-label="Search applications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <span>Search Application</span>
+    </div>
+    <div class="font-toggle" role="group" aria-label="Adjust text size">
+      <button onclick="setFontSize('normal')" class="active" id="font-normal">A</button>
+      <button onclick="setFontSize('large')" id="font-large">A+</button>
+      <button onclick="setFontSize('xl')" id="font-xl">A++</button>
+    </div>
+    <button class="header-bell" aria-label="Notifications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+    </button>
+    <div class="header-avatar" aria-label="User account" style="background:rgba(255,255,255,.9); color:var(--text-primary); font-size:12px; letter-spacing:1.5px;">BO</div>
+  </div>
+</header>
+
+<!-- ===== MAIN ===== -->
+<main id="main-content">
+  <div class="page-wrapper">
+    <section id="wizard-section">
+
+      <!-- Page heading -->
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0; flex-wrap:nowrap; gap:8px;">
+        <h1 class="page-heading" style="margin-bottom:0; flex:1; min-width:0;">Dispensation Application</h1>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <button class="btn btn-secondary btn-sm" onclick="openHelpPanel()" title="Help">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <span>Help</span>
+          </button>
+        </div>
+      </div>
+      <hr style="border:none; border-top:1px solid var(--grey-300); margin:16px 0 16px;">
+
+      <div class="page-layout">
+        <div class="wizard-main">
+
+          <!-- Stepper (5 tabs: Address, Vehicles, Documents, Bay Details, Checkout) -->
+          <nav class="stepper" aria-label="Application progress">
+            <div class="step-item active" id="step-ind-1">
+              <span class="step-num"><span>1</span></span>
+              <span class="step-label">Address</span>
+            </div>
+            <div class="step-connector" id="conn-1"></div>
+            <div class="step-item" id="step-ind-2">
+              <span class="step-num"><span>2</span></span>
+              <span class="step-label">Vehicles</span>
+            </div>
+            <div class="step-connector" id="conn-2"></div>
+            <div class="step-item" id="step-ind-3">
+              <span class="step-num"><span>3</span></span>
+              <span class="step-label">Documents</span>
+            </div>
+            <div class="step-connector" id="conn-3"></div>
+            <div class="step-item" id="step-ind-4">
+              <span class="step-num"><span>4</span></span>
+              <span class="step-label">Bay Details</span>
+            </div>
+            <div class="step-connector" id="conn-4"></div>
+            <div class="step-item" id="step-ind-5">
+              <span class="step-num"><span>5</span></span>
+              <span class="step-label">Checkout</span>
+            </div>
+          </nav>
+
+          <!-- Instruction Banner -->
+          <div class="instruction-alert" id="instruction-alert">
+            <div class="instruction-alert-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            </div>
+            <div class="instruction-alert-content">
+              <button class="instruction-alert-title" onclick="toggleInstructionAlert()" aria-expanded="true">
+                Dispensation Application — Instructions
+              </button>
+              <div class="instruction-alert-body" id="instruction-alert-body">
+                <p style="margin-bottom:8px;">This is a <strong>non-zonal / car-park permit</strong> application. You must provide a <strong>correspondence address</strong> (not a zonal address).</p>
+                <p style="margin-bottom:8px;">You will need to specify the <strong>number of bays</strong> and a <strong>reason for the purchase</strong>, both of which are mandatory.</p>
+                <p>Ensure all bay details are accurate before proceeding to checkout.</p>
+              </div>
+            </div>
+            <button class="instruction-alert-toggle" onclick="toggleInstructionAlert()" aria-label="Toggle instruction details">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" id="instruction-chevron"><polyline points="18 15 12 9 6 15"/></svg>
+            </button>
+          </div>
+
+          <!-- ====== STEP 1: ADDRESS (Non-Zonal Correspondence) ====== -->
+          <div id="step-1" class="step-content">
+
+            <div class="card" style="border:none; box-shadow:none; padding:0;">
+
+              <!-- Permit Mode Selector (Figma: two card options) -->
+              <div style="margin-bottom:24px;">
+                <p style="font-size:16px; font-weight:400; color:var(--text-primary); margin-bottom:8px; letter-spacing:0.15px;">Select the Permit mode</p>
+                <div class="permit-mode-toggle" role="radiogroup" aria-label="Permit mode selection">
+                  <label class="permit-mode-option selected" id="mode-virtual" onclick="setPermitMode('virtual')">
+                    <div class="permit-mode-icon" style="background:var(--primary-100);">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary-main)" stroke-width="1.5" width="24" height="24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10A15.3 15.3 0 0112 2z"/></svg>
+                    </div>
+                    <div class="permit-mode-info">
+                      <span class="permit-mode-label">Virtual Permit</span>
+                      <span class="permit-mode-desc">Access permits online or through the app.</span>
+                    </div>
+                    <span class="permit-mode-check" id="virtual-check">
+                      <svg viewBox="0 0 24 24" fill="var(--primary-main)" width="20" height="20"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    </span>
+                  </label>
+                  <label class="permit-mode-option" id="mode-physical" onclick="setPermitMode('physical')">
+                    <div class="permit-mode-icon" style="background:var(--grey-200);">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="1.5" width="24" height="24"><path d="M22 8.5V6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v2.5"/><path d="M22 11.5V18c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2v-6.5"/><path d="M6 10h4v4H6z"/><path d="M14 10h4"/><path d="M14 14h4"/></svg>
+                    </div>
+                    <div class="permit-mode-info">
+                      <span class="permit-mode-label">Physical Permit</span>
+                      <span class="permit-mode-desc">Display the issued physical letter on the vehicle</span>
+                    </div>
+                    <span class="permit-mode-check" id="physical-check" style="display:none;">
+                      <svg viewBox="0 0 24 24" fill="var(--primary-main)" width="20" height="20"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Address Section Header -->
+              <p style="font-size:16px; font-weight:400; color:var(--text-primary); margin-bottom:8px; letter-spacing:0.15px;">Address section</p>
+
+              <!-- Non-zonal info notice -->
+              <div class="notice notice-info" style="margin-bottom:16px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                <span>Non-zonal permits do not use the system-configured address. Please provide a correspondence address below.</span>
+              </div>
+
+              <!-- Address Mode Toggle (Figma: card-style radio selectors) -->
+              <div class="address-mode-cards" role="radiogroup" aria-label="Address selection method">
+                <label class="address-mode-card selected" id="mode-saved">
+                  <input type="radio" name="address-mode" value="saved" checked onchange="setAddressMode('saved')" style="accent-color:var(--primary-main); width:18px; height:18px;" />
+                  <span style="font-size:16px; color:var(--text-primary); letter-spacing:0.15px;">Use a saved address</span>
+                </label>
+                <label class="address-mode-card" id="mode-find">
+                  <input type="radio" name="address-mode" value="find" onchange="setAddressMode('find')" style="accent-color:var(--primary-main); width:18px; height:18px;" />
+                  <span style="font-size:16px; color:var(--text-primary); letter-spacing:0.15px;">Find the address manually</span>
+                </label>
+              </div>
+
+              <!-- SAVED ADDRESS MODE -->
+              <div id="saved-address-panel">
+                <div class="form-group">
+                  <label for="saved-address-select">Saved address</label>
+                  <select id="saved-address-select" onchange="onAddressDropdownChange('saved')">
+                    <option value="">Select</option>
+                  </select>
+                  <div class="error-msg" id="address-error">Please select or enter a complete address to continue.</div>
+                </div>
+                <!-- Detail fields shown only after selection -->
+                <div class="address-detail-fields hidden" id="saved-detail-fields">
+                  <div class="form-group">
+                    <label for="addr-property-saved">Property Name / No</label>
+                    <input type="text" id="addr-property-saved" readonly style="background:var(--grey-50);" />
+                  </div>
+                  <div class="form-group">
+                    <label for="addr-street-saved">Street</label>
+                    <input type="text" id="addr-street-saved" readonly style="background:var(--grey-50);" />
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="addr-town-saved">Town</label>
+                      <input type="text" id="addr-town-saved" readonly style="background:var(--grey-50);" />
+                    </div>
+                    <div class="form-group">
+                      <label for="addr-postcode-saved">Postcode</label>
+                      <input type="text" id="addr-postcode-saved" readonly style="background:var(--grey-50);" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- FIND ADDRESS MODE -->
+              <div id="find-address-panel" class="hidden">
+                <div class="form-group">
+                  <label for="find-address-input">Search and select an address</label>
+                  <div class="address-search-wrapper">
+                    <input type="text" id="find-address-input" placeholder="Start typing a street name or postcode&hellip;"
+                           autocomplete="off" aria-expanded="false" aria-controls="find-address-results" />
+                    <div id="find-address-results" class="address-search-results" role="listbox"></div>
+                  </div>
+                </div>
+                <!-- Detail fields shown only after selection -->
+                <div class="address-detail-fields hidden" id="find-detail-fields">
+                  <div class="form-group">
+                    <label for="addr-property-find">Property Name / No</label>
+                    <input type="text" id="addr-property-find" readonly style="background:var(--grey-50);" />
+                  </div>
+                  <div class="form-group">
+                    <label for="addr-street-find">Street</label>
+                    <input type="text" id="addr-street-find" readonly style="background:var(--grey-50);" />
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="addr-town-find">Town</label>
+                      <input type="text" id="addr-town-find" readonly style="background:var(--grey-50);" />
+                    </div>
+                    <div class="form-group">
+                      <label for="addr-postcode-find">Postcode</label>
+                      <input type="text" id="addr-postcode-find" readonly style="background:var(--grey-50);" />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Manual entry checkbox (find mode only) -->
+                <label class="manual-check-label">
+                  <input type="checkbox" id="manual-entry-check" onchange="toggleManualEntry()" />
+                  Can't find the address? Enter manually
+                </label>
+                <!-- Manual entry free-text fields -->
+                <div class="address-detail-fields hidden" id="manual-entry-fields" style="margin-top:16px;">
+                  <div class="form-group">
+                    <label for="addr-property-manual">Property Name / No</label>
+                    <input type="text" id="addr-property-manual" placeholder="e.g., 17" />
+                  </div>
+                  <div class="form-group">
+                    <label for="addr-street-manual">Street</label>
+                    <input type="text" id="addr-street-manual" placeholder="e.g., Abbey Hill" />
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="addr-town-manual">Town</label>
+                      <input type="text" id="addr-town-manual" placeholder="e.g., Kenilworth" />
+                    </div>
+                    <div class="form-group">
+                      <label for="addr-postcode-manual">Postcode</label>
+                      <input type="text" id="addr-postcode-manual" placeholder="e.g., CV8 1LU" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Business Name -->
+              <div class="form-group" style="margin-top:16px;">
+                <label for="business-name">Business Name</label>
+                <input type="text" id="business-name" placeholder="Enter your Business name" />
+              </div>
+
+              <!-- Save address checkbox (hidden when using saved address) -->
+              <label class="manual-check-label" style="margin-top:8px; display:none;" id="save-address-label">
+                <input type="checkbox" id="save-address-check" />
+                Save this address for future applications
+              </label>
+
+              <!-- Same street checkbox — auto-populate bay street from address -->
+              <label class="manual-check-label" style="margin-top:16px; padding:12px 16px; background:var(--primary-25); border-radius:var(--radius-input); border:1px solid var(--primary-100); display:flex; align-items:center; gap:8px; cursor:pointer;">
+                <input type="checkbox" id="same-street-check" onchange="onSameStreetChange()" style="accent-color:var(--primary-main); width:18px; height:18px;" />
+                <span style="font-size:14px; font-weight:500;">Use the same street as the correspondence address for the dispensation</span>
+              </label>
+
+            </div>
+
+          </div>
+
+          <!-- ====== STEP 2: VEHICLES (Skipped in navigation) ====== -->
+          <div id="step-2" class="step-content hidden">
+            <div class="card">
+              <h2>Vehicle Details</h2>
+              <p class="subtitle">Add vehicles associated with this dispensation permit application.</p>
+
+              <div class="notice notice-info" style="margin-top:0;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                <span>Maximum 4 vehicles are allowed in this application</span>
+              </div>
+
+              <!-- Vehicle Selection (input + dropdown combo) -->
+              <div class="form-group" style="position:relative;">
+                <label for="vehicle-input">Add vehicles <span style="color:var(--text-disabled);">(optional)</span></label>
+                <p class="hint">Select from saved vehicles or type a new VRM. Press Enter or comma to add.</p>
+                <div class="vehicle-chips" id="vehicle-chips-container">
+                  <input type="text" id="vehicle-input" autocomplete="off" placeholder="e.g., AB12 CDE" style="border:none; width:160px; padding:4px 0; flex:1; min-width:100px; box-shadow:none;" />
+                </div>
+                <div class="vehicle-dropdown" id="vehicle-dropdown"></div>
+                <div class="error-msg" id="vehicle-limit-error">Maximum vehicle limit reached. You cannot add more vehicles.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ====== STEP 3: DOCUMENTS (Skipped in navigation) ====== -->
+          <div id="step-3" class="step-content hidden">
+            <div class="card">
+              <h2>Supporting Documents</h2>
+              <p class="subtitle">Upload any supporting documents for your dispensation permit application.</p>
+
+              <div class="notice notice-info" style="margin-top:0;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                <span>Accepted formats: PDF, JPG, PNG. Maximum file size: 10 MB per file.</span>
+              </div>
+
+              <!-- Upload Zone -->
+              <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-upload-input').click()" ondragover="event.preventDefault(); this.classList.add('dragover');" ondragleave="this.classList.remove('dragover');" ondrop="handleDrop(event)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <p>Click to upload or drag and drop</p>
+                <p class="formats">PDF, JPG, PNG &bull; Max 10 MB per file</p>
+              </div>
+              <input type="file" id="file-upload-input" accept=".pdf,.jpg,.jpeg,.png" multiple style="display:none;" onchange="handleFileSelect(event)" />
+
+              <!-- Uploaded Files List -->
+              <div class="file-list" id="file-list"></div>
+            </div>
+          </div>
+
+          <!-- ====== STEP 4: BAY DETAILS + PURCHASE INPUTS ====== -->
+          <div id="step-4" class="step-content hidden">
+            <div class="card">
+              <h2>Bay Details &amp; Purchase Information</h2>
+              <p class="subtitle">Select duration, choose bay types, specify number of bays, and provide the reason for purchase.</p>
+
+              <!-- 1. Purchase Reason (MANDATORY) -->
+              <div class="form-group">
+                <label for="purchase-reason">Reason for Purchase <span style="color:var(--error);">*</span></label>
+                <select id="purchase-reason">
+                  <option value="">Select a reason</option>
+                  <option value="new-business">New business opening</option>
+                  <option value="construction">Construction / Building works</option>
+                  <option value="event-management">Event management</option>
+                  <option value="delivery-access">Delivery / Loading access</option>
+                  <option value="maintenance">Maintenance works</option>
+                  <option value="moving">Moving / Relocation</option>
+                  <option value="other">Other</option>
+                </select>
+                <div class="error-msg" id="purchase-reason-error">Please select a reason for the purchase.</div>
+              </div>
+
+              <div id="other-reason-group" class="form-group hidden">
+                <label for="other-reason-text">Specify other reason <span style="color:var(--error);">*</span></label>
+                <input type="text" id="other-reason-text" placeholder="Enter the reason for purchase" />
+                <div class="error-msg" id="other-reason-error">Please specify the reason.</div>
+              </div>
+
+              <!-- 2. Street Selection -->
+              <div class="form-group">
+                <label for="street-select">Street <span style="color:var(--error);">*</span></label>
+                <select id="street-select" onchange="onStreetChange()">
+                  <option value="">Select a street</option>
+                  <option value="High Street">High Street</option>
+                  <option value="Victoria Avenue">Victoria Avenue</option>
+                  <option value="London Road">London Road</option>
+                  <option value="Alexandra Street">Alexandra Street</option>
+                  <option value="Hamlet Court Road">Hamlet Court Road</option>
+                  <option value="Warrior Square">Warrior Square</option>
+                </select>
+                <div class="error-msg" id="street-error">Please select a street.</div>
+              </div>
+
+              <!-- 3. Bay Selection -->
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; margin-top:8px;">
+                <h3 style="font-size:16px; font-weight:500; letter-spacing:0.15px;">Bay Selection</h3>
+                <button class="btn btn-secondary btn-sm" onclick="addNewBayRow()">+ Add New Bay</button>
+              </div>
+
+              <div id="bay-rows-container">
+                <!-- Bay rows are added dynamically -->
+              </div>
+              <div class="error-msg" id="bay-error" style="margin-top:4px;">Please add at least one bay.</div>
+
+              <!-- Non-Zonal Purchase Limit Warning -->
+              <div class="notice notice-error hidden" id="purchase-limit-notice">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                <span><strong>You have exceeded the purchase limit for this application.</strong></span>
+              </div>
+
+              <!-- 4. Duration (Start / End Date & Time) -->
+              <div class="form-row" style="margin-bottom:20px; margin-top:20px;">
+                <div class="form-group">
+                  <label for="start-date" style="font-weight:500;">Start Date and time</label>
+                  <div class="date-time-row">
+                    <input type="date" id="start-date" value="2026-04-17" onchange="calculateEndDate()" />
+                    <select id="start-time" onchange="calculateEndDate()">
+                      <option value="05:30 AM">05:30 AM</option>
+                      <option value="06:00 AM">06:00 AM</option>
+                      <option value="06:30 AM">06:30 AM</option>
+                      <option value="07:00 AM">07:00 AM</option>
+                      <option value="07:30 AM">07:30 AM</option>
+                      <option value="08:00 AM">08:00 AM</option>
+                      <option value="08:30 AM">08:30 AM</option>
+                      <option value="09:00 AM">09:00 AM</option>
+                      <option value="09:30 AM">09:30 AM</option>
+                      <option value="10:00 AM">10:00 AM</option>
+                      <option value="10:30 AM">10:30 AM</option>
+                      <option value="11:00 AM">11:00 AM</option>
+                      <option value="11:30 AM">11:30 AM</option>
+                      <option value="12:00 PM" selected>12:00 PM</option>
+                      <option value="12:30 PM">12:30 PM</option>
+                      <option value="01:00 PM">01:00 PM</option>
+                      <option value="01:30 PM">01:30 PM</option>
+                      <option value="02:00 PM">02:00 PM</option>
+                      <option value="02:30 PM">02:30 PM</option>
+                      <option value="03:00 PM">03:00 PM</option>
+                      <option value="03:30 PM">03:30 PM</option>
+                      <option value="04:00 PM">04:00 PM</option>
+                      <option value="04:30 PM">04:30 PM</option>
+                      <option value="05:00 PM">05:00 PM</option>
+                      <option value="05:30 PM">05:30 PM</option>
+                      <option value="06:00 PM">06:00 PM</option>
+                      <option value="06:30 PM">06:30 PM</option>
+                      <option value="07:00 PM">07:00 PM</option>
+                      <option value="07:30 PM">07:30 PM</option>
+                      <option value="08:00 PM">08:00 PM</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="end-date" style="font-weight:500;">End Date and time</label>
+                  <div class="date-time-row">
+                    <input type="date" id="end-date" value="" readonly style="background:var(--grey-50);" />
+                    <select id="end-time" onchange="onEndTimeChange()">
+                      <option value="05:30 AM">05:30 AM</option>
+                      <option value="06:00 AM">06:00 AM</option>
+                      <option value="06:30 AM">06:30 AM</option>
+                      <option value="07:00 AM">07:00 AM</option>
+                      <option value="07:30 AM">07:30 AM</option>
+                      <option value="08:00 AM">08:00 AM</option>
+                      <option value="08:30 AM">08:30 AM</option>
+                      <option value="09:00 AM">09:00 AM</option>
+                      <option value="09:30 AM">09:30 AM</option>
+                      <option value="10:00 AM">10:00 AM</option>
+                      <option value="10:30 AM">10:30 AM</option>
+                      <option value="11:00 AM">11:00 AM</option>
+                      <option value="11:30 AM">11:30 AM</option>
+                      <option value="12:00 PM">12:00 PM</option>
+                      <option value="12:30 PM">12:30 PM</option>
+                      <option value="01:00 PM">01:00 PM</option>
+                      <option value="01:30 PM">01:30 PM</option>
+                      <option value="02:00 PM">02:00 PM</option>
+                      <option value="02:30 PM">02:30 PM</option>
+                      <option value="03:00 PM">03:00 PM</option>
+                      <option value="03:30 PM">03:30 PM</option>
+                      <option value="04:00 PM">04:00 PM</option>
+                      <option value="04:30 PM">04:30 PM</option>
+                      <option value="05:00 PM">05:00 PM</option>
+                      <option value="05:30 PM">05:30 PM</option>
+                      <option value="06:00 PM">06:00 PM</option>
+                      <option value="06:30 PM">06:30 PM</option>
+                      <option value="07:00 PM">07:00 PM</option>
+                      <option value="07:30 PM">07:30 PM</option>
+                      <option value="08:00 PM" selected>08:00 PM</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 5. Pricing Section (Duration-based) -->
+              <h3 style="font-size:16px; font-weight:500; letter-spacing:0.15px; margin-top:0; margin-bottom:12px;">Pricing Section</h3>
+              <div style="overflow-x:auto;">
+                <table class="pricing-duration-table" id="pricing-duration-table">
+                  <thead>
+                    <tr>
+                      <th>Duration</th>
+                      <th>Permit Price</th>
+                      <th>Diesel Surcharge</th>
+                      <th>Sub Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Populated by JS from config.durationPricing -->
+                  </tbody>
+                </table>
+              </div>
+              <div class="error-msg" id="duration-error" style="margin-top:4px;">Please select a duration.</div>
+
+              <!-- 6. Discount Section -->
+              <div class="discount-section">
+                <h3>Discount</h3>
+                <div class="discount-toggle-row">
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="blue-badge-toggle" onchange="onDiscountChange()" />
+                    <span class="slider"></span>
+                  </label>
+                  <div class="discount-toggle-info">
+                    <span class="toggle-title">Are you a Blue Badge holder?</span>
+                    <span class="toggle-desc">This text will be swapped out for some helpful info from the settings.</span>
+                  </div>
+                </div>
+                <div class="discount-toggle-row">
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="state-pension-toggle" onchange="onDiscountChange()" />
+                    <span class="slider"></span>
+                  </label>
+                  <div class="discount-toggle-info">
+                    <span class="toggle-title">Do you receive a state pension?</span>
+                    <span class="toggle-desc">This text will be swapped out for some helpful info from the settings.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="section-divider" style="margin:20px 0;"></div>
+
+              <!-- 7. Summary (Pricing Summary) -->
+              <div class="price-card" id="price-summary" style="margin-top:16px;">
+                <div class="price-line"><span class="p-label">Subtotal:</span><span class="p-value" id="ps-subtotal">&pound;0.00</span></div>
+                <div class="price-line" id="ps-discount-row" style="display:none;"><span class="p-label">Discount:</span><span class="p-value" id="ps-discount" style="color:var(--success);">-&pound;0.00</span></div>
+                <div class="price-line"><span class="p-label">Admin Fee:</span><span class="p-value" id="ps-admin">&pound;5.00</span></div>
+                <div class="price-line"><span class="p-label">VAT (20%):</span><span class="p-value" id="ps-vat">&pound;0.00</span></div>
+                <div class="price-line total"><span class="p-label">Total:</span><span class="p-value" id="ps-total">&pound;0.00</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ====== STEP 5: CHECKOUT (Review + Payment) ====== -->
+          <div id="step-5" class="step-content hidden">
+            <div class="card">
+              <h2>Checkout</h2>
+              <p class="subtitle">Review your application and complete purchase.</p>
+
+              <!-- Review Sections -->
+              <div class="review-section">
+                <div class="review-section-header">
+                  <h3>Correspondence Address</h3>
+                  <button class="edit-link" onclick="goToStep(1)">EDIT</button>
+                </div>
+                <div class="review-section-body" id="review-address">
+                  <div class="review-row"><span class="label">Address</span><span class="value" id="rev-address">&mdash;</span></div>
+                  <div class="review-row"><span class="label">Permit Mode</span><span class="value" id="rev-permit-mode">Virtual</span></div>
+                </div>
+              </div>
+
+              <div class="review-section">
+                <div class="review-section-header">
+                  <h3>Vehicles</h3>
+                </div>
+                <div class="review-section-body">
+                  <div class="review-row"><span class="label">Vehicles</span><span class="value" id="rev-vehicles">None</span></div>
+                </div>
+              </div>
+
+              <div class="review-section">
+                <div class="review-section-header">
+                  <h3>Documents</h3>
+                </div>
+                <div class="review-section-body">
+                  <div class="review-row"><span class="label">Uploaded Files</span><span class="value" id="rev-documents">None</span></div>
+                </div>
+              </div>
+
+              <div class="review-section">
+                <div class="review-section-header">
+                  <h3>Bay Details &amp; Purchase</h3>
+                  <button class="edit-link" onclick="goToStep(4)">EDIT</button>
+                </div>
+                <div class="review-section-body" id="review-bays">
+                  <div class="review-row"><span class="label">Street</span><span class="value" id="rev-street">&mdash;</span></div>
+                  <div class="review-row"><span class="label">Bays</span><span class="value" id="rev-bays">&mdash;</span></div>
+                  <div class="review-row"><span class="label">Duration</span><span class="value" id="rev-duration">&mdash;</span></div>
+                  <div class="review-row"><span class="label">Start Date &amp; Time</span><span class="value" id="rev-start">&mdash;</span></div>
+                  <div class="review-row"><span class="label">End Date &amp; Time</span><span class="value" id="rev-end">&mdash;</span></div>
+                  <div class="review-row"><span class="label">Discounts</span><span class="value" id="rev-discounts">None</span></div>
+                  <div class="review-row"><span class="label">Reason</span><span class="value" id="rev-reason">&mdash;</span></div>
+                </div>
+              </div>
+
+              <div class="review-section">
+                <div class="review-section-header">
+                  <h3>Price</h3>
+                  <button class="edit-link" onclick="goToStep(4)">EDIT</button>
+                </div>
+                <div class="review-section-body" id="review-price">
+                  <div class="review-row"><span class="label">Subtotal</span><span class="value" id="rev-subtotal">&pound;0.00</span></div>
+                  <div class="review-row" id="rev-discount-row" style="display:none;"><span class="label">Discount</span><span class="value" id="rev-discount" style="color:var(--success);">-&pound;0.00</span></div>
+                  <div class="review-row"><span class="label">Admin Fee</span><span class="value" id="rev-admin">&pound;5.00</span></div>
+                  <div class="review-row"><span class="label">VAT</span><span class="value" id="rev-vat">&pound;0.00</span></div>
+                  <div class="review-row" style="font-weight:600;"><span class="label" style="color:var(--text-primary);">Total</span><span class="value" style="color:var(--primary-main); font-size:18px;" id="rev-total">&pound;0.00</span></div>
+                </div>
+              </div>
+
+              <!-- Payment Method -->
+              <h3 style="font-size:16px; font-weight:500; margin:20px 0 12px;">Payment Method</h3>
+              <!-- Primary payment methods (2x2 grid) -->
+              <div class="payment-options" id="payment-options">
+                <div class="payment-option selected" onclick="selectPayment(this, 'card')" data-method="card" role="radio" aria-checked="true" tabindex="0">
+                  <span class="pay-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg></span>
+                  <span class="pay-info"><span class="pay-label">Credit / Debit Card</span><span class="pay-desc">Pay instantly using a card.</span></span>
+                  <span class="pay-check"></span>
+                </div>
+                <div class="payment-option" onclick="selectPayment(this, 'online-after')" data-method="online-after" role="radio" aria-checked="false" tabindex="0">
+                  <span class="pay-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg></span>
+                  <span class="pay-info"><span class="pay-label">Online After Approval</span><span class="pay-desc">Pay after your permit is approved.</span></span>
+                  <span class="pay-check"></span>
+                </div>
+                <div class="payment-option" onclick="selectPayment(this, 'wallet')" data-method="wallet" role="radio" aria-checked="false" tabindex="0">
+                  <span class="pay-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/><circle cx="18" cy="14" r="1"/></svg></span>
+                  <span class="pay-info"><span class="pay-label">Pay from Wallet</span><span class="pay-desc">Use your wallet balance (&pound;32.00).</span></span>
+                  <span class="pay-amount">&pound;32.00</span>
+                  <span class="pay-check"></span>
+                </div>
+                <div class="payment-option" onclick="selectPayment(this, 'more')" data-method="more" role="radio" aria-checked="false" tabindex="0">
+                  <span class="pay-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><circle cx="12" cy="12" r="10"/><circle cx="8" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="16" cy="12" r="1" fill="currentColor"/></svg></span>
+                  <span class="pay-info"><span class="pay-label">More Options</span><span class="pay-desc">Invoice, Direct Debit &amp; more.</span></span>
+                  <span class="pay-check"></span>
+                </div>
+              </div>
+
+              <!-- More payment options (expandable) -->
+              <div class="more-payment-list" id="more-payment-list">
+                <h4>More Payment Options</h4>
+                <div id="more-payment-items">
+                  <div class="more-pay-item" data-method="invoice" onclick="selectMorePayment(this, 'invoice')">
+                    <span class="pay-info"><span class="pay-label">Invoice</span><span class="pay-desc">Finance department receives the request.</span></span>
+                    <span class="pay-check"></span>
+                  </div>
+                  <div class="more-pay-item" data-method="direct-debit" onclick="selectMorePayment(this, 'direct-debit')">
+                    <span class="pay-info"><span class="pay-label">Direct Debit</span><span class="pay-desc">Set up recurring payment via your bank.</span></span>
+                    <span class="pay-badge">Recommended</span>
+                    <span class="pay-check"></span>
+                  </div>
+                  <div class="more-pay-item" data-method="bacs" onclick="selectMorePayment(this, 'bacs')">
+                    <span class="pay-info"><span class="pay-label">BACS Transfer</span><span class="pay-desc">Bank transfer — may take 3–5 working days.</span></span>
+                    <span class="pay-check"></span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card fields (shown only when Credit/Debit Card selected) -->
+              <div id="card-fields">
+                <div class="form-group"><label for="card-name">Name on card</label><input type="text" id="card-name" placeholder="J. Smith" /></div>
+                <div class="form-group"><label for="card-number">Card number</label><input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19" /></div>
+                <div class="form-row">
+                  <div class="form-group"><label for="card-expiry">Expiry date</label><input type="text" id="card-expiry" placeholder="MM/YY" maxlength="5" /></div>
+                  <div class="form-group"><label for="card-cvv">Security code (CVV)</label><input type="text" id="card-cvv" placeholder="123" maxlength="4" /></div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="email-confirm">Email for confirmation</label>
+                <p class="hint">We'll send your confirmation and reference number to this address.</p>
+                <input type="email" id="email-confirm" placeholder="your.email@example.com" />
+              </div>
+
+              <!-- Terms & Conditions -->
+              <div style="margin-top:16px; padding:16px; background:var(--grey-50); border-radius:var(--radius-input); border:1px solid var(--grey-300);">
+                <p style="font-size:14px; line-height:1.43;">By clicking <strong>Pay Now</strong>, you agree to our <a href="#" onclick="openTCModal(); return false;" style="color:var(--primary-main); font-weight:500;">Terms and Conditions</a>.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- T&C Modal -->
+          <div id="tc-modal" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:200; display:flex; align-items:center; justify-content:center;" onclick="closeTCModal(event)">
+            <div style="background:#fff; border-radius:var(--radius-card); max-width:600px; width:90%; max-height:80vh; overflow-y:auto; box-shadow:0 8px 32px rgba(0,0,0,.2);" onclick="event.stopPropagation()">
+              <div style="padding:20px 24px; border-bottom:1px solid var(--grey-300); display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="font-size:18px; font-weight:500;">Dispensation Permit — Terms and Conditions</h3>
+                <button onclick="closeTCModal()" style="background:none; border:none; font-size:20px; cursor:pointer; padding:4px 8px; color:var(--text-secondary);">&times;</button>
+              </div>
+              <div style="padding:24px; font-size:14px; line-height:1.6; color:var(--text-primary);">
+                <p><strong>1. Application Terms</strong><br>By submitting this dispensation application, you agree to abide by the terms set forth by the local authority for car park permit usage.</p>
+                <p style="margin-top:12px;"><strong>2. Payment</strong><br>All fees are non-refundable once the permit has been issued. Cancellation before issuance may be eligible for a partial refund subject to council policy.</p>
+                <p style="margin-top:12px;"><strong>3. Duration &amp; Bays</strong><br>The permit is valid only for the specified bays and location. Any changes require a new application.</p>
+                <p style="margin-top:12px;"><strong>4. Non-Zonal Rules</strong><br>This permit does not grant zonal access. The correspondence address provided is for communication purposes only.</p>
+                <p style="margin-top:12px;"><strong>5. Liability</strong><br>The council is not liable for any issues arising from incorrect information provided in this application.</p>
+              </div>
+              <div style="padding:16px 24px; border-top:1px solid var(--grey-300); display:flex; gap:12px; justify-content:flex-end;">
+                <button class="btn btn-secondary" onclick="closeTCModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="acceptTC()">I Understand</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ====== CONFIRMATION ====== -->
+          <div id="step-confirmation" class="step-content hidden">
+            <div class="card">
+              <div class="confirmation-box">
+                <div class="check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div>
+                <h2>Application Submitted!</h2>
+                <p style="color:var(--text-secondary);">Your dispensation car park permit application has been received.</p>
+                <div class="ref-number" id="ref-number">DISP-2026-00482</div>
+                <p style="font-size:12px; color:var(--text-secondary); margin-top:4px; letter-spacing:0.4px;">Confirmation sent to <strong id="conf-email">user@example.com</strong></p>
+                <div class="timeline" style="margin-top:28px;">
+                  <h3 style="margin-bottom:16px; text-align:left; font-size:14px; font-weight:500;">What happens next</h3>
+                  <div class="timeline-item"><div class="timeline-dot">1</div><div class="timeline-content"><h4>Application review</h4><p>Your dispensation application will be reviewed within 2 working days.</p></div></div>
+                  <div class="timeline-item"><div class="timeline-dot">2</div><div class="timeline-content"><h4>Permit issued</h4><p>Once approved, your permit will be issued and active for the specified bays.</p></div></div>
+                  <div class="timeline-item"><div class="timeline-dot">3</div><div class="timeline-content"><h4>Permit active</h4><p id="active-date-text">Your dispensation permit will be valid from your start date.</p></div></div>
+                  <div class="timeline-item"><div class="timeline-dot">4</div><div class="timeline-content"><h4>Permit expires</h4><p>Your permit expires at the end of the selected duration. Renew if needed.</p></div></div>
+                </div>
+                <div class="notice notice-info" style="text-align:left; margin-top:24px;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                  <span>For any queries about your dispensation permit, call <strong>01234 567890</strong>.</span>
+                </div>
+                <div style="margin-top:24px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                  <button class="btn btn-primary" onclick="location.reload()">Return to Home</button>
+                  <button class="btn btn-secondary" onclick="window.print()">Print Confirmation</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /wizard-main -->
+
+        <!-- ===== SUMMARY SIDEBAR ===== -->
+        <aside class="summary-sidebar" id="summary-sidebar">
+          <div class="summary-card">
+            <h3>Summary</h3>
+            <div style="padding:16px;">
+              <div id="summary-content">
+                <div class="summary-row"><span class="s-label">Address</span><span class="s-value" id="sum-address">&mdash;</span></div>
+                <div class="summary-divider"></div>
+                <div class="summary-row"><span class="s-label">Permit Mode</span><span class="s-value" id="sum-permit-mode">Virtual</span></div>
+                <div class="summary-row"><span class="s-label">Street</span><span class="s-value" id="sum-street">&mdash;</span></div>
+                <div class="summary-row"><span class="s-label">Bays Added</span><span class="s-value" id="sum-bays">0</span></div>
+                <div class="summary-row"><span class="s-label">Duration</span><span class="s-value" id="sum-duration">&mdash;</span></div>
+                <div class="summary-row"><span class="s-label">Start</span><span class="s-value" id="sum-start">&mdash;</span></div>
+                <div class="summary-row"><span class="s-label">End</span><span class="s-value" id="sum-end">&mdash;</span></div>
+                <div class="summary-row"><span class="s-label">Vehicles</span><span class="s-value" id="sum-vehicles">0</span></div>
+                <div class="summary-divider"></div>
+                <div class="summary-row"><span class="s-label">Reason</span><span class="s-value" id="sum-reason">&mdash;</span></div>
+                <div class="summary-divider"></div>
+                <div class="summary-total"><span class="s-label">Total</span><span class="s-value" id="sum-total">&pound;0.00</span></div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div><!-- /page-layout -->
+    </section>
+  </div>
+</main>
+
+<!-- Help Panel -->
+<div id="help-overlay" style="position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:200; display:none;" onclick="closeHelpPanel()"></div>
+<div id="help-panel" style="position:fixed; top:0; right:-420px; width:400px; max-width:90vw; height:100vh; background:#fff; box-shadow:-4px 0 24px rgba(0,0,0,.15); z-index:201; transition:right 250ms ease; overflow-y:auto; display:flex; flex-direction:column;">
+  <div style="padding:20px 24px; border-bottom:1px solid var(--grey-300); display:flex; justify-content:space-between; align-items:center;">
+    <h3 style="font-size:18px; font-weight:500;">Need Help?</h3>
+    <button onclick="closeHelpPanel()" style="background:none; border:none; font-size:22px; cursor:pointer; padding:4px 8px; color:var(--text-secondary); border-radius:var(--radius-input);">&times;</button>
+  </div>
+  <div style="padding:24px; flex:1; font-size:14px; line-height:1.6; color:var(--text-primary);">
+    <h4 style="font-size:15px; font-weight:500; margin:0 0 6px;">About This Application</h4>
+    <p style="margin-bottom:8px; color:var(--text-secondary);">This is a Dispensation (non-zonal / car-park) permit application. It requires a correspondence address instead of a zonal address.</p>
+    <h4 style="font-size:15px; font-weight:500; margin:16px 0 6px;">Address Step</h4>
+    <p style="margin-bottom:8px; color:var(--text-secondary);">Select a saved address or enter one manually. All fields (Postcode, Property, Street, Town) are required for manual entry.</p>
+    <h4 style="font-size:15px; font-weight:500; margin:16px 0 6px;">Bay Details</h4>
+    <p style="margin-bottom:8px; color:var(--text-secondary);">Select the street and add bay rows with type and number of spaces. "Reason for purchase" is mandatory. The number of bays is derived from the bay selection section.</p>
+    <h4 style="font-size:15px; font-weight:500; margin:16px 0 6px;">Purchase Limits</h4>
+    <p style="margin-bottom:8px; color:var(--text-secondary);">Non-zonal permissions may have purchase limits. If the limit is exceeded, you will be blocked from completing the purchase.</p>
+    <div style="background:var(--primary-25); border:1px solid var(--primary-100); border-radius:var(--radius-input); padding:16px; margin-top:16px;">
+      <h4 style="margin-top:0; font-size:15px; font-weight:500; color:var(--primary-main);">Contact Support</h4>
+      <p style="margin-bottom:4px; color:var(--text-secondary);"><strong>Phone:</strong> 01234 567890</p>
+      <p style="margin-bottom:4px; color:var(--text-secondary);"><strong>Email:</strong> permits@council.gov.uk</p>
+      <p style="margin-bottom:0; color:var(--text-secondary);"><strong>Hours:</strong> Mon–Fri, 9:00 AM – 5:00 PM</p>
+    </div>
+  </div>
+</div>
+
+<!-- Sticky bottom nav -->
+<div class="sticky-nav-bar visible" id="sticky-nav-bar">
+  <div class="nav-left">
+    <!-- Kebab menu (mobile only) — holds Cancel action -->
+    <button class="btn btn-icon kebab-menu-btn" id="kebab-menu-btn" onclick="toggleKebabMenu()" aria-label="More options">
+      <svg width="4" height="20" viewBox="0 0 4 20" fill="none"><circle cx="2" cy="2" r="2" fill="#5F6368"/><circle cx="2" cy="10" r="2" fill="#5F6368"/><circle cx="2" cy="18" r="2" fill="#5F6368"/></svg>
+    </button>
+    <!-- Kebab dropdown -->
+    <div class="kebab-dropdown" id="kebab-dropdown">
+      <button class="kebab-dropdown-item" onclick="location.reload(); toggleKebabMenu();">Cancel</button>
+    </div>
+    <button class="btn btn-secondary" id="sticky-back-btn" onclick="stickyBack()" style="display:none;">Back</button>
+    <button class="btn btn-text cancel-text-btn" onclick="location.reload()">Cancel</button>
+  </div>
+  <div class="nav-right">
+    <button class="btn btn-primary" id="sticky-next-btn" onclick="stickyNext()">Save and Continue</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast toast-success" id="toast" role="alert" aria-live="assertive"></div>
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer">
+  <p><a href="#">Privacy Policy</a> | <a href="#">Cookie Policy</a> | &copy; Copyright 2026</p>
+</footer>
+
+<script>
+/* ===================================================================
+   DISPENSATION (NON-ZONAL / CAR-PARK) APPLICATION PROTOTYPE
+   User Story #254434
+   =================================================================== */
+
+var state = {
+  currentStep: 1,
+  totalSteps: 5,
+  permitMode: 'virtual',
+  addressMode: 'saved',
+  address: null,
+  bays: [],
+  street: '',
+  purchaseReason: '',
+  otherReason: '',
+  selectedDuration: null,
+  startDate: '2026-04-17',
+  startTime: '12:00 PM',
+  endDate: '',
+  endTime: '08:00 PM',
+  discountBlueBadge: false,
+  discountStatePension: false,
+  vehicles: [],
+  files: [],
+  paymentMethod: 'card',
+  email: '',
+  totalFee: 0,
+};
+
+/* === Configuration === */
+var config = {
+  vehicleLimit: 4,
+  savedVehicles: [
+    { vrm: 'AB12 CDE', type: 'Personal' },
+    { vrm: 'XY63 FGH', type: 'Personal' },
+    { vrm: 'MN19 JKL', type: 'Visitor' },
+  ],
+
+  savedAddresses: [
+    { id: 101, property: '17', street: 'Abbey Hill', town: 'Kenilworth', postcode: 'CV8 1LU' },
+    { id: 102, property: '5', street: 'High Street', town: 'Southend-on-Sea', postcode: 'SS1 1AB' },
+    { id: 103, property: '42', street: 'Hamlet Court Road', town: 'Westcliff-on-Sea', postcode: 'SS0 7LN' },
+  ],
+  sampleAddresses: [
+    { id: 1, property: '17', street: 'Abbey Hill', town: 'Kenilworth', postcode: 'CV8 1LU' },
+    { id: 2, property: '5', street: 'High Street', town: 'Southend-on-Sea', postcode: 'SS1 1AB' },
+    { id: 3, property: '12', street: 'Victoria Avenue', town: 'Southend-on-Sea', postcode: 'SS2 6EX' },
+    { id: 4, property: '27', street: 'Alexandra Street', town: 'Southend-on-Sea', postcode: 'SS1 1BH' },
+    { id: 5, property: '3', street: 'London Road', town: 'Southend-on-Sea', postcode: 'SS1 1PD' },
+    { id: 6, property: '42', street: 'Hamlet Court Road', town: 'Westcliff-on-Sea', postcode: 'SS0 7LN' },
+    { id: 7, property: '8', street: 'Baker Street', town: 'Southend-on-Sea', postcode: 'SS1 2ES' },
+    { id: 8, property: '15', street: 'Warrior Square', town: 'Southend-on-Sea', postcode: 'SS1 2JJ' },
+    { id: 9, property: '20', street: 'Sutton Road', town: 'Southend-on-Sea', postcode: 'SS2 5ES' },
+    { id: 10, property: '33', street: 'Prince Avenue', town: 'Southend-on-Sea', postcode: 'SS0 0JP' },
+  ],
+  bayTypes: {
+    PB: { name: 'Paid bay (meter/pay-and-display)', price: 25 },
+    RB: { name: 'Resident bay', price: 25 },
+    PO: { name: 'Permit-only bay', price: 20 },
+    LW: { name: 'Limited waiting bay', price: 18 },
+    LB: { name: 'Loading bay', price: 22 },
+    DB: { name: 'Disabled bay', price: 30 },
+    FP: { name: 'Free parking bay', price: 15 },
+  },
+  adminFee: 5.00,
+  vatRate: 0.20,
+  // Duration-based pricing
+  durationPricing: [
+    { key: '1m',  label: '1 Month',   months: 1,  permitPrice: 5.00,  dieselSurcharge: 25.00,  subtotal: 25.00  },
+    { key: '3m',  label: '3 Months',  months: 3,  permitPrice: 12.00, dieselSurcharge: 36.00,  subtotal: 36.00  },
+    { key: '6m',  label: '6 Months',  months: 6,  permitPrice: 20.00, dieselSurcharge: 120.00, subtotal: 120.00 },
+    { key: '12m', label: '12 Months', months: 12, permitPrice: 35.00, dieselSurcharge: 420.00, subtotal: 420.00 },
+  ],
+  discounts: {
+    blueBadge: { label: 'Blue Badge Holder', percent: 50 },
+    statePension: { label: 'State Pension', percent: 25 },
+  },
+  // Non-zonal limit: null = Unlimited, number = limited
+  nonZonalLimit: 10,
+  currentPurchases: 3,
+
+};
+
+var bayCounter = 0;
+
+// Build text property for addresses
+config.savedAddresses.forEach(function (a) { a.text = a.property + ' ' + a.street + ', ' + a.town + ', ' + a.postcode; });
+config.sampleAddresses.forEach(function (a) { a.text = a.property + ' ' + a.street + ', ' + a.town + ', ' + a.postcode; });
+
+/* === INIT === */
+document.addEventListener('DOMContentLoaded', function () {
+  populateAddressDropdowns();
+  setupFindAddressSearch();
+  populateDurationTable();
+  calculateEndDate();
+  updateStepperUI();
+  showStep(1);
+
+  // Purchase reason toggle
+  document.getElementById('purchase-reason').addEventListener('change', function () {
+    var otherGroup = document.getElementById('other-reason-group');
+    if (this.value === 'other') {
+      otherGroup.classList.remove('hidden');
+    } else {
+      otherGroup.classList.add('hidden');
+    }
+  });
+});
+
+/* ===== ADDRESS MODE & SELECTION ===== */
+function populateAddressDropdowns() {
+  var savedSel = document.getElementById('saved-address-select');
+  config.savedAddresses.forEach(function (a) {
+    var opt = document.createElement('option');
+    opt.value = a.id; opt.textContent = a.text;
+    savedSel.appendChild(opt);
+  });
+}
+
+function setupFindAddressSearch() {
+  var input = document.getElementById('find-address-input');
+  var results = document.getElementById('find-address-results');
+  var debounceTimer;
+
+  input.addEventListener('input', function () {
+    clearTimeout(debounceTimer);
+    var query = this.value.trim().toLowerCase();
+    if (query.length < 2) { results.classList.remove('open'); input.setAttribute('aria-expanded', 'false'); return; }
+    debounceTimer = setTimeout(function () {
+      var matches = config.sampleAddresses.filter(function (a) { return a.text.toLowerCase().indexOf(query) !== -1; });
+      results.innerHTML = '';
+      if (matches.length === 0) {
+        results.innerHTML = '<div class="no-results">No addresses found. Try entering manually below.</div>';
+      } else {
+        matches.forEach(function (addr) {
+          var div = document.createElement('div');
+          div.className = 'result-item'; div.setAttribute('role', 'option');
+          div.textContent = addr.text;
+          div.addEventListener('click', function () { selectFindAddress(addr); });
+          results.appendChild(div);
+        });
+      }
+      results.classList.add('open');
+      input.setAttribute('aria-expanded', 'true');
+    }, 250);
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.address-search-wrapper')) {
+      results.classList.remove('open');
+      input.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
+
+function setAddressMode(mode) {
+  state.addressMode = mode;
+  document.querySelectorAll('.address-mode-card').forEach(function (el) { el.classList.remove('selected'); });
+  document.getElementById('mode-' + mode).classList.add('selected');
+  document.querySelectorAll('input[name="address-mode"]').forEach(function (r) { r.checked = (r.value === mode); });
+  document.getElementById('saved-address-panel').classList.toggle('hidden', mode !== 'saved');
+  document.getElementById('find-address-panel').classList.toggle('hidden', mode !== 'find');
+  // Show "save address" checkbox only in find mode
+  document.getElementById('save-address-label').style.display = (mode === 'saved') ? 'none' : '';
+  // Reset both panels
+  resetSavedPanel();
+  resetFindPanel();
+  state.address = null;
+  document.getElementById('address-error').classList.remove('visible');
+  updateSummary();
+}
+
+function resetSavedPanel() {
+  document.getElementById('saved-address-select').value = '';
+  document.getElementById('saved-detail-fields').classList.add('hidden');
+  clearFieldSet('saved');
+}
+
+function resetFindPanel() {
+  document.getElementById('find-address-input').value = '';
+  document.getElementById('find-address-results').classList.remove('open');
+  document.getElementById('find-detail-fields').classList.add('hidden');
+  clearFieldSet('find');
+  document.getElementById('manual-entry-check').checked = false;
+  document.getElementById('manual-entry-fields').classList.add('hidden');
+  clearFieldSet('manual');
+}
+
+function onAddressDropdownChange(mode) {
+  var selEl = document.getElementById('saved-address-select');
+  var id = parseInt(selEl.value, 10);
+  var addr = config.savedAddresses.find(function (a) { return a.id === id; });
+  if (addr) {
+    fillFieldSet('saved', addr);
+    document.getElementById('saved-detail-fields').classList.remove('hidden');
+    state.address = { property: addr.property, street: addr.street, town: addr.town, postcode: addr.postcode };
+    autoSelectStreet(addr.street);
+  } else {
+    document.getElementById('saved-detail-fields').classList.add('hidden');
+    clearFieldSet('saved');
+    state.address = null;
+  }
+  document.getElementById('address-error').classList.remove('visible');
+  updateSummary();
+}
+
+function selectFindAddress(addr) {
+  document.getElementById('find-address-input').value = addr.text;
+  document.getElementById('find-address-results').classList.remove('open');
+  document.getElementById('find-address-input').setAttribute('aria-expanded', 'false');
+  fillFieldSet('find', addr);
+  document.getElementById('find-detail-fields').classList.remove('hidden');
+  state.address = { property: addr.property, street: addr.street, town: addr.town, postcode: addr.postcode };
+  autoSelectStreet(addr.street);
+  document.getElementById('address-error').classList.remove('visible');
+  updateSummary();
+}
+
+function autoSelectStreet(streetName) {
+  var sel = document.getElementById('street-select');
+  for (var i = 0; i < sel.options.length; i++) {
+    if (sel.options[i].value === streetName) { sel.value = streetName; return; }
+  }
+}
+
+function onSameStreetChange() {
+  var cb = document.getElementById('same-street-check');
+  var sel = document.getElementById('street-select');
+  if (!cb.checked) { sel.disabled = false; sel.value = ''; return; }
+  var addrStreet = '';
+  var savedStreet = document.getElementById('addr-street-saved');
+  var findStreet = document.getElementById('addr-street-find');
+  var manualStreet = document.getElementById('addr-street-manual');
+  if (savedStreet && savedStreet.value) addrStreet = savedStreet.value;
+  else if (findStreet && findStreet.value) addrStreet = findStreet.value;
+  else if (manualStreet && manualStreet.value) addrStreet = manualStreet.value;
+  if (addrStreet) {
+    autoSelectStreet(addrStreet);
+    sel.disabled = true;
+  }
+}
+
+function fillFieldSet(prefix, addr) {
+  document.getElementById('addr-property-' + prefix).value = addr.property || '';
+  document.getElementById('addr-street-' + prefix).value = addr.street || '';
+  document.getElementById('addr-town-' + prefix).value = addr.town || '';
+  document.getElementById('addr-postcode-' + prefix).value = addr.postcode || '';
+}
+
+function clearFieldSet(prefix) {
+  document.getElementById('addr-property-' + prefix).value = '';
+  document.getElementById('addr-street-' + prefix).value = '';
+  document.getElementById('addr-town-' + prefix).value = '';
+  document.getElementById('addr-postcode-' + prefix).value = '';
+}
+
+function toggleManualEntry() {
+  var checked = document.getElementById('manual-entry-check').checked;
+  if (checked) {
+    document.getElementById('find-address-input').disabled = true;
+    document.getElementById('find-detail-fields').classList.add('hidden');
+    document.getElementById('manual-entry-fields').classList.remove('hidden');
+    clearFieldSet('find');
+    state.address = null;
+  } else {
+    document.getElementById('find-address-input').disabled = false;
+    document.getElementById('manual-entry-fields').classList.add('hidden');
+    clearFieldSet('manual');
+  }
+  document.getElementById('address-error').classList.remove('visible');
+  updateSummary();
+}
+
+/* === PERMIT MODE === */
+function setPermitMode(mode) {
+  state.permitMode = mode;
+  document.getElementById('mode-virtual').classList.toggle('selected', mode === 'virtual');
+  document.getElementById('mode-physical').classList.toggle('selected', mode === 'physical');
+  document.getElementById('virtual-check').style.display = mode === 'virtual' ? '' : 'none';
+  document.getElementById('physical-check').style.display = mode === 'physical' ? '' : 'none';
+  document.getElementById('sum-permit-mode').textContent = mode === 'virtual' ? 'Virtual' : 'Physical';
+}
+
+/* === STEP NAVIGATION === */
+function showStep(n) {
+  for (var i = 1; i <= state.totalSteps; i++) {
+    var el = document.getElementById('step-' + i);
+    if (el) el.classList.toggle('hidden', i !== n);
+  }
+  document.getElementById('step-confirmation').classList.add('hidden');
+  state.currentStep = n;
+  updateStepperUI();
+  updateNavButtons();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goToStep(n) {
+  showStep(n);
+}
+
+function updateStepperUI() {
+  for (var i = 1; i <= state.totalSteps; i++) {
+    var ind = document.getElementById('step-ind-' + i);
+    if (!ind) continue;
+    ind.classList.remove('active', 'completed');
+    if (i < state.currentStep) {
+      ind.classList.add('completed');
+    } else if (i === state.currentStep) {
+      ind.classList.add('active');
+    }
+    // Mark skipped steps as completed if current step is beyond them
+    if (skippedSteps.indexOf(i) !== -1 && state.currentStep > i) {
+      ind.classList.add('completed');
+    }
+
+    var conn = document.getElementById('conn-' + i);
+    if (conn) conn.classList.toggle('completed', i < state.currentStep);
+  }
+}
+
+function updateNavButtons() {
+  var backBtn = document.getElementById('sticky-back-btn');
+  var nextBtn = document.getElementById('sticky-next-btn');
+  backBtn.style.display = state.currentStep > 1 ? '' : 'none';
+
+  if (state.currentStep === state.totalSteps) {
+    nextBtn.textContent = 'Pay Now';
+  } else {
+    nextBtn.textContent = 'SAVE AND CONTINUE';
+  }
+}
+
+/* Steps 2 (Vehicles) and 3 (Documents) are shown in stepper but skipped in navigation */
+var skippedSteps = [2, 3];
+
+function getNextStep(current) {
+  var next = current + 1;
+  while (skippedSteps.indexOf(next) !== -1 && next <= state.totalSteps) next++;
+  return next;
+}
+
+function getPrevStep(current) {
+  var prev = current - 1;
+  while (skippedSteps.indexOf(prev) !== -1 && prev >= 1) prev--;
+  return prev;
+}
+
+function stickyBack() {
+  var prev = getPrevStep(state.currentStep);
+  if (prev >= 1) {
+    showStep(prev);
+  }
+}
+
+function stickyNext() {
+  if (!validateCurrentStep()) return;
+  updateSummary();
+
+  if (state.currentStep < state.totalSteps) {
+    var next = getNextStep(state.currentStep);
+    if (next === state.totalSteps) populateReview();
+    showStep(next);
+  } else {
+    submitApplication();
+  }
+}
+
+/* === VALIDATION === */
+function validateCurrentStep() {
+  var valid = true;
+  clearAllErrors();
+
+  switch (state.currentStep) {
+    case 1: // Address
+      var mode = document.querySelector('input[name="address-mode"]:checked').value;
+      var isManual = mode === 'find' && document.getElementById('manual-entry-check').checked;
+      var hasAddress = false;
+
+      document.getElementById('saved-address-select').classList.remove('error');
+      document.getElementById('find-address-input').classList.remove('error');
+      document.querySelectorAll('#manual-entry-fields .error').forEach(function (el) { el.classList.remove('error'); });
+
+      if (mode === 'saved') {
+        hasAddress = !!document.getElementById('saved-address-select').value;
+        if (!hasAddress) document.getElementById('saved-address-select').classList.add('error');
+      } else if (isManual) {
+        var street = document.getElementById('addr-street-manual').value.trim();
+        var postcode = document.getElementById('addr-postcode-manual').value.trim();
+        hasAddress = !!street && !!postcode;
+        if (!street) document.getElementById('addr-street-manual').classList.add('error');
+        if (!postcode) document.getElementById('addr-postcode-manual').classList.add('error');
+        if (hasAddress) {
+          state.address = {
+            property: document.getElementById('addr-property-manual').value.trim(),
+            street: street,
+            town: document.getElementById('addr-town-manual').value.trim(),
+            postcode: postcode
+          };
+        }
+      } else {
+        // Find mode — check if an address was selected from search
+        hasAddress = !!document.getElementById('addr-street-find').value.trim();
+        if (!hasAddress) document.getElementById('find-address-input').classList.add('error');
+      }
+
+      if (!hasAddress) { showError('address-error'); valid = false; }
+      break;
+
+    case 4: // Bay Details + Purchase Inputs
+      var reason = document.getElementById('purchase-reason').value;
+      if (!reason) { showError('purchase-reason-error'); document.getElementById('purchase-reason').classList.add('error'); valid = false; }
+      if (reason === 'other') {
+        if (!document.getElementById('other-reason-text').value.trim()) { showError('other-reason-error'); document.getElementById('other-reason-text').classList.add('error'); valid = false; }
+      }
+      state.purchaseReason = reason;
+      state.otherReason = document.getElementById('other-reason-text') ? document.getElementById('other-reason-text').value.trim() : '';
+
+      if (!document.getElementById('street-select').value) { showError('street-error'); document.getElementById('street-select').classList.add('error'); valid = false; }
+      state.street = document.getElementById('street-select').value;
+
+      if (state.bays.length === 0) { showError('bay-error'); valid = false; }
+
+      // Non-zonal purchase limit check
+      if (config.nonZonalLimit !== null) {
+        if (config.currentPurchases + 1 > config.nonZonalLimit) {
+          document.getElementById('purchase-limit-notice').classList.remove('hidden');
+          valid = false;
+        }
+      }
+      break;
+
+    case 5: // Checkout — T&C is informational only, no blocking check
+      break;
+  }
+  return valid;
+}
+
+function showError(id) { var el = document.getElementById(id); if (el) el.classList.add('visible'); }
+function hideError(id) { var el = document.getElementById(id); if (el) el.classList.remove('visible'); }
+
+function clearAllErrors() {
+  document.querySelectorAll('.error-msg').forEach(function (el) { el.classList.remove('visible'); });
+  document.querySelectorAll('.error').forEach(function (el) { el.classList.remove('error'); });
+  document.getElementById('purchase-limit-notice').classList.add('hidden');
+}
+
+/* === BAY ROWS === */
+function addNewBayRow() {
+  bayCounter++;
+  var id = bayCounter;
+  var container = document.getElementById('bay-rows-container');
+  var row = document.createElement('div');
+  row.className = 'bay-row-entry';
+  row.id = 'bay-row-' + id;
+  row.setAttribute('data-id', id);
+
+  var bayOpts = '<option value="">Select bay type</option>';
+  for (var key in config.bayTypes) {
+    bayOpts += '<option value="' + key + '">' + config.bayTypes[key].name + '</option>';
+  }
+
+  row.innerHTML =
+    '<div class="form-group"><label>Bay Type <span style="color:var(--error);">*</span></label><select onchange="onBayTypeChange(' + id + ')" id="bay-type-' + id + '">' + bayOpts + '</select></div>' +
+    '<div class="form-group"><label>Spaces</label><input type="number" min="1" value="1" id="bay-spaces-' + id + '" onchange="onBaySpacesChange(' + id + ')" oninput="onBaySpacesChange(' + id + ')" /></div>' +
+    '<div class="bay-row-remove"><button class="btn btn-sm" style="background:none; border:none; color:var(--error); cursor:pointer; font-size:18px; padding:4px 8px;" onclick="removeBayRow(' + id + ')" aria-label="Remove bay row">&times;</button></div>';
+
+  container.appendChild(row);
+  // Add to state
+  state.bays.push({ id: id, type: '', spaces: 1 });
+  recalculatePrice();
+  updateSummary();
+}
+
+function onBayTypeChange(id) {
+  var sel = document.getElementById('bay-type-' + id);
+  var typeCode = sel.value;
+  var bay = state.bays.find(function (b) { return b.id === id; });
+  if (bay) {
+    bay.type = typeCode;
+    var spaces = parseInt(document.getElementById('bay-spaces-' + id).value) || 1;
+    bay.spaces = spaces;
+  }
+  recalculatePrice();
+  updateSummary();
+}
+
+function onBaySpacesChange(id) {
+  var spaces = parseInt(document.getElementById('bay-spaces-' + id).value) || 1;
+  var bay = state.bays.find(function (b) { return b.id === id; });
+  if (bay) bay.spaces = spaces;
+  recalculatePrice();
+  updateSummary();
+}
+
+function removeBayRow(id) {
+  var row = document.getElementById('bay-row-' + id);
+  if (row) row.remove();
+  state.bays = state.bays.filter(function (b) { return b.id !== id; });
+  recalculatePrice();
+  updateSummary();
+}
+
+/* === PRICING DURATION TABLE === */
+function populateDurationTable() {
+  var tbody = document.querySelector('#pricing-duration-table tbody');
+  tbody.innerHTML = '';
+  config.durationPricing.forEach(function (d, idx) {
+    var tr = document.createElement('tr');
+    tr.setAttribute('data-duration', d.key);
+    if (idx === 0) tr.classList.add('selected-duration');
+    tr.onclick = function () { selectDuration(d.key); };
+    tr.innerHTML =
+      '<td><input type="radio" name="duration" class="duration-radio" value="' + d.key + '"' + (idx === 0 ? ' checked' : '') + ' /><span class="duration-label">' + d.label + '</span></td>' +
+      '<td>&pound;' + d.permitPrice.toFixed(2) + '</td>' +
+      '<td>&pound;' + d.dieselSurcharge.toFixed(2) + '</td>' +
+      '<td>&pound;' + d.subtotal.toFixed(2) + '</td>';
+    tbody.appendChild(tr);
+  });
+  // Auto-select first duration
+  state.selectedDuration = config.durationPricing[0].key;
+  recalculatePrice();
+}
+
+function selectDuration(key) {
+  state.selectedDuration = key;
+  var rows = document.querySelectorAll('#pricing-duration-table tbody tr');
+  rows.forEach(function (r) {
+    var isSelected = r.getAttribute('data-duration') === key;
+    r.classList.toggle('selected-duration', isSelected);
+    r.querySelector('.duration-radio').checked = isSelected;
+  });
+  calculateEndDate();
+  recalculatePrice();
+  updateSummary();
+}
+
+/* === START / END DATE CALCULATION === */
+function calculateEndDate() {
+  var startDateStr = document.getElementById('start-date').value;
+  var startTime = document.getElementById('start-time').value;
+  state.startDate = startDateStr;
+  state.startTime = startTime;
+
+  if (!startDateStr || !state.selectedDuration) {
+    document.getElementById('end-date').value = '';
+    state.endDate = '';
+    return;
+  }
+
+  var dur = config.durationPricing.find(function (d) { return d.key === state.selectedDuration; });
+  if (!dur) return;
+
+  var parts = startDateStr.split('-');
+  var start = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+  start.setMonth(start.getMonth() + dur.months);
+
+  var endYear = start.getFullYear();
+  var endMonth = String(start.getMonth() + 1).padStart(2, '0');
+  var endDay = String(start.getDate()).padStart(2, '0');
+  var endDateStr = endYear + '-' + endMonth + '-' + endDay;
+
+  document.getElementById('end-date').value = endDateStr;
+  state.endDate = endDateStr;
+  state.endTime = document.getElementById('end-time').value;
+  updateSummary();
+}
+
+function onEndTimeChange() {
+  state.endTime = document.getElementById('end-time').value;
+  updateSummary();
+}
+
+function onDiscountChange() {
+  state.discountBlueBadge = document.getElementById('blue-badge-toggle').checked;
+  state.discountStatePension = document.getElementById('state-pension-toggle').checked;
+  recalculatePrice();
+  updateSummary();
+}
+
+function recalculatePrice() {
+  // Get selected duration price
+  var dur = config.durationPricing.find(function (d) { return d.key === state.selectedDuration; });
+  var subtotal = dur ? dur.subtotal : 0;
+
+  // Apply discounts
+  var discountPercent = 0;
+  if (state.discountBlueBadge) discountPercent += config.discounts.blueBadge.percent;
+  if (state.discountStatePension) discountPercent += config.discounts.statePension.percent;
+  if (discountPercent > 100) discountPercent = 100;
+  var discountAmount = subtotal * (discountPercent / 100);
+  var afterDiscount = subtotal - discountAmount;
+
+  var admin = config.adminFee;
+  var vat = (afterDiscount + admin) * config.vatRate;
+  var total = afterDiscount + admin + vat;
+  state.totalFee = total;
+
+  document.getElementById('ps-subtotal').textContent = '£' + subtotal.toFixed(2);
+  // Show/hide discount row
+  var discountRow = document.getElementById('ps-discount-row');
+  if (discountPercent > 0) {
+    discountRow.style.display = '';
+    document.getElementById('ps-discount').textContent = '-£' + discountAmount.toFixed(2) + ' (' + discountPercent + '%)';
+  } else {
+    discountRow.style.display = 'none';
+  }
+  document.getElementById('ps-admin').textContent = '£' + admin.toFixed(2);
+  document.getElementById('ps-vat').textContent = '£' + vat.toFixed(2);
+  document.getElementById('ps-total').textContent = '£' + total.toFixed(2);
+  document.getElementById('sum-total').textContent = '£' + total.toFixed(2);
+}
+
+/* === STREET === */
+function onStreetChange() {
+  state.street = document.getElementById('street-select').value;
+  updateSummary();
+}
+
+/* === VEHICLES === */
+(function () {
+  document.addEventListener('DOMContentLoaded', function () {
+    var input = document.getElementById('vehicle-input');
+    var dropdown = document.getElementById('vehicle-dropdown');
+    if (!input || !dropdown) return;
+
+    input.addEventListener('focus', function () { showVehicleDropdown(); });
+    input.addEventListener('input', function () { showVehicleDropdown(); });
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ',') {
+        e.preventDefault();
+        addVehicle(input.value.replace(/,/g, '').trim().toUpperCase());
+        input.value = '';
+        dropdown.classList.remove('open');
+      }
+    });
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('#vehicle-chips-container') && !e.target.closest('#vehicle-dropdown')) {
+        dropdown.classList.remove('open');
+      }
+    });
+  });
+
+  window.showVehicleDropdown = function () {
+    var dropdown = document.getElementById('vehicle-dropdown');
+    var query = document.getElementById('vehicle-input').value.trim().toUpperCase();
+    var html = '';
+    config.savedVehicles.forEach(function (v) {
+      if (state.vehicles.indexOf(v.vrm) === -1) {
+        if (!query || v.vrm.indexOf(query) !== -1) {
+          html += '<div class="vehicle-dropdown-item" onclick="addVehicle(\'' + v.vrm + '\')"><span>' + v.vrm + '</span><span class="vd-badge">' + v.type + '</span></div>';
+        }
+      }
+    });
+    if (html) {
+      dropdown.innerHTML = html;
+      dropdown.classList.add('open');
+    } else {
+      dropdown.classList.remove('open');
+    }
+  };
+
+  window.addVehicle = function (vrm) {
+    if (!vrm || state.vehicles.indexOf(vrm) !== -1) return;
+    if (state.vehicles.length >= config.vehicleLimit) {
+      document.getElementById('vehicle-limit-error').classList.add('visible');
+      return;
+    }
+    state.vehicles.push(vrm);
+    renderVehicleChips();
+    document.getElementById('vehicle-input').value = '';
+    document.getElementById('vehicle-dropdown').classList.remove('open');
+    document.getElementById('vehicle-limit-error').classList.remove('visible');
+    updateSummary();
+  };
+
+  window.removeVehicle = function (vrm) {
+    state.vehicles = state.vehicles.filter(function (v) { return v !== vrm; });
+    renderVehicleChips();
+    document.getElementById('vehicle-limit-error').classList.remove('visible');
+    updateSummary();
+  };
+
+  function renderVehicleChips() {
+    var container = document.getElementById('vehicle-chips-container');
+    var input = document.getElementById('vehicle-input');
+    container.querySelectorAll('.vehicle-chip').forEach(function (c) { c.remove(); });
+    state.vehicles.forEach(function (vrm) {
+      var chip = document.createElement('span');
+      chip.className = 'vehicle-chip';
+      chip.innerHTML = vrm + ' <button class="chip-close" onclick="removeVehicle(\'' + vrm + '\')" aria-label="Remove ' + vrm + '">&times;</button>';
+      container.insertBefore(chip, input);
+    });
+  }
+})();
+
+/* === FILE UPLOAD === */
+function handleFileSelect(e) {
+  Array.from(e.target.files).forEach(addFile);
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.remove('dragover');
+  Array.from(e.dataTransfer.files).forEach(addFile);
+}
+
+function addFile(file) {
+  if (file.size > 10 * 1024 * 1024) {
+    showToast('File too large: ' + file.name, 'error');
+    return;
+  }
+  state.files.push({ name: file.name, size: file.size });
+  renderFileList();
+}
+
+function removeFile(idx) {
+  state.files.splice(idx, 1);
+  renderFileList();
+}
+
+function renderFileList() {
+  var container = document.getElementById('file-list');
+  container.innerHTML = '';
+  state.files.forEach(function (f, i) {
+    var div = document.createElement('div');
+    div.className = 'file-item';
+    div.innerHTML = '<div class="file-info"><span>\ud83d\udcc4</span><span>' + escapeHtml(f.name) + '</span><span class="file-size">(' + (f.size / 1024).toFixed(1) + ' KB)</span></div>' +
+      '<button style="background:none; border:none; color:var(--error); cursor:pointer; font-size:16px;" onclick="removeFile(' + i + ')" aria-label="Remove file">&times;</button>';
+    container.appendChild(div);
+  });
+}
+
+
+
+/* === DATE FORMATTING === */
+function formatDisplayDate(dateStr) {
+  if (!dateStr) return '—';
+  var parts = dateStr.split('-');
+  var d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+  var day = String(d.getDate()).padStart(2, '0');
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return day + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+/* === SUMMARY === */
+function updateSummary() {
+  var addrText = '—';
+  if (state.address) {
+    addrText = state.address.property + ' ' + state.address.street + ', ' + state.address.town;
+  }
+  document.getElementById('sum-address').textContent = addrText;
+  document.getElementById('sum-street').textContent = state.street || '—';
+  document.getElementById('sum-bays').textContent = state.bays.length;
+  var dur = config.durationPricing.find(function (d) { return d.key === state.selectedDuration; });
+  document.getElementById('sum-duration').textContent = dur ? dur.label : '—';
+  document.getElementById('sum-start').textContent = state.startDate ? formatDisplayDate(state.startDate) + ', ' + state.startTime : '—';
+  document.getElementById('sum-end').textContent = state.endDate ? formatDisplayDate(state.endDate) + ', ' + state.endTime : '—';
+  var reason = document.getElementById('purchase-reason');
+  document.getElementById('sum-reason').textContent = reason && reason.value ? reason.options[reason.selectedIndex].text : '—';
+  document.getElementById('sum-vehicles').textContent = state.vehicles.length;
+}
+
+/* === REVIEW (Step 5 populate) === */
+function populateReview() {
+  var addrText = '—';
+  if (state.address) addrText = state.address.property + ' ' + state.address.street + ', ' + state.address.town + ', ' + state.address.postcode;
+  document.getElementById('rev-address').textContent = addrText;
+  document.getElementById('rev-permit-mode').textContent = state.permitMode === 'virtual' ? 'Virtual' : 'Physical';
+  document.getElementById('rev-street').textContent = state.street || '—';
+
+  var baysSummary = state.bays.map(function (b) {
+    return b.type ? config.bayTypes[b.type].name + ' × ' + b.spaces : '';
+  }).filter(Boolean).join('; ');
+  document.getElementById('rev-bays').textContent = baysSummary || '—';
+
+  // Duration
+  var dur = config.durationPricing.find(function (d) { return d.key === state.selectedDuration; });
+  document.getElementById('rev-duration').textContent = dur ? dur.label : '—';
+
+  // Start / End
+  document.getElementById('rev-start').textContent = state.startDate ? formatDisplayDate(state.startDate) + ', ' + state.startTime : '—';
+  document.getElementById('rev-end').textContent = state.endDate ? formatDisplayDate(state.endDate) + ', ' + state.endTime : '—';
+
+  // Discounts
+  var discounts = [];
+  if (state.discountBlueBadge) discounts.push('Blue Badge (' + config.discounts.blueBadge.percent + '%)');
+  if (state.discountStatePension) discounts.push('State Pension (' + config.discounts.statePension.percent + '%)');
+  document.getElementById('rev-discounts').textContent = discounts.length > 0 ? discounts.join(', ') : 'None';
+
+  var reasonSel = document.getElementById('purchase-reason');
+  var reasonText = reasonSel.value === 'other' ? 'Other: ' + state.otherReason : (reasonSel.value ? reasonSel.options[reasonSel.selectedIndex].text : '—');
+  document.getElementById('rev-reason').textContent = reasonText;
+
+  // Vehicles
+  document.getElementById('rev-vehicles').textContent = state.vehicles.length > 0 ? state.vehicles.join(', ') : 'None';
+  // Documents
+  document.getElementById('rev-documents').textContent = state.files.length > 0 ? state.files.map(function(f) { return f.name; }).join(', ') : 'None';
+
+  document.getElementById('rev-subtotal').textContent = document.getElementById('ps-subtotal').textContent;
+  var discountEl = document.getElementById('rev-discount-row');
+  if (state.discountBlueBadge || state.discountStatePension) {
+    discountEl.style.display = '';
+    document.getElementById('rev-discount').textContent = document.getElementById('ps-discount').textContent;
+  } else {
+    discountEl.style.display = 'none';
+  }
+  document.getElementById('rev-admin').textContent = document.getElementById('ps-admin').textContent;
+  document.getElementById('rev-vat').textContent = document.getElementById('ps-vat').textContent;
+  document.getElementById('rev-total').textContent = document.getElementById('ps-total').textContent;
+}
+
+/* === PAYMENT === */
+function selectPayment(el, method) {
+  // Deselect all primary options
+  document.querySelectorAll('.payment-option').forEach(function (o) { o.classList.remove('selected'); o.setAttribute('aria-checked', 'false'); });
+  // Deselect all more-payment items
+  document.querySelectorAll('.more-pay-item').forEach(function (o) { o.classList.remove('selected'); });
+  el.classList.add('selected'); el.setAttribute('aria-checked', 'true');
+  state.paymentMethod = method;
+
+  // Toggle card fields
+  document.getElementById('card-fields').classList.toggle('hidden', method !== 'card');
+
+  // Toggle more payment options panel
+  var morePanel = document.getElementById('more-payment-list');
+  if (method === 'more') {
+    morePanel.classList.add('open');
+    var firstItem = morePanel.querySelector('.more-pay-item');
+    if (firstItem) { selectMorePayment(firstItem, firstItem.getAttribute('data-method')); }
+  } else {
+    morePanel.classList.remove('open');
+  }
+}
+
+function selectMorePayment(el, method) {
+  document.querySelectorAll('.more-pay-item').forEach(function (o) { o.classList.remove('selected'); });
+  el.classList.add('selected');
+  state.paymentMethod = method;
+  document.getElementById('card-fields').classList.add('hidden');
+}
+
+/* === SUBMIT === */
+function submitApplication() {
+  var email = document.getElementById('email-confirm').value.trim() || 'user@example.com';
+  document.getElementById('email-confirm').classList.remove('error');
+  state.email = email;
+
+  var btn = document.querySelector('#sticky-nav-bar .nav-right .btn-primary');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Processing\u2026';
+    if (!document.getElementById('spin-style')) {
+      var style = document.createElement('style'); style.id = 'spin-style';
+      style.textContent = '.spinner{display:inline-block;width:16px;height:16px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite;}@keyframes spin{to{transform:rotate(360deg);}}';
+      document.head.appendChild(style);
+    }
+  }
+
+  setTimeout(function () {
+    if (btn) { btn.disabled = false; btn.innerHTML = 'Pay Now'; }
+
+    // Generate reference
+    var ref = 'DISP-' + new Date().getFullYear() + '-' + String(Math.floor(10000 + Math.random() * 90000));
+    document.getElementById('ref-number').textContent = ref;
+    document.getElementById('conf-email').textContent = state.email;
+
+    // Update active date text
+    var startFormatted = state.startDate ? new Date(state.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+    document.getElementById('active-date-text').textContent = 'Your dispensation permit will be valid from ' + startFormatted + ' at ' + (state.startTime || '12:00 PM') + '.';
+
+    // Hide all steps, show confirmation
+    for (var i = 1; i <= state.totalSteps; i++) {
+      document.getElementById('step-' + i).classList.add('hidden');
+    }
+    document.getElementById('step-confirmation').classList.remove('hidden');
+    document.getElementById('sticky-nav-bar').classList.remove('visible');
+    document.getElementById('instruction-alert').classList.add('hidden');
+
+    // Hide stepper & sidebar
+    document.querySelector('.stepper').style.display = 'none';
+    document.getElementById('summary-sidebar').style.display = 'none';
+
+    showToast('Application submitted successfully!', 'success');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 2000);
+}
+
+/* === T&C MODAL === */
+function openTCModal() {
+  var modal = document.getElementById('tc-modal');
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+}
+function closeTCModal(e) {
+  if (e && e.target !== document.getElementById('tc-modal')) return;
+  var modal = document.getElementById('tc-modal');
+  modal.classList.add('hidden');
+  modal.style.display = 'none';
+}
+function acceptTC() {
+  closeTCModal();
+}
+
+/* === HELP PANEL === */
+function openHelpPanel() {
+  document.getElementById('help-overlay').style.display = 'block';
+  document.getElementById('help-panel').style.right = '0';
+}
+function closeHelpPanel() {
+  document.getElementById('help-overlay').style.display = 'none';
+  document.getElementById('help-panel').style.right = '-420px';
+}
+
+/* === INSTRUCTION ALERT === */
+function toggleInstructionAlert() {
+  var body = document.getElementById('instruction-alert-body');
+  var chevron = document.querySelector('.instruction-alert-toggle');
+  body.classList.toggle('collapsed');
+  chevron.classList.toggle('flipped');
+}
+
+/* === KEBAB MENU (mobile) === */
+function toggleKebabMenu() {
+  document.getElementById('kebab-dropdown').classList.toggle('open');
+}
+document.addEventListener('click', function (e) {
+  if (!e.target.closest('#kebab-menu-btn') && !e.target.closest('#kebab-dropdown')) {
+    var dd = document.getElementById('kebab-dropdown');
+    if (dd) dd.classList.remove('open');
+  }
+});
+
+/* === FONT SIZE === */
+function setFontSize(size) {
+  document.body.classList.remove('font-large', 'font-xl');
+  if (size === 'large') document.body.classList.add('font-large');
+  if (size === 'xl') document.body.classList.add('font-xl');
+  document.querySelectorAll('.font-toggle button').forEach(function (b) { b.classList.remove('active'); });
+  document.getElementById('font-' + (size === 'normal' ? 'normal' : size)).classList.add('active');
+}
+
+/* === TOAST === */
+function showToast(msg, type) {
+  var toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast toast-' + (type || 'success') + ' show';
+  setTimeout(function () { toast.classList.remove('show'); }, 3000);
+}
+
+/* === UTILITIES === */
+function escapeHtml(str) {
+  var div = document.createElement('div');
+  div.appendChild(document.createTextNode(str));
+  return div.innerHTML;
+}
+</script>
+</body>
+</html>
