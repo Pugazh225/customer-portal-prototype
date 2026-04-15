@@ -1,0 +1,1969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dispensation Details — View Details</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ===== DESIGN TOKENS ===== */
+    :root {
+      --primary-main: #3276CF;
+      --primary-dark: #2560A8;
+      --primary-800: #22497D;
+      --primary-25: #F2F5FA;
+      --primary-100: #A2C1EA;
+      --primary-200: #84ADE4;
+      --text-primary: #212121;
+      --text-secondary: #757575;
+      --text-disabled: #9E9E9E;
+      --grey-50: #FAFAFA;
+      --grey-100: #F5F5F5;
+      --grey-200: #EEEEEE;
+      --grey-300: #E0E0E0;
+      --grey-400: #BDBDBD;
+      --neutral-100: #CBCCCD;
+      --neutral-300: #8E9092;
+      --success: #2E7D32;
+      --warning: #ED6C02;
+      --error: #D32F2F;
+      --info: #0288D1;
+      --avatar-bg: #DC4A11;
+      --bg-page: #FFFFFF;
+      --yellow-500: #FFEB3B;
+      --shadow-card: 0px 4px 6px rgba(0,0,0,0.1), 0px 2px 4px rgba(0,0,0,0.1);
+      --shadow-toast: 0 4px 12px rgba(0,0,0,0.15);
+      --radius-btn: 10px;
+      --radius-card: 10px;
+      --radius-input: 8px;
+      --radius-chip: 16px;
+      --radius-nav: 8px;
+      --font-size-base: 16px;
+    }
+
+    /* ===== RESET ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: var(--font-size-base); scroll-behavior: smooth; }
+    body {
+      font-family: 'Roboto', Helvetica, Arial, sans-serif;
+      color: var(--text-primary);
+      background: var(--bg-page);
+      line-height: 1.5;
+      letter-spacing: 0.15px;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+    body.font-large { --font-size-base: 18px; }
+    body.font-xl    { --font-size-base: 20px; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; }
+    }
+
+    /* ===== SKIP LINK ===== */
+    .skip-link {
+      position: absolute; left: -999px; top: 0;
+      background: var(--primary-main); color: #fff; padding: 8px 16px;
+      z-index: 1000; border-radius: 0 0 var(--radius-input) 0;
+      font-size: 14px;
+    }
+    .skip-link:focus { left: 0; }
+
+    /* ===== HEADER ===== */
+    .site-header {
+      background: var(--primary-800);
+      border-bottom: 4px solid var(--primary-main);
+      padding: 0 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 56px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 24px; }
+    .site-header .logo { display: flex; align-items: center; gap: 12px; }
+    .site-header .logo-icon {
+      width: 36px; height: 36px; background: var(--yellow-500);
+      border-radius: 4px; display: flex; align-items: center; justify-content: center;
+      font-weight: 500; font-size: 14px; color: var(--primary-800);
+    }
+    .header-divider { width: 1px; height: 24px; background: rgba(255,255,255,.3); }
+    .header-nav { display: flex; align-items: center; gap: 0; }
+    .header-nav a {
+      text-decoration: none; color: #fff; font-size: 14px;
+      font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px;
+      padding: 16px 20px; display: flex; align-items: center; gap: 8px;
+      transition: background 150ms ease; line-height: 24px;
+    }
+    .header-nav a:hover { background: rgba(255,255,255,.08); }
+    .header-nav a.active { color: var(--yellow-500); }
+    .header-nav a svg { width: 20px; height: 20px; }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .header-search {
+      display: flex; align-items: center; gap: 6px;
+      border: 1px solid rgba(255,255,255,.5); border-radius: var(--radius-input);
+      padding: 8px 12px; width: 240px; opacity: .7; transition: opacity 150ms;
+    }
+    .header-search:focus-within { opacity: 1; border-color: #fff; }
+    .header-search svg { width: 20px; height: 20px; color: #fff; flex-shrink: 0; }
+    .header-search input {
+      background: none; border: none; color: #fff; font-size: 14px;
+      width: 100%; outline: none; font-family: inherit; letter-spacing: 0.15px;
+    }
+    .header-search input::placeholder { color: rgba(255,255,255,.6); }
+    .header-bell {
+      background: none; border: none; color: #fff; cursor: pointer;
+      padding: 8px; border-radius: var(--radius-nav); transition: background 150ms;
+    }
+    .header-bell:hover { background: rgba(255,255,255,.1); }
+    .header-bell svg { width: 24px; height: 24px; }
+    .header-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--avatar-bg); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 500; letter-spacing: 0.16px;
+    }
+    .font-toggle {
+      display: flex; gap: 2px; align-items: center;
+      border: 1px solid rgba(255,255,255,.4); border-radius: var(--radius-input);
+      padding: 2px; background: rgba(255,255,255,.08);
+    }
+    .font-toggle button {
+      background: none; border: none; padding: 3px 8px; cursor: pointer;
+      font-weight: 500; border-radius: 6px; color: rgba(255,255,255,.6);
+      font-size: 12px; transition: all 150ms; font-family: inherit;
+    }
+    .font-toggle button.active { background: rgba(255,255,255,.2); color: #fff; }
+
+    /* ===== PAGE WRAPPER ===== */
+    .page-wrapper {
+      max-width: 1152px; margin: 0 auto;
+      padding: 24px 24px 100px;
+    }
+
+    /* ===== BACK LINK ===== */
+    .back-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 16px; color: var(--text-secondary);
+      text-decoration: none; margin-bottom: 4px;
+      letter-spacing: 0.15px; line-height: 1.5;
+      transition: color 150ms;
+    }
+    .back-link:hover { color: var(--primary-main); }
+    .back-link svg { width: 16px; height: 16px; }
+
+    /* ===== PAGE HEADER ===== */
+    .page-header {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px;
+    }
+    .page-header-left { display: flex; flex-direction: column; gap: 4px; }
+    .page-title-row { display: flex; align-items: center; gap: 8px; }
+    .page-title-row h1 {
+      font-size: 24px; font-weight: 400; line-height: 1.334;
+      color: var(--text-primary); letter-spacing: 0;
+    }
+    .page-header-right { display: flex; align-items: center; gap: 12px; }
+
+    /* ===== STATUS CHIP ===== */
+    .status-chip {
+      display: inline-flex; align-items: center;
+      padding: 3px 10px; border-radius: 100px;
+      font-size: 13px; font-weight: 400; letter-spacing: 0.16px;
+      line-height: 18px; border: 1px solid;
+    }
+    .status-chip.active { border-color: #43A047; color: #43A047; }
+    .status-chip.pending { border-color: var(--warning); color: var(--warning); }
+    .status-chip.waiting-payment { border-color: var(--info); color: var(--info); }
+    .status-chip.payment-failed { border-color: var(--error); color: var(--error); }
+    .status-chip.rejected { border-color: var(--error); color: var(--error); }
+    .status-chip.cancelled { border-color: var(--grey-400); color: var(--text-disabled); }
+    .status-chip.expired { border-color: var(--grey-400); color: var(--text-disabled); }
+    .status-chip.on-hold { border-color: var(--warning); color: var(--warning); }
+    .status-chip.internal-referral { border-color: var(--warning); color: var(--warning); }
+    .status-chip.waiting-info { border-color: var(--info); color: var(--info); }
+    .status-chip.in-progress { border-color: var(--info); color: var(--info); }
+    .status-chip.request-evidence { border-color: var(--warning); color: var(--warning); }
+    .status-chip.due-to-close { border-color: var(--warning); color: var(--warning); }
+    .status-chip.print { border-color: var(--grey-400); color: var(--text-disabled); }
+
+    /* ===== OVERFLOW MENU ===== */
+    .overflow-menu { position: relative; }
+    .overflow-icon-btn {
+      background: none; border: none; border-radius: 100px;
+      padding: 5px; cursor: pointer; display: flex; align-items: center;
+      justify-content: center; transition: background 150ms;
+      color: var(--text-primary);
+    }
+    .overflow-icon-btn:hover { background: var(--grey-100); }
+    .overflow-icon-btn svg { width: 24px; height: 24px; }
+    .overflow-dropdown {
+      position: absolute; top: 100%; right: 0; margin-top: 4px;
+      background: #fff; border: 1px solid var(--grey-300);
+      border-radius: var(--radius-input); box-shadow: var(--shadow-card);
+      min-width: 180px; z-index: 50; display: none;
+    }
+    .overflow-dropdown.open { display: block; }
+    .overflow-dropdown button {
+      display: block; width: 100%; padding: 10px 16px;
+      background: none; border: none; text-align: left;
+      font-size: 14px; cursor: pointer; color: var(--text-primary);
+      font-family: inherit; transition: background 150ms;
+    }
+    .overflow-dropdown button:hover { background: var(--grey-50); }
+    .overflow-dropdown button.danger-item { color: var(--error); }
+    .overflow-dropdown button.danger-item:hover { background: #fce4ec; }
+
+    /* ===== HEADER DIVIDER LINE ===== */
+    .header-line { height: 1px; background: var(--grey-300); margin: 16px 0 0; }
+
+    /* ===== TAB NAV ===== */
+    .tab-nav {
+      display: flex; gap: 0;
+      background: #fff; position: sticky; top: 56px; z-index: 10;
+      margin-top: 16px;
+    }
+    .tab-btn {
+      padding: 9px 16px; background: none; border: none;
+      font-size: 14px; font-weight: 500; letter-spacing: 0.4px;
+      text-transform: uppercase; cursor: pointer;
+      color: var(--text-secondary); border-bottom: 2px solid transparent;
+      transition: color 150ms, border-color 150ms;
+      font-family: inherit; display: inline-flex; align-items: center; gap: 8px;
+    }
+    .tab-btn:hover { color: var(--primary-main); }
+    .tab-btn.active { color: var(--primary-main); border-bottom-color: var(--primary-main); }
+    .tab-btn .tab-badge {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--error); color: #fff;
+      font-size: 11px; font-weight: 500;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+
+    /* ===== CARD ===== */
+    .card {
+      background: #fff; border: 1px solid var(--grey-300);
+      border-radius: var(--radius-card); padding: 24px;
+      margin-bottom: 20px;
+    }
+    .card h2 {
+      font-size: 20px; font-weight: 500; line-height: 1.6;
+      letter-spacing: 0.15px; margin-bottom: 4px; color: var(--text-primary);
+    }
+    .card h3 {
+      font-size: 16px; font-weight: 500; line-height: 1.5;
+      letter-spacing: 0.15px; margin-bottom: 12px; color: var(--text-primary);
+    }
+    .card .subtitle {
+      color: var(--text-secondary); font-size: 14px;
+      line-height: 1.43; letter-spacing: 0.17px; margin-bottom: 20px;
+    }
+
+    /* ===== LIST ITEM ROW ===== */
+    .list-item-row {
+      display: flex; gap: 8px; align-items: center;
+      min-height: 48px;
+    }
+    .list-item-row .li-label,
+    .list-item-row .li-value {
+      padding: 14px 8px;
+      font-size: 14px; line-height: 1.43; letter-spacing: 0.17px;
+    }
+    .list-item-row .li-label { color: var(--text-secondary); flex: 0 0 200px; }
+    .list-item-row .li-value { color: var(--text-primary); font-weight: 400; flex: 1; }
+    .overview-list { margin-bottom: 4px; padding-left: 12px; }
+    .overview-section-title {
+      font-size: 16px; font-weight: 500; color: var(--text-primary);
+      padding: 12px 0 4px; letter-spacing: 0.15px;
+      margin-bottom: 0;
+    }
+
+    /* ===== DETAIL ROWS ===== */
+    .detail-row {
+      display: flex; justify-content: space-between;
+      padding: 8px 0; font-size: 14px; line-height: 1.43;
+      letter-spacing: 0.17px; border-bottom: 1px solid var(--grey-200);
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-row .d-label { color: var(--text-secondary); min-width: 180px; flex-shrink: 0; }
+    .detail-row .d-value { font-weight: 500; color: var(--text-primary); text-align: right; }
+
+    /* ===== SECTION DIVIDER ===== */
+    .section-divider { height: 1px; background: var(--grey-300); margin: 20px 0; }
+
+    /* ===== STREET GROUP ===== */
+    .street-group { margin-bottom: 12px; max-width: 720px; }
+    .street-group-header {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--grey-50);
+      border: 1px solid var(--grey-200); border-radius: var(--radius-input) var(--radius-input) 0 0;
+      font-size: 14px; font-weight: 500; color: var(--text-primary);
+      padding: 8px 16px;
+    }
+    .street-group-header svg { width: 18px; height: 18px; color: var(--primary-main); }
+    .street-group-body {
+      border: 1px solid var(--grey-200); border-top: none;
+      border-radius: 0 0 var(--radius-input) var(--radius-input);
+      padding: 12px 16px;
+    }
+    .bay-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 6px 0; font-size: 14px;
+    }
+    .bay-row + .bay-row { border-top: 1px solid var(--grey-200); padding-top: 8px; }
+    .bay-row .bay-type { color: var(--text-primary); }
+    .bay-row .bay-spaces {
+      background: var(--primary-25); color: var(--primary-main);
+      padding: 2px 10px; border-radius: var(--radius-chip);
+      font-size: 13px; font-weight: 500;
+    }
+
+    /* ===== PRICING CARD ===== */
+    .pricing-card {
+      background: var(--grey-50); border: 1px solid var(--grey-200);
+      border-radius: var(--radius-input); padding: 16px;
+      margin-bottom: 12px; max-width: 720px;
+    }
+    .pricing-card-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 8px;
+    }
+    .pricing-card-header .bay-name {
+      font-size: 14px; font-weight: 500; color: var(--text-primary);
+    }
+    .pricing-card-header .bay-price {
+      font-size: 16px; font-weight: 500; color: var(--primary-main);
+    }
+    .pricing-card-meta {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      font-size: 13px; color: var(--text-secondary); line-height: 1.5;
+    }
+    .pricing-card-meta span { display: inline-flex; align-items: center; gap: 4px; }
+
+    /* ===== NOTICE ===== */
+    .notice {
+      display: flex; gap: 12px; padding: 12px 16px;
+      border-radius: var(--radius-input); font-size: 14px;
+      line-height: 1.43; letter-spacing: 0.17px; margin-bottom: 16px;
+    }
+    .notice-info { background: #E3F2FD; color: var(--info); }
+    .notice-warning { background: #FFF3E0; color: var(--warning); }
+    .notice-success { background: rgba(46,125,50,.08); color: var(--success); border: 1px solid var(--success); }
+    .notice-error { background: rgba(211,47,47,.06); color: var(--error); border: 1px solid rgba(211,47,47,.2); }
+    .notice svg { width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px; }
+    .notice span { color: var(--text-primary); }
+    .notice a { color: var(--primary-main); text-decoration: underline; cursor: pointer; }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      height: 40px; min-width: 100px;
+      padding: 0 22px; border-radius: var(--radius-btn); font-size: 14px;
+      font-weight: 500; cursor: pointer; border: none;
+      text-transform: uppercase; letter-spacing: 0.4px; line-height: 40px;
+      transition: background 150ms ease, border-color 150ms ease;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      font-family: 'Roboto', Helvetica, Arial, sans-serif;
+      white-space: nowrap;
+    }
+    .btn:focus-visible { outline: 2px solid var(--primary-main); outline-offset: 2px; }
+    .btn-primary {
+      background: var(--primary-main); color: #fff; border: none;
+      font-size: 15px; letter-spacing: 0.46px;
+    }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-primary:disabled { background: var(--grey-400); cursor: not-allowed; }
+    .btn-secondary {
+      background: transparent; color: var(--primary-main);
+      border: 1px solid var(--primary-main);
+    }
+    .btn-secondary:hover { background: var(--primary-25); }
+    .btn-text {
+      background: transparent; color: var(--primary-main); border: none;
+      min-width: auto;
+    }
+    .btn-text:hover { background: var(--primary-25); }
+    .btn-danger { background: var(--error); color: #fff; border: none; }
+    .btn-danger:hover { background: #B71C1C; }
+
+    /* ===== VEHICLE TAB ===== */
+    .vrm-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
+    @media (max-width: 768px) { .vrm-grid { grid-template-columns: 1fr; } }
+    .vrm-empty-state { text-align: center; padding: 48px 24px; border: 2px dashed var(--grey-300); border-radius: 8px; margin-top: 16px; }
+    .vrm-card {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; background: #fff;
+      border: 1px solid var(--grey-300); border-radius: 8px;
+      position: relative;
+    }
+    .vrm-card .vrm-plate {
+      display: inline-flex; align-items: center;
+      background: #FFF6A5; color: var(--text-primary);
+      font-weight: 400; font-size: 14px; letter-spacing: 0.17px;
+      line-height: 1.43;
+      padding: 2px 8px; border-radius: 4px; border: 1px solid #E8D636;
+      font-family: 'Roboto', Helvetica, Arial, sans-serif;
+    }
+    .vrm-card .vrm-plate-wrapper { flex: 1; display: flex; align-items: center; }
+    .vrm-card-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+    .vrm-card-actions button {
+      background: none; border: none; cursor: pointer;
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-secondary); transition: background 150ms;
+      padding: 4px;
+    }
+    .vrm-card-actions button:hover { background: var(--grey-100); }
+    .vrm-card-actions button svg { width: 20px; height: 20px; }
+    .vrm-card-actions .vrm-delete-btn:hover { color: var(--error); background: #fce4ec; }
+
+    /* Tab nav wrapper */
+    .tab-nav-wrapper { display: flex; align-items: center; justify-content: space-between; }
+    .tab-nav-wrapper .tab-nav { flex: 1; }
+    .add-vehicle-btn {
+      display: none; align-items: center; gap: 8px;
+      padding: 8px 16px; border: 1px solid var(--primary-100);
+      border-radius: 8px; background: transparent;
+      color: var(--primary-main); font-size: 14px; font-weight: 500;
+      letter-spacing: 0.4px; text-transform: uppercase;
+      cursor: pointer; font-family: inherit; white-space: nowrap;
+      min-width: 100px; transition: background 150ms, opacity 150ms;
+    }
+    .add-vehicle-btn:hover:not(:disabled) { background: var(--primary-25); }
+    .add-vehicle-btn.visible { display: inline-flex; }
+    .add-vehicle-btn:disabled { opacity: 0.45; cursor: not-allowed; border-color: var(--grey-300); color: var(--text-disabled); }
+    .add-vehicle-btn svg { width: 20px; height: 20px; }
+
+    /* VRM Modal */
+    .vrm-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.45);
+      z-index: 200; display: none; align-items: center; justify-content: center;
+    }
+    .vrm-modal-overlay.open { display: flex; }
+    .vrm-modal {
+      background: #fff; border-radius: 12px;
+      width: 560px; max-width: 90vw;
+      box-shadow: 0 8px 32px rgba(0,0,0,.2);
+      overflow: hidden; display: flex; flex-direction: column;
+      max-height: 80vh;
+    }
+    .vrm-modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 24px; background: var(--primary-800); color: #fff;
+    }
+    .vrm-modal-header h2 { font-size: 20px; font-weight: 500; margin: 0; color: #fff; letter-spacing: 0.15px; line-height: 1.6; }
+    .vrm-modal-header .modal-close-x {
+      background: none; border: none; color: #fff;
+      cursor: pointer; line-height: 1; padding: 0;
+      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+    }
+    .vrm-modal-body { padding: 12px 24px; overflow-y: auto; flex: 1; }
+    .vrm-modal-body .vrm-input-row {
+      display: flex; gap: 0; align-items: flex-end; flex-wrap: wrap;
+    }
+    .vrm-modal-body .vrm-input-row .form-group { flex: 1; margin-bottom: 0; padding: 8px; }
+    .vrm-modal-body .vrm-input-row .btn-add-inline {
+      width: 100px; height: 42px; border: 1px solid var(--primary-100);
+      background: #fff; color: var(--primary-main); font-weight: 500;
+      font-size: 14px; border-radius: 8px; cursor: pointer;
+      font-family: inherit; text-transform: uppercase; letter-spacing: 0.4px;
+      margin: 8px 8px 8px 0; line-height: 24px;
+    }
+    .vrm-modal-body .vrm-input-row .btn-add-inline:hover { background: var(--primary-25); }
+    .vrm-modal-body .vrm-input-row .btn-add-inline:disabled { opacity: 0.5; cursor: not-allowed; }
+    .vrm-modal-body .vrm-staged-list { margin-top: 12px; padding: 0 8px; }
+    .vrm-modal-body .vrm-staged-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 12px; border: 1px solid var(--grey-200);
+      border-radius: 6px; margin-bottom: 8px; background: #fafafa;
+    }
+    .vrm-modal-body .vrm-staged-item .staged-plate {
+      display: inline-flex; padding: 2px 10px; background: #FFF6A5;
+      border: 1px solid #E8D636; border-radius: 4px; font-size: 14px;
+      font-weight: 400; letter-spacing: 1px;
+    }
+    .vrm-modal-body .vrm-staged-item .staged-remove {
+      background: none; border: none; color: var(--error);
+      cursor: pointer; font-size: 18px; line-height: 1; padding: 4px;
+    }
+    .vrm-modal-body .vrm-limit-info {
+      margin-top: 12px; padding: 8px 12px; background: #E8F4FD;
+      border-left: 3px solid var(--primary-main); border-radius: 4px;
+      font-size: 13px; color: var(--text-secondary);
+    }
+    .vrm-modal-body .vrm-limit-info.warning { background: #FFF4E5; border-left-color: #ed6c02; }
+    .vrm-modal-footer {
+      display: flex; justify-content: flex-end; gap: 24px;
+      padding: 16px 24px; border-top: 1px solid var(--grey-400);
+    }
+    .vrm-modal-footer .footer-btn-group { display: flex; gap: 12px; align-items: center; }
+
+    /* ===== DELETE DIALOG ===== */
+    .vrm-delete-dialog {
+      background: #fff; border-radius: 8px; width: 420px; max-width: 90vw;
+      box-shadow: 0 4px 18px 3px rgba(0,0,0,.12), 0 10px 14px 1px rgba(0,0,0,.14), 0 6px 6px -3px rgba(0,0,0,.2);
+      overflow: hidden;
+    }
+    .vrm-delete-dialog .dialog-title {
+      height: 56px; display: flex; align-items: center;
+      padding: 8px 12px 8px 24px;
+    }
+    .vrm-delete-dialog .dialog-title h2 {
+      flex: 1; font-size: 20px; font-weight: 500; margin: 0;
+      color: var(--text-primary); letter-spacing: 0.15px; line-height: 1.6;
+    }
+    .vrm-delete-dialog .dialog-content { padding: 12px 24px 32px; }
+    .vrm-delete-dialog .dialog-content p {
+      font-size: 14px; font-weight: 400; line-height: 1.43;
+      letter-spacing: 0.17px; color: var(--text-primary); margin: 0;
+    }
+    .vrm-delete-dialog .dialog-actions {
+      display: flex; align-items: center; justify-content: flex-end;
+      padding: 12px 20px 20px;
+    }
+    .vrm-delete-dialog .dialog-actions .dialog-btn-group { display: flex; gap: 12px; align-items: center; }
+
+    /* ===== CANCEL DIALOG ===== */
+    .cancel-dialog {
+      background: #fff; border-radius: 12px; width: 560px; max-width: 90vw;
+      box-shadow: 0 8px 32px rgba(0,0,0,.2);
+      overflow: hidden; display: flex; flex-direction: column;
+      max-height: 80vh;
+    }
+    .cancel-dialog-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 24px; background: var(--primary-800); color: #fff;
+    }
+    .cancel-dialog-header h2 {
+      font-size: 20px; font-weight: 500; margin: 0; color: #fff;
+      letter-spacing: 0.15px; line-height: 1.6;
+    }
+    .cancel-dialog-header .modal-close-x {
+      background: none; border: none; color: #fff;
+      cursor: pointer; line-height: 1; padding: 0;
+      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+    }
+    .cancel-dialog-body { padding: 12px 24px; overflow-y: auto; flex: 1; }
+    .cancel-dialog-body h3 {
+      font-size: 16px; font-weight: 500; margin-bottom: 12px; color: var(--text-primary);
+    }
+    .cancel-dialog-footer {
+      display: flex; justify-content: flex-end; gap: 24px;
+      padding: 16px 24px; border-top: 1px solid var(--grey-400);
+    }
+    .cancel-dialog-footer .footer-btn-group { display: flex; gap: 12px; align-items: center; }
+    .inline-error {
+      display: none; margin-top: 6px; font-size: 13px; color: var(--error);
+      line-height: 1.43; letter-spacing: 0.17px;
+    }
+    .inline-error.visible { display: flex; align-items: flex-start; gap: 6px; }
+    .form-group.has-error select { border-color: var(--error); }
+    .form-group.has-error select:focus { box-shadow: 0 0 0 1px var(--error); }
+    .form-group.has-error textarea { border-color: var(--error); }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+      text-align: center; padding: 40px 24px; color: var(--text-secondary);
+    }
+    .empty-state svg { width: 48px; height: 48px; color: var(--grey-400); margin-bottom: 12px; }
+    .empty-state p { font-size: 14px; margin-bottom: 16px; }
+
+    /* ===== FORM ===== */
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block; font-size: 14px; font-weight: 400;
+      line-height: 1.43; letter-spacing: 0.17px;
+      margin-bottom: 6px; color: var(--text-primary);
+    }
+    select, input[type="text"], input[type="number"], input[type="date"], input[type="time"], textarea {
+      width: 100%; padding: 10px 14px;
+      border: 1px solid var(--grey-400); border-radius: var(--radius-input);
+      font-size: 16px; line-height: 24px; letter-spacing: 0.15px;
+      color: var(--text-primary); background: #fff;
+      font-family: 'Roboto', Helvetica, Arial, sans-serif;
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+    select { padding-right: 32px; appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23555' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center;
+    }
+    select:focus, input:focus, textarea:focus {
+      outline: none; border-color: var(--primary-main);
+      box-shadow: 0 0 0 1px var(--primary-main);
+    }
+    textarea { resize: vertical; min-height: 80px; }
+
+    /* ===== EXTEND PAGE ===== */
+    .extend-page { background: var(--bg-page); min-height: calc(100vh - 60px); padding-bottom: 80px; }
+    .extend-layout { display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; }
+    @media (max-width: 768px) { .extend-layout { grid-template-columns: 1fr; } }
+    .summary-sidebar { position: sticky; top: 80px; }
+    .summary-card {
+      background: #fff; border: 1px solid var(--primary-25, var(--grey-200));
+      border-radius: var(--radius-card); padding: 0;
+      box-shadow: 0px 1px 21.4px 0px rgba(81,85,110,0.12);
+      overflow: hidden;
+    }
+    .summary-card h3 {
+      font-size: 20px; font-weight: 500; line-height: 1.6;
+      letter-spacing: 0.15px; margin: 0;
+      padding: 12px 16px; color: var(--text-primary);
+      border-bottom: 1px solid var(--grey-400);
+    }
+    .summary-row {
+      display: flex; justify-content: space-between;
+      padding: 6px 0; font-size: 14px; line-height: 1.43;
+      letter-spacing: 0.17px;
+    }
+    .summary-row .s-label { color: var(--text-secondary); }
+    .summary-row .s-value { font-weight: 500; color: var(--text-primary); text-align: right; max-width: 55%; }
+    .summary-divider { height: 1px; background: var(--grey-200); margin: 8px 0; }
+    .summary-total {
+      display: flex; justify-content: space-between;
+      padding: 12px 0 0; font-size: 16px; font-weight: 500;
+    }
+    .summary-total .s-value { color: var(--primary-main); font-size: 20px; }
+    .extend-bottom-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: #fff; border-top: 1px solid var(--grey-300);
+      padding: 16px 180px; z-index: 50;
+      display: flex; justify-content: flex-end; gap: 12px;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .date-time-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+    .date-time-row select { max-width: 120px; }
+
+    /* Payment method */
+    .payment-method-section { margin-top: 8px; }
+    .payment-method-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 0 8px; }
+    .payment-method-header h3 { font-size: 16px; font-weight: 500; color: var(--text-primary); margin: 0; }
+    .payment-method-header .change-link {
+      font-size: 14px; font-weight: 500; color: var(--primary-main);
+      text-transform: uppercase; letter-spacing: 0.4px;
+      cursor: pointer; background: none; border: none; font-family: inherit;
+    }
+    .payment-card-display {
+      display: flex; align-items: center; gap: 16px;
+      border: 1px solid var(--grey-300); border-radius: var(--radius-input);
+      padding: 16px 20px; background: #fff;
+    }
+    .payment-card-icon {
+      width: 48px; height: 32px; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 600; color: #fff;
+      background: linear-gradient(135deg, #EB001B 0%, #EB001B 33%, #7673C0 33%, #7673C0 66%, #00A2E5 66%, #00A2E5 100%);
+      letter-spacing: 0.5px; flex-shrink: 0;
+    }
+    .payment-card-info { display: flex; flex-direction: column; }
+    .payment-card-number { font-size: 15px; font-weight: 500; color: var(--text-primary); letter-spacing: 1px; }
+    .payment-card-expiry { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+
+    /* ===== REFUND PANEL ===== */
+    .refund-panel {
+      background: var(--grey-50); border: 1px solid var(--grey-300);
+      border-radius: var(--radius-card); padding: 20px 24px;
+    }
+    .refund-line {
+      display: flex; justify-content: space-between;
+      padding: 6px 0; font-size: 14px; line-height: 1.43;
+    }
+    .refund-line .r-label { color: var(--text-secondary); }
+    .refund-line .r-value { font-weight: 500; }
+    .refund-line.total {
+      font-size: 16px; font-weight: 500;
+      border-top: 2px solid var(--grey-300); padding-top: 12px; margin-top: 8px;
+    }
+    .refund-line.total .r-value { color: var(--success); }
+    .refund-formula {
+      background: #E3F2FD; border-left: 4px solid var(--info);
+      border-radius: 0 var(--radius-input) var(--radius-input) 0;
+      padding: 12px 16px; margin: 12px 0; font-size: 13px;
+      line-height: 1.5; color: var(--text-primary); font-family: monospace;
+    }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed; top: 72px; left: 50%; transform: translateX(-50%);
+      background: #fff; color: var(--text-primary);
+      padding: 12px 24px; border-radius: var(--radius-input);
+      font-size: 14px; box-shadow: 0 4px 16px rgba(0,0,0,.12);
+      z-index: 300; display: none; align-items: center; gap: 12px;
+      max-width: 540px; border: 1px solid var(--grey-300);
+    }
+    .toast.visible { display: flex; }
+    .toast.success { background: #E8F5E9; border-color: var(--success); color: var(--success); }
+    .toast.info { background: #E3F2FD; border-color: var(--info); color: var(--info); }
+    .toast svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+    /* ===== DEMO BAR ===== */
+    .demo-bar {
+      background: #FFF9C4; border: 1px solid #FBC02D;
+      border-radius: var(--radius-input); padding: 12px 16px;
+      margin-bottom: 20px; display: flex; align-items: center; gap: 12px;
+      flex-wrap: wrap; font-size: 13px;
+    }
+    .demo-bar label { font-weight: 500; color: var(--text-primary); }
+    .demo-bar select {
+      padding: 6px 12px; font-size: 13px; border-radius: var(--radius-input);
+      border: 1px solid var(--grey-400); width: auto;
+    }
+    .demo-bar .demo-note { color: var(--text-secondary); font-style: italic; }
+
+    /* ===== FOOTER ===== */
+    .site-footer {
+      background: var(--primary-800);
+      border-top: 4px solid var(--primary-main);
+      padding: 24px; text-align: center;
+      margin-top: auto;
+    }
+    .site-footer p { font-size: 14px; line-height: 24px; color: #fff; }
+    .site-footer a { color: #fff; }
+
+    .hidden { display: none !important; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .site-header { padding: 0 16px; height: 52px; }
+      .header-nav a { padding: 12px 12px; font-size: 13px; }
+      .header-search { width: 180px; }
+      .page-wrapper { padding: 20px 16px 80px; }
+      .extend-layout { grid-template-columns: 1fr; }
+      .summary-sidebar { position: static; }
+      .extend-bottom-bar { padding: 16px 24px; }
+      .vrm-grid { grid-template-columns: repeat(2, 1fr); }
+      .cancel-dialog, .vrm-modal, .vrm-delete-dialog { width: 95vw; max-width: 95vw; }
+      .list-item-row .li-label { flex: 0 0 170px; }
+      .form-row { grid-template-columns: 1fr; gap: 16px; }
+    }
+    @media (max-width: 640px) {
+      .site-header { padding: 0 8px; height: 48px; }
+      .header-divider { display: none; }
+      .header-search { display: none; }
+      .header-nav a { padding: 8px; font-size: 12px; }
+      .header-nav a span.nav-text { display: none; }
+      .font-toggle { display: none; }
+      .page-wrapper { padding: 16px 16px 80px; }
+      .page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .page-header-right { width: 100%; display: flex; align-items: center; gap: 12px; }
+      .page-header-right .btn { flex: 1; min-width: 0; }
+      .page-title-row h1 { font-size: 20px; font-weight: 500; }
+      .tab-nav { overflow-x: auto; }
+      .tab-btn { white-space: nowrap; padding: 9px 12px; }
+      .tab-nav-wrapper { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .add-vehicle-btn { width: 100%; justify-content: center; }
+      .list-item-row { display: flex; flex-direction: row; gap: 24px; }
+      .list-item-row .li-label { flex: 1 0 0; font-size: 14px; padding: 10px 8px; }
+      .list-item-row .li-value { flex: 1 0 0; font-size: 14px; padding: 10px 8px; }
+      .street-group { max-width: 100%; }
+      .pricing-card { max-width: 100%; }
+      .card { padding: 16px; }
+      .vrm-grid { grid-template-columns: 1fr; gap: 10px; }
+      .cancel-dialog, .vrm-modal { width: 100vw; max-width: 100vw; border-radius: 0; max-height: 100vh; }
+      .extend-bottom-bar { padding: 12px 16px; }
+      .extend-bottom-bar .btn { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<!-- ===== HEADER ===== -->
+<header class="site-header" role="banner">
+  <div class="header-left">
+    <div class="logo">
+      <div class="logo-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" width="20" height="20"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor" opacity=".9"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+      </div>
+    </div>
+    <div class="header-divider"></div>
+    <nav class="header-nav" aria-label="Main navigation">
+      <a href="#" class="active" onclick="return false;"><span class="nav-text">My Applications</span></a>
+      <a href="#" onclick="return false;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        <span class="nav-text">Vehicles</span>
+      </a>
+      <a href="#" onclick="return false;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+        <span class="nav-text">Documents</span>
+      </a>
+      <a href="#" onclick="return false;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+        <span class="nav-text">Payment</span>
+      </a>
+    </nav>
+  </div>
+  <div class="header-right">
+    <div class="header-search" aria-label="Search applications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <span>Search Application</span>
+    </div>
+    <div class="font-toggle" role="group" aria-label="Adjust text size">
+      <button onclick="setFontSize('normal')" class="active" aria-label="Normal text" id="font-normal">A</button>
+      <button onclick="setFontSize('large')" aria-label="Large text" id="font-large">A+</button>
+      <button onclick="setFontSize('xl')" aria-label="Extra large text" id="font-xl">A++</button>
+    </div>
+    <button class="header-bell" aria-label="Notifications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+    </button>
+    <div class="header-avatar" aria-label="User account" style="background:rgba(255,255,255,.9); color:var(--text-primary); font-size:12px; letter-spacing:1.5px;">JD</div>
+  </div>
+</header>
+
+<!-- ===== MAIN CONTENT ===== -->
+<main id="main-content">
+  <div class="page-wrapper">
+
+    <!-- Demo Controls -->
+    <div class="demo-bar" role="region" aria-label="Prototype demo controls">
+      <label for="status-select">&#9881; Status:</label>
+      <select id="status-select" onchange="changeStatus(this.value)">
+        <option value="active">Active</option>
+        <option value="pending-approval">Pending Approval</option>
+        <option value="on-hold">On Hold</option>
+        <option value="internal-referral">Internal Referral</option>
+        <option value="waiting-info">Waiting for Customer Information</option>
+        <option value="request-evidence">Request Support Evidence</option>
+        <option value="due-to-close-evidence">Due to be Closed (prev: Evidence)</option>
+        <option value="waiting-payment">Waiting for Payment (Online)</option>
+        <option value="waiting-payment-offline">Waiting for Payment (Offline/Southend)</option>
+        <option value="payment-failed">Payment Failed</option>
+        <option value="due-to-close-payment">Due to be Closed (prev: Payment Failed)</option>
+        <option value="rejected">Rejected</option>
+        <option value="cancelled">Cancelled</option>
+        <option value="expired">Expired</option>
+        <option value="in-progress">In Progress</option>
+        <option value="print">Print</option>
+      </select>
+      <label for="template-select" style="margin-left:12px;">&#128196; Template:</label>
+      <select id="template-select" onchange="changeTemplate(this.value)">
+        <option value="dispensation">Dispensation (Generic)</option>
+        <option value="suspension">Suspension Template</option>
+        <option value="carpark">Non-Zonal Car Park</option>
+      </select>
+      <label for="payment-mode-select" style="margin-left:12px;">&#128179; Payment:</label>
+      <select id="payment-mode-select" onchange="changePaymentMode(this.value)">
+        <option value="online">Online</option>
+        <option value="offline">Offline (Southend)</option>
+      </select>
+      <span class="demo-note">Prototype testing only</span>
+    </div>
+
+    <!-- Page Header -->
+    <div class="page-header" id="action-bar">
+      <div class="page-header-left">
+        <a href="#" class="back-link" onclick="return false;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back
+        </a>
+        <div class="page-title-row">
+          <h1>Dispensation Application</h1>
+          <span id="status-badge" class="status-chip active"><span id="status-text">Active</span></span>
+        </div>
+      </div>
+      <div class="page-header-right">
+        <button class="btn btn-primary" id="primary-action" onclick="handlePrimaryAction()">Extend</button>
+        <div class="overflow-menu" id="secondary-actions">
+          <button class="overflow-icon-btn" onclick="toggleOverflow()" aria-label="More actions" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+          </button>
+          <div class="overflow-dropdown" id="overflow-dropdown"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-line"></div>
+
+    <!-- Info Messages -->
+    <div id="info-offline-payment" class="notice notice-warning hidden" style="margin-top:16px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span>This application uses offline payment. The <strong>Pay</strong> button is not available. Please contact the council for payment instructions.</span>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tab-nav-wrapper">
+      <nav class="tab-nav" role="tablist" aria-label="Application details tabs">
+        <button class="tab-btn active" role="tab" aria-selected="true" onclick="switchTab('overview')" id="tab-overview">Overview</button>
+        <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('vehicle')" id="tab-vehicle">Vehicles</button>
+        <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('documents')" id="tab-documents">Documents</button>
+      </nav>
+      <button class="add-vehicle-btn" id="add-vehicle-btn" onclick="openVrmModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add New Vehicle
+      </button>
+    </div>
+
+    <!-- ======================== -->
+    <!-- TAB: OVERVIEW            -->
+    <!-- ======================== -->
+    <section id="panel-overview" role="tabpanel" aria-labelledby="tab-overview">
+
+      <!-- Applicant Details -->
+      <h3 class="overview-section-title">Applicant Details</h3>
+      <div class="overview-list">
+        <div class="list-item-row">
+          <span class="li-label">First Name</span>
+          <span class="li-value">James</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Last Name</span>
+          <span class="li-value">Donovan</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Application Reference</span>
+          <span class="li-value">DIS-2026-00456</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Permission Name</span>
+          <span class="li-value" id="permission-name-value">Dispensation — Zone B</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Permission Type</span>
+          <span class="li-value">Dispensation</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Applicant Address</span>
+          <span class="li-value">42 Victoria Road, Southend-on-Sea, SS2 6EZ</span>
+        </div>
+      </div>
+
+      <!-- Dispensation Details -->
+      <h3 class="overview-section-title">Dispensation Details</h3>
+      <div class="overview-list">
+        <div class="list-item-row">
+          <span class="li-label">Start Date &amp; Time</span>
+          <span class="li-value" id="overview-start">01 April 2026, 08:00</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">End Date &amp; Time</span>
+          <span class="li-value" id="overview-end">30 April 2026, 18:00</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Duration</span>
+          <span class="li-value" id="overview-duration">30 Days</span>
+        </div>
+        <!-- Dispensation-specific: Number of Bays (#250230) -->
+        <div class="list-item-row" id="dispensation-bays-row">
+          <span class="li-label">Number of Bays Provided</span>
+          <span class="li-value">4 Bays</span>
+        </div>
+        <!-- Dispensation-specific: Reason for Purchase (#250230) -->
+        <div class="list-item-row" id="dispensation-reason-row">
+          <span class="li-label">Reason for Purchase</span>
+          <span class="li-value">Building Maintenance — Scaffolding Access</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Payment Method</span>
+          <span class="li-value" id="overview-payment-method">Online (Card)</span>
+        </div>
+      </div>
+
+      <!-- Street & Bay Groups — shown for Suspension template (#250230) -->
+      <div id="suspension-streets-section" class="hidden">
+        <h3 class="overview-section-title">Streets &amp; Bay Selection</h3>
+        <div style="padding-left:16px;">
+          <div class="street-group">
+            <div class="street-group-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              High Street, <span style="color:var(--text-secondary); font-weight:400;">Southend</span>
+            </div>
+            <div class="street-group-body">
+              <div class="bay-row">
+                <span class="bay-type">Paid Bay</span>
+                <span class="bay-spaces">2 Bay Spaces</span>
+              </div>
+              <div class="bay-row">
+                <span class="bay-type">Resident Parking Bay</span>
+                <span class="bay-spaces">1 Bay Space</span>
+              </div>
+            </div>
+          </div>
+          <div class="street-group">
+            <div class="street-group-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Queens Road, <span style="color:var(--text-secondary); font-weight:400;">Southend</span>
+            </div>
+            <div class="street-group-body">
+              <div class="bay-row">
+                <span class="bay-type">Disabled Bay</span>
+                <span class="bay-spaces">1 Bay Space</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Car Park Details — shown for Non-Zonal Car Park template (#250230) -->
+      <div id="carpark-details-section" class="hidden">
+        <h3 class="overview-section-title">Car Park Details</h3>
+        <div class="overview-list">
+          <div class="list-item-row">
+            <span class="li-label">Car Park Name</span>
+            <span class="li-value">Southend Central Car Park</span>
+          </div>
+          <div class="list-item-row">
+            <span class="li-label">Zone</span>
+            <span class="li-value">Zone B — Non-Zonal</span>
+          </div>
+          <div class="list-item-row">
+            <span class="li-label">Allocated Spaces</span>
+            <span class="li-value">2 Spaces</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Price Breakdown -->
+      <h3 class="overview-section-title">Price Breakdown</h3>
+      <div style="padding-left:16px;">
+
+        <!-- Suspension pricing cards (visible for suspension template) -->
+        <div id="suspension-pricing-cards" class="hidden">
+          <div class="pricing-card">
+            <div class="pricing-card-header">
+              <span class="bay-name">Paid Bay</span>
+              <span class="bay-price">&pound;120.00</span>
+            </div>
+            <div class="pricing-card-meta">
+              <span>2 Bay Spaces</span><span>&middot;</span><span>30 Days</span>
+            </div>
+          </div>
+          <div class="pricing-card">
+            <div class="pricing-card-header">
+              <span class="bay-name">Resident Parking Bay</span>
+              <span class="bay-price">&pound;60.00</span>
+            </div>
+            <div class="pricing-card-meta">
+              <span>1 Bay Space</span><span>&middot;</span><span>30 Days</span>
+            </div>
+          </div>
+          <div class="pricing-card">
+            <div class="pricing-card-header">
+              <span class="bay-name">Disabled Bay</span>
+              <span class="bay-price">&pound;30.00</span>
+            </div>
+            <div class="pricing-card-meta">
+              <span>1 Bay Space</span><span>&middot;</span><span>30 Days</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pricing Summary -->
+        <div class="overview-list" style="margin-top:8px;">
+          <div class="list-item-row">
+            <span class="li-label">Subtotal</span>
+            <span class="li-value" id="price-subtotal">&pound;200.00</span>
+          </div>
+          <div class="list-item-row">
+            <span class="li-label">Admin Fee</span>
+            <span class="li-value">&pound;10.00</span>
+          </div>
+          <div class="list-item-row">
+            <span class="li-label">VAT (20%)</span>
+            <span class="li-value" id="price-vat">&pound;42.00</span>
+          </div>
+          <div class="list-item-row" style="padding-top:12px; border-top: 2px solid var(--grey-300);">
+            <span class="li-label" style="font-weight:500; font-size:16px; color:var(--text-primary);">Total Price</span>
+            <span class="li-value" id="price-total" style="font-size:20px; font-weight:500; color:var(--primary-main);">&pound;252.00</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ======================== -->
+    <!-- TAB: VEHICLE (#250229)   -->
+    <!-- ======================== -->
+    <section id="panel-vehicle" role="tabpanel" aria-labelledby="tab-vehicle" class="hidden">
+      <div style="padding-left:16px;">
+        <div class="vrm-empty-state" id="vrm-empty-state" style="display:none;">
+          <svg viewBox="0 0 48 48" fill="none" stroke="#9e9e9e" stroke-width="1.5" width="64" height="64">
+            <path d="M8 30h32v8a2 2 0 01-2 2H10a2 2 0 01-2-2v-8z"/>
+            <path d="M12 22l4-10h16l4 10"/>
+            <path d="M8 30l-2-5h36l-2 5"/>
+            <circle cx="14" cy="35" r="2.5" fill="#9e9e9e"/>
+            <circle cx="34" cy="35" r="2.5" fill="#9e9e9e"/>
+          </svg>
+          <p style="margin:12px 0 4px; font-size:16px; font-weight:500; color:var(--text-primary);">No vehicles added yet</p>
+          <p style="margin:0 0 16px; font-size:14px; color:var(--text-secondary);">Add a vehicle registration mark (VRM) to this application.</p>
+          <button class="btn btn-primary" onclick="openVrmModal()">+ Add Vehicle</button>
+        </div>
+        <div class="vrm-info-text" id="vrm-info-text" style="display:none; margin-bottom:16px; padding:10px 14px; background:#E8F4FD; border-left:4px solid var(--primary-main); border-radius:4px; font-size:13px; color:var(--text-secondary);">
+          You can add <strong id="vrm-remaining-count">3</strong> more vehicle(s). Maximum allowed: <strong>5</strong>.
+        </div>
+        <div class="vrm-grid" id="vrm-grid">
+          <div class="vrm-card" data-vrm="AB21 CDE">
+            <div class="vrm-plate-wrapper"><div class="vrm-plate">AB21 CDE</div></div>
+            <div class="vrm-card-actions">
+              <button onclick="openEditVrmModal(this)" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="vrm-delete-btn" onclick="confirmDeleteVrm(this)" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
+            </div>
+          </div>
+          <div class="vrm-card" data-vrm="FG55 HIJ">
+            <div class="vrm-plate-wrapper"><div class="vrm-plate">FG55 HIJ</div></div>
+            <div class="vrm-card-actions">
+              <button onclick="openEditVrmModal(this)" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="vrm-delete-btn" onclick="confirmDeleteVrm(this)" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================== -->
+    <!-- TAB: DOCUMENTS (#250229) -->
+    <!-- ======================== -->
+    <section id="panel-documents" role="tabpanel" aria-labelledby="tab-documents" class="hidden">
+      <div class="card" style="padding-left:16px;">
+        <h2>Documents</h2>
+        <p class="subtitle">Supporting documents uploaded with this application.</p>
+        <div class="empty-state" id="docs-empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+          <p>No documents have been uploaded for this application.</p>
+        </div>
+        <div id="submit-doc-area" class="hidden" style="margin-top:16px;">
+          <div style="border: 2px dashed var(--grey-300); border-radius: var(--radius-input); padding: 32px; text-align: center; cursor: pointer;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:40px;height:40px;color:var(--grey-400);margin-bottom:8px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <p style="color:var(--text-secondary);font-size:14px;">Drag &amp; drop files here or click to browse</p>
+            <p style="font-size:12px;color:var(--text-disabled);margin-top:4px;">PDF, JPG, PNG — Max 10MB each</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- ===== EXTEND DISPENSATION PAGE ===== -->
+<div id="extend-page" class="extend-page hidden">
+  <div class="page-wrapper">
+    <div class="page-header">
+      <div class="page-header-left">
+        <a href="#" class="back-link" onclick="closeExtendPage(); return false;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back to Application
+        </a>
+        <div class="page-title-row"><h1>Extend Dispensation</h1></div>
+      </div>
+    </div>
+    <div class="header-line"></div>
+    <div class="extend-layout" style="margin-top:20px;">
+      <div class="extend-main">
+        <div class="notice notice-info" style="margin-bottom:20px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <span>Extension must continue from current end date (30 April 2026, 18:00). No gaps allowed.</span>
+        </div>
+        <h3 class="overview-section-title">Extension Duration</h3>
+        <div style="padding-left:16px;">
+          <div class="form-row" style="margin-top:12px;">
+            <div class="form-group">
+              <label for="extend-duration-value">Number of Day(s)</label>
+              <input type="number" id="extend-duration-value" value="7" min="1" max="30" />
+            </div>
+            <div class="form-group">
+              <label for="extend-duration-type">Period Type</label>
+              <select id="extend-duration-type">
+                <option value="days" selected>Day(s)</option>
+                <option value="weeks">Week(s)</option>
+                <option value="months">Month(s)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="extend-start">Start Date and time</label>
+              <div class="date-time-row">
+                <input type="date" id="extend-start" value="2026-04-30" readonly style="background:var(--grey-50);" />
+                <select disabled style="background:var(--grey-50);"><option>06:00 PM</option></select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="extend-end">End Date and time</label>
+              <div class="date-time-row">
+                <input type="date" id="extend-end" value="2026-05-07" readonly style="background:var(--grey-50);" />
+                <select disabled style="background:var(--grey-50);"><option>06:00 PM</option></select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="payment-method-section">
+          <div class="payment-method-header">
+            <h3>Payment Method</h3>
+            <button class="change-link" id="extend-change-payment">Change</button>
+          </div>
+          <div style="padding-left:16px;">
+            <div id="ext-payment-card-view">
+              <div class="payment-card-display">
+                <div class="payment-card-icon">maestro</div>
+                <div class="payment-card-info">
+                  <span class="payment-card-number">**** **** **** 7392</span>
+                  <span class="payment-card-expiry">Expires on 11 Sep 2028</span>
+                </div>
+              </div>
+            </div>
+            <!-- Offline payment message -->
+            <div id="ext-payment-offline-msg" class="hidden">
+              <div class="notice notice-warning" style="margin-bottom:0;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <span>Offline payment — extension fee will be collected by the council separately.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p style="font-size:13px; line-height:1.5; color:var(--text-secondary); margin-top:16px; padding-left:16px;">
+          By clicking <strong>Submit Extension</strong>, you agree to the
+          <a href="#" style="color:var(--primary-main); text-decoration:underline;">Terms and Conditions</a>.
+        </p>
+      </div>
+      <aside class="summary-sidebar">
+        <div class="summary-card">
+          <h3>Extension Summary</h3>
+          <div style="padding:16px;">
+            <div class="summary-row"><span class="s-label">Dispensation Fee</span><span class="s-value">&pound;70.00</span></div>
+            <div class="summary-row" style="font-size:12px; color:var(--text-secondary); padding:0 0 4px;"><span>4 Bays &middot; 7 Days</span></div>
+            <div class="summary-divider"></div>
+            <div class="summary-row"><span class="s-label">Subtotal</span><span class="s-value">&pound;70.00</span></div>
+            <div class="summary-row"><span class="s-label">Admin Fee</span><span class="s-value">&pound;10.00</span></div>
+            <div class="summary-row"><span class="s-label">VAT (20%)</span><span class="s-value">&pound;16.00</span></div>
+            <div class="summary-divider"></div>
+            <div class="summary-total"><span class="s-label">Total</span><span class="s-value">&pound;96.00</span></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+    <div class="extend-bottom-bar">
+      <button class="btn btn-secondary" onclick="closeExtendPage()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitExtension()">Submit Extension</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== VRM ADD/EDIT MODAL ===== -->
+<div class="vrm-modal-overlay" id="vrm-modal">
+  <div class="vrm-modal" role="dialog" aria-modal="true">
+    <div class="vrm-modal-header">
+      <h2 id="vrm-modal-title">Add New Vehicle</h2>
+      <button class="modal-close-x" onclick="closeVrmModal()" aria-label="Close">&times;</button>
+    </div>
+    <div class="vrm-modal-body">
+      <div class="vrm-input-row" id="vrm-input-row">
+        <div class="form-group">
+          <label for="vrm-modal-input">New VRM</label>
+          <input type="text" id="vrm-modal-input" placeholder="EC1A 1BB" maxlength="8" style="text-transform:uppercase; letter-spacing:2px;" onkeydown="if(event.key==='Enter'){event.preventDefault(); if(editingCard){saveVrm();}else{addVrmToStaged();}}" />
+        </div>
+        <button class="btn-add-inline" id="vrm-add-inline-btn" onclick="addVrmToStaged()">ADD</button>
+      </div>
+      <div class="vrm-staged-list" id="vrm-staged-list"></div>
+      <div class="vrm-limit-info" id="vrm-modal-limit-info"></div>
+    </div>
+    <div class="vrm-modal-footer">
+      <div class="footer-btn-group">
+        <button class="btn btn-secondary" onclick="closeVrmModal()">CANCEL</button>
+        <button class="btn btn-primary" id="vrm-modal-save" onclick="saveVrm()">ADD VEHICLE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DELETE CONFIRMATION DIALOG ===== -->
+<div class="vrm-modal-overlay" id="vrm-delete-modal">
+  <div class="vrm-delete-dialog" role="dialog" aria-modal="true">
+    <div class="dialog-title"><h2>Delete Vehicle</h2></div>
+    <div class="dialog-content">
+      <p>Are you sure you want to remove <strong id="vrm-delete-plate"></strong> from this application?</p>
+    </div>
+    <div class="dialog-actions">
+      <div class="dialog-btn-group">
+        <button class="btn btn-secondary" onclick="closeDeleteModal()">CANCEL</button>
+        <button class="btn btn-primary" style="background:#E53935;border-color:#E53935;" onclick="executeDeleteVrm()">DELETE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CANCEL APPLICATION DIALOG (#250290 — online refund / offline manual refund) ===== -->
+<div class="vrm-modal-overlay" id="cancel-modal">
+  <div class="cancel-dialog" role="dialog" aria-labelledby="cancel-modal-title" aria-modal="true">
+    <div class="cancel-dialog-header">
+      <h2 id="cancel-modal-title">Cancel Dispensation</h2>
+      <button class="modal-close-x" onclick="closeCancelModal()" aria-label="Close">&times;</button>
+    </div>
+    <div class="cancel-dialog-body">
+      <!-- Application Context -->
+      <h3>Application Summary</h3>
+      <div class="detail-row"><span class="d-label">Application Reference</span><span class="d-value">DIS-2026-00456</span></div>
+      <div class="detail-row"><span class="d-label">Permission Type</span><span class="d-value">Dispensation</span></div>
+      <div class="detail-row"><span class="d-label">Status</span><span class="d-value"><span class="status-chip active" style="font-size:12px;" id="cancel-status-badge">Active</span></span></div>
+      <div class="detail-row"><span class="d-label">Start Date</span><span class="d-value">01 Apr 2026, 08:00</span></div>
+      <div class="detail-row"><span class="d-label">End Date</span><span class="d-value">30 Apr 2026, 18:00</span></div>
+
+      <div class="section-divider"></div>
+
+      <!-- Online refund section (hidden for offline/Southend) -->
+      <div id="cancel-refund-section">
+        <h3>Refund Calculation</h3>
+        <div class="refund-formula">
+          Eligible Refund = Bays &times; Remaining Duration &times; Price per Unit per Day<br>
+          Refundable Amount = Eligible Refund &minus; Cancellation Charge
+        </div>
+        <div class="refund-panel">
+          <div class="refund-line"><span class="r-label">Duration Used</span><span class="r-value">8 Days</span></div>
+          <div class="refund-line"><span class="r-label">Remaining Duration</span><span class="r-value">22 Days</span></div>
+          <div class="refund-line" style="border-top:1px solid var(--grey-300); padding-top:8px; margin-top:8px;">
+            <span class="r-label">Eligible Refund (4 bays &times; 22 days)</span><span class="r-value">&pound;110.00</span>
+          </div>
+          <div class="refund-line"><span class="r-label">Cancellation Charge</span><span class="r-value" style="color:var(--error);">&minus;&pound;10.00</span></div>
+          <div class="refund-line total">
+            <span class="r-label" style="color:var(--text-primary);">Refundable Amount</span>
+            <span class="r-value">&pound;100.00</span>
+          </div>
+        </div>
+        <div class="section-divider"></div>
+      </div>
+
+      <!-- Offline/Southend manual refund message (#250290) -->
+      <div id="cancel-offline-refund-section" class="hidden">
+        <div class="notice notice-info" style="margin-bottom:16px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <span>If you are eligible for a refund, it will be processed and should be returned to you within 5-10 days depending on your acquiring bank.</span>
+        </div>
+        <div class="section-divider"></div>
+      </div>
+
+      <!-- Cancellation Reason -->
+      <div class="form-group" id="cancel-reason-group">
+        <label for="cancel-reason">Cancellation Reason <span style="color:var(--error);">*</span></label>
+        <select id="cancel-reason" onchange="clearCancelReasonError(); toggleOtherReason();">
+          <option value="">Select a reason</option>
+          <option value="no-longer-needed">No longer needed</option>
+          <option value="change-dates">Need to change dates</option>
+          <option value="cost">Cost too high</option>
+          <option value="other">Other</option>
+        </select>
+        <div class="inline-error" id="cancel-reason-error">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style="width:16px;height:16px;flex-shrink:0;margin-top:1px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          <span>Please select a cancellation reason</span>
+        </div>
+      </div>
+      <!-- "Other" description field (#250290 AC) -->
+      <div class="form-group hidden" id="cancel-other-group">
+        <label for="cancel-other-desc">Description <span style="color:var(--error);">*</span></label>
+        <textarea id="cancel-other-desc" placeholder="Please describe the reason for cancellation..."></textarea>
+        <div class="inline-error" id="cancel-other-error">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style="width:16px;height:16px;flex-shrink:0;margin-top:1px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          <span>Please provide a description</span>
+        </div>
+      </div>
+    </div>
+    <div class="cancel-dialog-footer">
+      <div class="footer-btn-group">
+        <button class="btn btn-secondary" onclick="closeCancelModal()">GO BACK</button>
+        <button class="btn btn-primary" style="background:#E53935;border-color:#E53935;" onclick="onCancelApplicationClick()">PROCEED TO CANCEL</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CANCEL CONFIRMATION DIALOG ===== -->
+<div class="vrm-modal-overlay" id="cancel-confirm-modal">
+  <div class="vrm-delete-dialog" role="dialog" aria-modal="true">
+    <div class="dialog-title"><h2>Cancel Application</h2></div>
+    <div class="dialog-content">
+      <p>Are you sure you want to cancel this application? <span id="cancel-confirm-refund-msg">A refund of <strong>&pound;100.00</strong> will be processed.</span></p>
+    </div>
+    <div class="dialog-actions">
+      <div class="dialog-btn-group">
+        <button class="btn btn-secondary" onclick="closeCancelConfirm()">NO, GO BACK</button>
+        <button class="btn btn-primary" style="background:#E53935;border-color:#E53935;" onclick="executeCancel()">CONFIRM CANCELLATION</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast" role="alert">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+  <span id="toast-msg"></span>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer" role="contentinfo">
+  <p>&copy; 2026 Council Parking Services &middot; <a href="#">Privacy</a> &middot; <a href="#">Accessibility</a> &middot; <a href="#">Contact</a></p>
+</footer>
+
+<script>
+  /* ============================= */
+  /* FONT SIZE                     */
+  /* ============================= */
+  function setFontSize(size) {
+    document.body.classList.remove('font-large', 'font-xl');
+    if (size === 'large') document.body.classList.add('font-large');
+    if (size === 'xl') document.body.classList.add('font-xl');
+    document.querySelectorAll('.font-toggle button').forEach(b => b.classList.remove('active'));
+    document.getElementById('font-' + (size === 'normal' ? 'normal' : size)).classList.add('active');
+  }
+
+  /* ============================= */
+  /* TAB SWITCHING                 */
+  /* ============================= */
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+    document.querySelectorAll('[role="tabpanel"]').forEach(p => p.classList.add('hidden'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.getElementById('tab-' + tab).setAttribute('aria-selected', 'true');
+    document.getElementById('panel-' + tab).classList.remove('hidden');
+    const addBtn = document.getElementById('add-vehicle-btn');
+    if (tab === 'vehicle') { updateAddVehicleBtn(); } else { addBtn.classList.remove('visible'); }
+  }
+
+  /* ============================= */
+  /* GLOBAL STATE                  */
+  /* ============================= */
+  let currentPaymentMode = 'online'; // 'online' | 'offline'
+  let currentTemplate = 'dispensation'; // 'dispensation' | 'suspension' | 'carpark'
+
+  /* ============================= */
+  /* STATUS-BASED ACTION BAR       */
+  /* #250228 — all 15 scenarios    */
+  /* ============================= */
+  const statusConfig = {
+    'active': {
+      badge: 'active', label: 'Active',
+      // #255559: primary resolved dynamically by template — see getTemplatePrimary()
+      primary: '__template__', secondary: ['Receipt', 'Cancel', 'View T&C']
+    },
+    'pending-approval': {
+      badge: 'pending', label: 'Pending Approval',
+      primary: null, secondary: ['Cancel']
+    },
+    'on-hold': {
+      badge: 'on-hold', label: 'On Hold',
+      primary: null, secondary: ['Cancel']
+    },
+    'internal-referral': {
+      badge: 'internal-referral', label: 'Internal Referral',
+      primary: null, secondary: ['Cancel']
+    },
+    'waiting-info': {
+      badge: 'waiting-info', label: 'Waiting for Customer Information',
+      primary: 'Submit Document', secondary: ['Cancel', 'View T&C']
+    },
+    'request-evidence': {
+      badge: 'request-evidence', label: 'Request Support Evidence',
+      primary: 'Submit Document', secondary: ['Cancel', 'View T&C']
+    },
+    'due-to-close-evidence': {
+      badge: 'due-to-close', label: 'Due to be Closed',
+      primary: 'Submit Document', secondary: ['Cancel', 'View T&C']
+    },
+    'waiting-payment': {
+      badge: 'waiting-payment', label: 'Waiting for Payment',
+      primary: 'Pay', secondary: ['Cancel', 'View T&C'],
+      paymentSensitive: true
+    },
+    'waiting-payment-offline': {
+      badge: 'waiting-payment', label: 'Waiting for Payment (Offline)',
+      primary: null, secondary: ['Cancel', 'View T&C'],
+      showOfflineNotice: true
+    },
+    'payment-failed': {
+      badge: 'payment-failed', label: 'Payment Failed',
+      primary: 'Pay', secondary: ['Cancel', 'View T&C']
+    },
+    'due-to-close-payment': {
+      badge: 'due-to-close', label: 'Due to be Closed',
+      primary: 'Pay', secondary: ['Cancel', 'View T&C']
+    },
+    'rejected': {
+      badge: 'rejected', label: 'Rejected',
+      primary: 'Reapply', secondary: []
+    },
+    'cancelled': {
+      badge: 'cancelled', label: 'Cancelled',
+      primary: null, secondary: []
+    },
+    'expired': {
+      badge: 'expired', label: 'Expired',
+      primary: null, secondary: []
+    },
+    'in-progress': {
+      badge: 'in-progress', label: 'In Progress',
+      primary: null, secondary: []
+    },
+    'print': {
+      badge: 'print', label: 'Print',
+      primary: null, secondary: []
+    }
+  };
+
+  /* ============================= */
+  /* #255559 — Renew / Extend      */
+  /* Template-aware primary action  */
+  /* ============================= */
+  function getTemplatePrimary() {
+    // Suspension template → Extend (only in Active state, resolved by caller)
+    // Car Park / Dispensation template → Renew
+    if (currentTemplate === 'suspension') return 'Extend';
+    return 'Renew';
+  }
+
+  function changeStatus(status) {
+    const cfg = statusConfig[status];
+    if (!cfg) return;
+
+    // Badge
+    const badge = document.getElementById('status-badge');
+    badge.className = 'status-chip ' + cfg.badge;
+    document.getElementById('status-text').textContent = cfg.label;
+
+    // Primary action — resolve template-aware Extend/Renew (#255559)
+    const primaryBtn = document.getElementById('primary-action');
+    let effectivePrimary = cfg.primary;
+
+    if (effectivePrimary === '__template__') {
+      effectivePrimary = getTemplatePrimary();
+    }
+
+    if (cfg.paymentSensitive && currentPaymentMode === 'offline') {
+      effectivePrimary = null; // No Pay button for offline
+    }
+
+    if (effectivePrimary) {
+      primaryBtn.textContent = effectivePrimary;
+      primaryBtn.className = 'btn btn-primary';
+      primaryBtn.classList.remove('hidden');
+    } else {
+      primaryBtn.classList.add('hidden');
+    }
+
+    // Secondary actions
+    const secondaryMenu = document.getElementById('secondary-actions');
+    if (cfg.secondary && cfg.secondary.length > 0) {
+      secondaryMenu.classList.remove('hidden');
+      const dropdown = document.getElementById('overflow-dropdown');
+      dropdown.innerHTML = '';
+      const otherActions = cfg.secondary.filter(a => a !== 'Cancel');
+      const hasCancel = cfg.secondary.includes('Cancel');
+      otherActions.forEach(action => {
+        const btn = document.createElement('button');
+        btn.textContent = action;
+        btn.onclick = function() { showToast(action + ' action triggered'); closeOverflow(); };
+        dropdown.appendChild(btn);
+      });
+      if (hasCancel) {
+        const cancelBtn = document.createElement('button');
+        cancelBtn.textContent = 'Cancel Application';
+        cancelBtn.className = 'danger-item';
+        cancelBtn.onclick = function() { showCancelModal(); closeOverflow(); };
+        dropdown.appendChild(cancelBtn);
+      }
+    } else {
+      secondaryMenu.classList.add('hidden');
+    }
+
+    // Offline payment notice
+    const offlineNotice = document.getElementById('info-offline-payment');
+    if (cfg.showOfflineNotice || (cfg.paymentSensitive && currentPaymentMode === 'offline')) {
+      offlineNotice.classList.remove('hidden');
+    } else {
+      offlineNotice.classList.add('hidden');
+    }
+
+    // Documents submit area
+    const submitDocArea = document.getElementById('submit-doc-area');
+    if (status === 'waiting-info' || status === 'request-evidence' || status === 'due-to-close-evidence') {
+      submitDocArea.classList.remove('hidden');
+    } else {
+      submitDocArea.classList.add('hidden');
+    }
+  }
+
+  /* ============================= */
+  /* TEMPLATE SWITCHING (#250230)  */
+  /* ============================= */
+  function changeTemplate(template) {
+    currentTemplate = template;
+
+    // Toggle dispensation-specific fields
+    const baysRow = document.getElementById('dispensation-bays-row');
+    const reasonRow = document.getElementById('dispensation-reason-row');
+    const suspensionStreets = document.getElementById('suspension-streets-section');
+    const carparkDetails = document.getElementById('carpark-details-section');
+    const suspensionPricing = document.getElementById('suspension-pricing-cards');
+    const permName = document.getElementById('permission-name-value');
+
+    // Hide all template-specific sections first
+    baysRow.classList.add('hidden');
+    reasonRow.classList.add('hidden');
+    suspensionStreets.classList.add('hidden');
+    carparkDetails.classList.add('hidden');
+    suspensionPricing.classList.add('hidden');
+
+    if (template === 'dispensation') {
+      // Generic dispensation: show bays + reason, hide streets/carpark
+      baysRow.classList.remove('hidden');
+      reasonRow.classList.remove('hidden');
+      permName.textContent = 'Dispensation — Zone B';
+    } else if (template === 'suspension') {
+      // Suspension template: show streets & bays, suspension pricing cards
+      suspensionStreets.classList.remove('hidden');
+      suspensionPricing.classList.remove('hidden');
+      permName.textContent = 'Parking Bay Suspension — Zone A';
+    } else if (template === 'carpark') {
+      // Non-zonal car park: show car park details, no streets
+      carparkDetails.classList.remove('hidden');
+      permName.textContent = 'Car Park Dispensation — Non-Zonal';
+    }
+
+    // #255559: Re-apply status to update Extend/Renew primary action per template
+    changeStatus(document.getElementById('status-select').value);
+  }
+
+  /* ============================= */
+  /* PAYMENT MODE (#250228/#250290)*/
+  /* ============================= */
+  function changePaymentMode(mode) {
+    currentPaymentMode = mode;
+    const paymentMethodValue = document.getElementById('overview-payment-method');
+
+    if (mode === 'offline') {
+      paymentMethodValue.textContent = 'Offline (Manual)';
+      document.getElementById('ext-payment-card-view').classList.add('hidden');
+      document.getElementById('ext-payment-offline-msg').classList.remove('hidden');
+      document.getElementById('extend-change-payment').style.display = 'none';
+    } else {
+      paymentMethodValue.textContent = 'Online (Card)';
+      document.getElementById('ext-payment-card-view').classList.remove('hidden');
+      document.getElementById('ext-payment-offline-msg').classList.add('hidden');
+      document.getElementById('extend-change-payment').style.display = '';
+    }
+
+    // Update cancel modal refund sections (#250290)
+    updateCancelRefundSections();
+
+    // Re-apply current status to update action bar
+    changeStatus(document.getElementById('status-select').value);
+  }
+
+  function updateCancelRefundSections() {
+    const onlineSection = document.getElementById('cancel-refund-section');
+    const offlineSection = document.getElementById('cancel-offline-refund-section');
+    const confirmRefundMsg = document.getElementById('cancel-confirm-refund-msg');
+
+    if (currentPaymentMode === 'offline') {
+      // #250290: No refund display for Southend/offline
+      onlineSection.classList.add('hidden');
+      offlineSection.classList.remove('hidden');
+      confirmRefundMsg.innerHTML = 'This action cannot be undone.';
+    } else {
+      onlineSection.classList.remove('hidden');
+      offlineSection.classList.add('hidden');
+      confirmRefundMsg.innerHTML = 'A refund of <strong>&pound;100.00</strong> will be processed.';
+    }
+  }
+
+  function handlePrimaryAction() {
+    const btn = document.getElementById('primary-action');
+    const action = btn.textContent.trim();
+    if (action === 'Extend') {
+      openExtendPage();
+    } else if (action === 'Renew') {
+      showToast('Redirecting to renewal flow...', true);
+    } else if (action === 'Pay') {
+      showToast('Redirecting to payment gateway...');
+    } else if (action === 'Submit Document') {
+      switchTab('documents');
+      document.getElementById('submit-doc-area').classList.remove('hidden');
+    } else if (action === 'Reapply') {
+      showToast('Redirecting to new application...');
+    }
+  }
+
+  /* ============================= */
+  /* OVERFLOW MENU                 */
+  /* ============================= */
+  function toggleOverflow() {
+    document.getElementById('overflow-dropdown').classList.toggle('open');
+  }
+  function closeOverflow() {
+    document.querySelectorAll('.overflow-dropdown.open').forEach(d => d.classList.remove('open'));
+  }
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.overflow-menu')) closeOverflow();
+  });
+
+  /* ============================= */
+  /* EXTEND DISPENSATION           */
+  /* ============================= */
+  function openExtendPage() {
+    document.getElementById('main-content').classList.add('hidden');
+    document.getElementById('extend-page').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  }
+  function closeExtendPage() {
+    document.getElementById('extend-page').classList.add('hidden');
+    document.getElementById('main-content').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  }
+  function submitExtension() {
+    closeExtendPage();
+    showToast('Your extension request has been successfully submitted.', true);
+  }
+
+  /* ============================= */
+  /* CANCEL APPLICATION (#250290)  */
+  /* ============================= */
+  function showCancelModal() {
+    clearCancelReasonError();
+    document.getElementById('cancel-reason').value = '';
+    document.getElementById('cancel-other-group').classList.add('hidden');
+    document.getElementById('cancel-other-desc').value = '';
+    updateCancelRefundSections();
+
+    // Update cancel status badge to match current status
+    const currentLabel = document.getElementById('status-text').textContent;
+    document.getElementById('cancel-status-badge').textContent = currentLabel;
+
+    document.getElementById('cancel-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeCancelModal() {
+    document.getElementById('cancel-modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function clearCancelReasonError() {
+    document.getElementById('cancel-reason-group').classList.remove('has-error');
+    document.getElementById('cancel-reason-error').classList.remove('visible');
+    if (document.getElementById('cancel-other-group')) {
+      document.getElementById('cancel-other-group').classList.remove('has-error');
+      document.getElementById('cancel-other-error').classList.remove('visible');
+    }
+  }
+  function toggleOtherReason() {
+    const reason = document.getElementById('cancel-reason').value;
+    const otherGroup = document.getElementById('cancel-other-group');
+    if (reason === 'other') {
+      otherGroup.classList.remove('hidden');
+    } else {
+      otherGroup.classList.add('hidden');
+    }
+  }
+  function onCancelApplicationClick() {
+    const reason = document.getElementById('cancel-reason').value;
+    if (!reason) {
+      document.getElementById('cancel-reason-group').classList.add('has-error');
+      document.getElementById('cancel-reason-error').classList.add('visible');
+      document.getElementById('cancel-reason').focus();
+      return;
+    }
+    // Validate "Other" description (#250290 AC)
+    if (reason === 'other') {
+      const desc = document.getElementById('cancel-other-desc').value.trim();
+      if (!desc) {
+        document.getElementById('cancel-other-group').classList.add('has-error');
+        document.getElementById('cancel-other-error').classList.add('visible');
+        document.getElementById('cancel-other-desc').focus();
+        return;
+      }
+    }
+    document.getElementById('cancel-confirm-modal').classList.add('open');
+  }
+  function closeCancelConfirm() {
+    document.getElementById('cancel-confirm-modal').classList.remove('open');
+  }
+  function executeCancel() {
+    closeCancelConfirm();
+    closeCancelModal();
+    document.getElementById('status-select').value = 'cancelled';
+    changeStatus('cancelled');
+    if (currentPaymentMode === 'offline') {
+      showToast('Application cancelled successfully.', true);
+    } else {
+      showToast('Application cancelled. Refund of £100.00 will be processed.', true);
+    }
+  }
+
+  /* ============================= */
+  /* VEHICLE MANAGEMENT            */
+  /* ============================= */
+  const maxVehicles = 5;
+  let editingCard = null;
+  let stagedVrms = [];
+
+  function escapeHtml(text) {
+    const map = {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'};
+    return text.replace(/[&<>"']/g, m => map[m]);
+  }
+
+  function buildVrmCardHTML(vrm) {
+    return '<div class="vrm-plate-wrapper"><div class="vrm-plate">' + escapeHtml(vrm) + '</div></div>' +
+      '<div class="vrm-card-actions">' +
+        '<button onclick="openEditVrmModal(this)" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
+        '<button class="vrm-delete-btn" onclick="confirmDeleteVrm(this)" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>' +
+      '</div>';
+  }
+
+  function openVrmModal() {
+    editingCard = null; stagedVrms = [];
+    document.getElementById('vrm-modal-title').textContent = 'Add New Vehicle';
+    document.getElementById('vrm-modal-save').textContent = 'ADD VEHICLE';
+    document.getElementById('vrm-modal-input').value = '';
+    document.getElementById('vrm-add-inline-btn').style.display = '';
+    document.getElementById('vrm-modal-limit-info').style.display = '';
+    renderStagedList(); updateModalLimitInfo();
+    document.getElementById('vrm-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('vrm-modal-input').focus();
+  }
+
+  function addVrmToStaged() {
+    const input = document.getElementById('vrm-modal-input');
+    const val = input.value.trim().toUpperCase();
+    if (!val) { input.focus(); return; }
+    const currentCount = document.querySelectorAll('#vrm-grid .vrm-card').length;
+    if (currentCount + stagedVrms.length >= maxVehicles) { showToast('Maximum ' + maxVehicles + ' vehicles allowed'); return; }
+    if (stagedVrms.includes(val)) { showToast('VRM ' + val + ' already added'); input.value = ''; input.focus(); return; }
+    const existing = Array.from(document.querySelectorAll('#vrm-grid .vrm-card')).map(c => c.dataset.vrm);
+    if (existing.includes(val)) { showToast('VRM ' + val + ' already exists'); input.value = ''; input.focus(); return; }
+    stagedVrms.push(val);
+    input.value = '';
+    renderStagedList(); updateModalLimitInfo();
+    input.focus();
+  }
+
+  function removeStagedVrm(index) { stagedVrms.splice(index, 1); renderStagedList(); updateModalLimitInfo(); }
+
+  function renderStagedList() {
+    const list = document.getElementById('vrm-staged-list');
+    if (!stagedVrms.length) { list.innerHTML = ''; return; }
+    list.innerHTML = stagedVrms.map((vrm, i) =>
+      '<div class="vrm-staged-item"><span class="staged-plate">' + escapeHtml(vrm) + '</span>' +
+      '<button class="staged-remove" onclick="removeStagedVrm(' + i + ')" title="Remove">&times;</button></div>'
+    ).join('');
+  }
+
+  function updateModalLimitInfo() {
+    const info = document.getElementById('vrm-modal-limit-info');
+    const addBtn = document.getElementById('vrm-add-inline-btn');
+    const currentCount = document.querySelectorAll('#vrm-grid .vrm-card').length;
+    const remaining = maxVehicles - currentCount - stagedVrms.length;
+    if (remaining <= 0) {
+      info.className = 'vrm-limit-info warning';
+      info.innerHTML = 'Maximum limit of <strong>' + maxVehicles + '</strong> vehicles reached.';
+      addBtn.disabled = true;
+    } else {
+      info.className = 'vrm-limit-info';
+      info.innerHTML = 'You can add <strong>' + remaining + '</strong> more vehicle(s). Maximum allowed: <strong>' + maxVehicles + '</strong>.';
+      addBtn.disabled = false;
+    }
+  }
+
+  function saveVrm() {
+    if (!editingCard && stagedVrms.length > 0) {
+      const grid = document.getElementById('vrm-grid');
+      stagedVrms.forEach(vrm => {
+        if (grid.querySelectorAll('.vrm-card').length >= maxVehicles) return;
+        const card = document.createElement('div');
+        card.className = 'vrm-card'; card.dataset.vrm = vrm;
+        card.innerHTML = buildVrmCardHTML(vrm);
+        grid.appendChild(card);
+      });
+      showToast(stagedVrms.length + ' vehicle(s) added', true);
+      stagedVrms = []; closeVrmModal(); updateAddVehicleBtn(); return;
+    }
+    if (editingCard) {
+      const val = document.getElementById('vrm-modal-input').value.trim().toUpperCase();
+      if (!val) { document.getElementById('vrm-modal-input').focus(); return; }
+      editingCard.dataset.vrm = val;
+      editingCard.innerHTML = buildVrmCardHTML(val);
+      showToast('VRM updated to ' + val, true);
+      closeVrmModal(); updateAddVehicleBtn(); return;
+    }
+    const val = document.getElementById('vrm-modal-input').value.trim().toUpperCase();
+    if (val) { addVrmToStaged(); if (stagedVrms.length > 0) saveVrm(); }
+  }
+
+  function closeVrmModal() {
+    document.getElementById('vrm-modal').classList.remove('open');
+    document.body.style.overflow = ''; editingCard = null; stagedVrms = [];
+  }
+
+  function openEditVrmModal(btnEl) {
+    editingCard = btnEl.closest('.vrm-card');
+    document.getElementById('vrm-modal-title').textContent = 'Edit Vehicle';
+    document.getElementById('vrm-modal-save').textContent = 'SAVE CHANGES';
+    document.getElementById('vrm-modal-input').value = editingCard.dataset.vrm || '';
+    document.getElementById('vrm-add-inline-btn').style.display = 'none';
+    document.getElementById('vrm-staged-list').innerHTML = '';
+    document.getElementById('vrm-modal-limit-info').style.display = 'none';
+    document.getElementById('vrm-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('vrm-modal-input').focus();
+  }
+
+  let deleteTarget = null;
+  function confirmDeleteVrm(btnEl) {
+    deleteTarget = btnEl.closest('.vrm-card');
+    document.getElementById('vrm-delete-plate').textContent = deleteTarget.dataset.vrm;
+    document.getElementById('vrm-delete-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeDeleteModal() {
+    document.getElementById('vrm-delete-modal').classList.remove('open');
+    document.body.style.overflow = ''; deleteTarget = null;
+  }
+  function executeDeleteVrm() {
+    if (deleteTarget) {
+      const plate = deleteTarget.dataset.vrm;
+      deleteTarget.remove();
+      showToast('VRM ' + plate + ' removed', true);
+      updateAddVehicleBtn();
+    }
+    closeDeleteModal();
+  }
+
+  function updateAddVehicleBtn() {
+    const count = document.querySelectorAll('#vrm-grid .vrm-card').length;
+    const btn = document.getElementById('add-vehicle-btn');
+    const emptyState = document.getElementById('vrm-empty-state');
+    const grid = document.getElementById('vrm-grid');
+    const infoText = document.getElementById('vrm-info-text');
+    const remaining = maxVehicles - count;
+    if (count === 0) {
+      emptyState.style.display = ''; grid.style.display = 'none'; infoText.style.display = 'none';
+      btn.classList.add('visible'); btn.disabled = false;
+    } else if (count >= maxVehicles) {
+      emptyState.style.display = 'none'; grid.style.display = ''; infoText.style.display = '';
+      infoText.innerHTML = 'Maximum limit of <strong>' + maxVehicles + '</strong> vehicles reached.';
+      infoText.style.borderLeftColor = '#ed6c02'; infoText.style.background = '#FFF4E5';
+      btn.classList.add('visible'); btn.disabled = true;
+    } else {
+      emptyState.style.display = 'none'; grid.style.display = ''; infoText.style.display = '';
+      infoText.innerHTML = 'You can add <strong>' + remaining + '</strong> more vehicle(s). Maximum allowed: <strong>' + maxVehicles + '</strong>.';
+      infoText.style.borderLeftColor = 'var(--primary-main)'; infoText.style.background = '#E8F4FD';
+      btn.classList.add('visible'); btn.disabled = false;
+    }
+  }
+
+  /* ============================= */
+  /* TOAST                         */
+  /* ============================= */
+  let toastTimer;
+  function showToast(msg, isSuccess) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toast-msg').textContent = msg;
+    toast.className = 'toast visible' + (isSuccess ? ' success' : ' info');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('visible'), 3500);
+  }
+
+  /* ============================= */
+  /* INIT                          */
+  /* ============================= */
+  changeStatus('active');
+  changeTemplate('dispensation');
+  changePaymentMode('online');
+</script>
+
+</body>
+</html>
