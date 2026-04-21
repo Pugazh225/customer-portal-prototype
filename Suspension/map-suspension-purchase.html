@@ -2194,6 +2194,18 @@ customer-portal-prototype<!DOCTYPE html>
                   <div class="popup-body" id="popup-body"></div>
                 </div>
 
+                <!-- Street & Town (read-only, populated after map selection) -->
+                <div class="form-row" id="map-street-town-fields" style="display:none; margin-top:16px;">
+                  <div class="form-group">
+                    <label for="map-street-name">Street Name</label>
+                    <input type="text" id="map-street-name" readonly style="background:var(--grey-50);" />
+                  </div>
+                  <div class="form-group">
+                    <label for="map-town-name">Town Name</label>
+                    <input type="text" id="map-town-name" readonly style="background:var(--grey-50);" />
+                  </div>
+                </div>
+
                 <!-- Bay Selection heading -->
                 <div style="display:flex; align-items:center; justify-content:space-between; margin-top:16px; margin-bottom:8px;">
                   <h3 style="font-size:16px; font-weight:500; letter-spacing:0.15px; margin:0;">Bay Selection</h3>
@@ -4272,6 +4284,14 @@ var mapConfig = {
   selectedStreet: null,
   selectedBays: [], // [{street, bayType, baySpaces, maxSpaces, availableSpaces}]
 
+  // Simulated town mapping per street
+  streetTownMap: {
+    'Baker Street': 'Westminster',
+    'High Street': 'Camden',
+    'Victoria Avenue': 'Kensington',
+    'Abbey Hill': 'Greenwich',
+  },
+
   // Simulated TRO/TMO API data — streets, bay types, total spaces
   troTmoData: {
     'Baker Street': [
@@ -4342,6 +4362,12 @@ function selectMapStreet (streetName) {
   var poly = leafletStreetLayers[streetName];
   if (poly) poly.setStyle({ color: '#3276CF', weight: 8 });
   mapConfig.selectedStreet = streetName;
+
+  // Populate Street Name and Town Name read-only fields
+  var streetTownFields = document.getElementById('map-street-town-fields');
+  document.getElementById('map-street-name').value = streetName;
+  document.getElementById('map-town-name').value = mapConfig.streetTownMap[streetName] || '';
+  streetTownFields.style.display = '';
 
   // Update instruction
   var prompt = document.getElementById('map-select-prompt');
