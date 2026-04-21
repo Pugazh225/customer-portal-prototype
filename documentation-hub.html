@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Guides — Customer Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+  <style>
+    /* ===== DESIGN TOKENS ===== */
+    :root {
+      --primary-main: #3276CF;
+      --primary-dark: #2560A8;
+      --primary-800: #22497D;
+      --primary-25: #F2F5FA;
+      --primary-100: #A2C1EA;
+      --primary-200: #84ADE4;
+      --text-primary: #212121;
+      --text-secondary: #757575;
+      --text-disabled: #9E9E9E;
+      --grey-50: #FAFAFA;
+      --grey-100: #F5F5F5;
+      --grey-200: #EEEEEE;
+      --grey-300: #E0E0E0;
+      --grey-400: #BDBDBD;
+      --neutral-100: #CBCCCD;
+      --neutral-300: #8E9092;
+      --success: #2E7D32;
+      --warning: #ED6C02;
+      --error: #D32F2F;
+      --info: #0288D1;
+      --avatar-bg: #DC4A11;
+      --bg-page: #FFFFFF;
+      --yellow-500: #FFEB3B;
+      --shadow-card: 0px 4px 6px rgba(0,0,0,0.1), 0px 2px 4px rgba(0,0,0,0.1);
+      --radius-btn: 10px;
+      --radius-card: 10px;
+      --radius-input: 8px;
+      --radius-chip: 16px;
+      --radius-nav: 8px;
+      --sidebar-width: 320px;
+      --font-size-base: 16px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: var(--font-size-base); scroll-behavior: smooth; }
+    body {
+      font-family: 'Roboto', Helvetica, Arial, sans-serif;
+      color: var(--text-primary);
+      background: var(--bg-page); line-height: 1.5;
+      letter-spacing: 0.15px; min-height: 100vh; overflow: hidden;
+    }
+    body.font-large { --font-size-base: 18px; }
+    body.font-xl    { --font-size-base: 20px; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; }
+    }
+
+    .skip-link {
+      position: absolute; left: -999px; top: 0;
+      background: var(--primary-main); color: #fff; padding: 8px 16px;
+      z-index: 1000; border-radius: 0 0 var(--radius-input) 0;
+      font-size: 14px; text-decoration: none;
+    }
+    .skip-link:focus { left: 0; }
+
+    /* ===== HEADER (matches other prototypes exactly) ===== */
+    .site-header {
+      background: var(--primary-800);
+      border-bottom: 4px solid var(--primary-main);
+      padding: 0 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 56px; position: sticky; top: 0; z-index: 200;
+    }
+    .header-left { display: flex; align-items: center; gap: 24px; }
+    .site-header .logo { display: flex; align-items: center; gap: 12px; }
+    .site-header .logo-icon {
+      width: 36px; height: 36px; background: var(--yellow-500);
+      border-radius: 4px; display: flex; align-items: center; justify-content: center;
+      font-weight: 500; font-size: 14px; color: var(--primary-800);
+    }
+    .header-divider { width: 1px; height: 24px; background: rgba(255,255,255,.3); }
+    .header-nav { display: flex; align-items: center; gap: 0; }
+    .header-nav a {
+      text-decoration: none; color: #fff; font-size: 14px;
+      font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px;
+      padding: 16px 20px; display: flex; align-items: center; gap: 8px;
+      transition: background 150ms ease; line-height: 24px;
+    }
+    .header-nav a:hover { background: rgba(255,255,255,.08); }
+    .header-nav a.active { color: var(--yellow-500); }
+    .header-nav a svg { width: 20px; height: 20px; }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .header-search {
+      display: flex; align-items: center; gap: 6px;
+      border: 1px solid rgba(255,255,255,.5); border-radius: var(--radius-input);
+      padding: 8px 12px; width: 240px; opacity: .7; transition: opacity 150ms;
+    }
+    .header-search:focus-within { opacity: 1; border-color: #fff; }
+    .header-search svg { width: 20px; height: 20px; color: #fff; flex-shrink: 0; }
+    .header-search input {
+      background: none; border: none; color: #fff; font-size: 14px;
+      width: 100%; outline: none; font-family: inherit; letter-spacing: 0.15px;
+    }
+    .header-search input::placeholder { color: rgba(255,255,255,.6); }
+    .header-bell {
+      background: none; border: none; color: #fff; cursor: pointer;
+      padding: 8px; border-radius: var(--radius-nav); transition: background 150ms;
+    }
+    .header-bell:hover { background: rgba(255,255,255,.1); }
+    .header-bell svg { width: 24px; height: 24px; }
+    .header-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(255,255,255,.9); color: var(--text-primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 500; letter-spacing: 1.5px;
+      cursor: pointer; position: relative;
+    }
+    .font-toggle {
+      display: flex; gap: 2px; align-items: center;
+      border: 1px solid rgba(255,255,255,.4); border-radius: var(--radius-input);
+      padding: 2px; background: rgba(255,255,255,.08);
+    }
+    .font-toggle button {
+      background: none; border: none; padding: 3px 8px; cursor: pointer;
+      font-weight: 500; border-radius: 6px; color: rgba(255,255,255,.6);
+      font-size: 12px; transition: all 150ms; font-family: inherit;
+    }
+    .font-toggle button.active { background: rgba(255,255,255,.2); color: #fff; }
+
+    /* Profile dropdown (User Guides accessed from here) */
+    .profile-wrapper { position: relative; }
+    .profile-dropdown {
+      display: none; position: absolute; top: calc(100% + 8px); right: 0;
+      background: #fff; border: 1px solid var(--grey-300); border-radius: var(--radius-input);
+      box-shadow: var(--shadow-card); min-width: 200px; z-index: 300;
+      overflow: hidden;
+    }
+    .profile-dropdown.open { display: block; }
+    .profile-dropdown-header {
+      padding: 16px; border-bottom: 1px solid var(--grey-200);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .profile-dropdown-header .pd-avatar {
+      width: 40px; height: 40px; border-radius: 50%; background: var(--avatar-bg);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 500;
+    }
+    .profile-dropdown-header .pd-info { display: flex; flex-direction: column; }
+    .profile-dropdown-header .pd-name { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+    .profile-dropdown-header .pd-email { font-size: 12px; color: var(--text-secondary); }
+    .profile-dropdown a, .profile-dropdown button {
+      display: flex; align-items: center; gap: 10px; width: 100%;
+      padding: 10px 16px; background: none; border: none;
+      font-size: 14px; color: var(--text-primary); text-decoration: none;
+      cursor: pointer; font-family: inherit; transition: background 150ms;
+      text-align: left;
+    }
+    .profile-dropdown a:hover, .profile-dropdown button:hover { background: var(--grey-50); }
+    .profile-dropdown a.active-link { color: var(--primary-main); font-weight: 500; }
+    .profile-dropdown .pd-icon { font-size: 20px; color: var(--text-secondary); }
+    .profile-dropdown .pd-divider { height: 1px; background: var(--grey-200); margin: 4px 0; }
+    .profile-dropdown a.active-link .pd-icon { color: var(--primary-main); }
+
+    /* ===== MOBILE BOTTOM SHEET (guide navigation drawer) ===== */
+    .mobile-category-bar { display: none; }
+    .mobile-guide-list { display: none; }
+
+    .mobile-nav-fab {
+      display: none; position: fixed; bottom: 64px; right: 16px;
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--primary-main); color: #fff; border: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,.25); cursor: pointer;
+      z-index: 250; align-items: center; justify-content: center;
+      transition: transform 200ms, background 200ms;
+    }
+    .mobile-nav-fab:hover { background: var(--primary-dark); }
+    .mobile-nav-fab:active { transform: scale(.92); }
+    .mobile-nav-fab .material-icons-outlined { font-size: 26px; }
+
+    .mobile-sheet-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4);
+      z-index: 400; opacity: 0; transition: opacity 250ms;
+    }
+    .mobile-sheet-overlay.open { display: block; opacity: 1; }
+
+    .mobile-sheet {
+      display: none; position: fixed; bottom: 0; left: 0; right: 0;
+      background: #fff; z-index: 410;
+      border-radius: 16px 16px 0 0;
+      box-shadow: 0 -4px 24px rgba(0,0,0,.12);
+      max-height: 75vh; transform: translateY(100%);
+      transition: transform 300ms cubic-bezier(.32,.72,0,1);
+      flex-direction: column;
+    }
+    .mobile-sheet.open { display: flex; transform: translateY(0); }
+
+    .mobile-sheet-handle {
+      width: 36px; height: 4px; background: var(--grey-300);
+      border-radius: 2px; margin: 10px auto 0; flex-shrink: 0;
+    }
+    .mobile-sheet-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px 8px; flex-shrink: 0;
+    }
+    .mobile-sheet-header h3 {
+      font-size: 16px; font-weight: 500; color: var(--text-primary);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .mobile-sheet-header h3 .material-icons-outlined { font-size: 20px; color: var(--primary-main); }
+    .mobile-sheet-close {
+      background: none; border: none; padding: 4px; cursor: pointer;
+      color: var(--text-secondary); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .mobile-sheet-close:hover { background: var(--grey-100); }
+    .mobile-sheet-close .material-icons-outlined { font-size: 22px; }
+
+    .mobile-sheet-search {
+      display: flex; align-items: center; gap: 8px;
+      margin: 0 16px 8px; padding: 8px 12px;
+      background: var(--grey-50); border: 1px solid var(--neutral-100);
+      border-radius: var(--radius-input); transition: border-color 200ms;
+    }
+    .mobile-sheet-search:focus-within { border-color: var(--primary-main); }
+    .mobile-sheet-search .material-icons-outlined { font-size: 18px; color: var(--neutral-300); }
+    .mobile-sheet-search input {
+      background: none; border: none; outline: none;
+      font-size: 14px; font-family: inherit; width: 100%; color: var(--text-primary);
+    }
+    .mobile-sheet-search input::placeholder { color: var(--text-disabled); }
+
+    .mobile-sheet-body {
+      flex: 1; overflow-y: auto; padding: 0 0 16px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .mobile-sheet-body::-webkit-scrollbar { width: 4px; }
+    .mobile-sheet-body::-webkit-scrollbar-thumb { background: var(--grey-300); border-radius: 4px; }
+
+    .mobile-sheet-cat {
+      padding: 0;
+    }
+    .mobile-sheet-cat-header {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px; cursor: pointer; user-select: none;
+      font-size: 14px; font-weight: 500; color: var(--text-primary);
+      background: none; border: none; width: 100%; text-align: left;
+      font-family: inherit; transition: background 150ms;
+    }
+    .mobile-sheet-cat-header:hover { background: var(--grey-50); }
+    .mobile-sheet-cat-header .cat-icon { font-size: 20px; color: var(--primary-main); }
+    .mobile-sheet-cat-header .chevron {
+      font-size: 18px; color: var(--text-secondary);
+      margin-left: auto; transition: transform 200ms;
+    }
+    .mobile-sheet-cat-header .doc-count {
+      font-size: 11px; font-weight: 500; background: var(--grey-200);
+      color: var(--text-secondary); border-radius: 10px; padding: 1px 7px;
+    }
+    .mobile-sheet-cat.expanded .mobile-sheet-cat-header { color: var(--primary-main); background: var(--primary-25); }
+    .mobile-sheet-cat.expanded .mobile-sheet-cat-header .chevron { transform: rotate(90deg); }
+    .mobile-sheet-guides { display: none; }
+    .mobile-sheet-cat.expanded .mobile-sheet-guides { display: block; }
+
+    .mobile-sheet-guide {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 16px 10px 48px; cursor: pointer;
+      font-size: 14px; color: var(--text-primary);
+      background: none; border: none; width: 100%; text-align: left;
+      font-family: inherit; transition: background 150ms;
+      min-height: 44px;
+    }
+    .mobile-sheet-guide:hover { background: var(--grey-50); }
+    .mobile-sheet-guide.active { background: var(--primary-25); color: var(--primary-main); font-weight: 500; }
+    .mobile-sheet-guide .doc-type-icon { font-size: 18px; flex-shrink: 0; }
+    .mobile-sheet-guide .doc-type-icon.doc { color: #2B5797; }
+    .mobile-sheet-guide .doc-type-icon.pdf { color: #D32F2F; }
+    .mobile-sheet-guide .doc-type-icon.ppt { color: #D04423; }
+    .mobile-sheet-guide .doc-type-icon.video { color: #7B1FA2; }
+    .mobile-sheet-guide .doc-type-icon.url { color: #0288D1; }
+    .mobile-sheet-guide .doc-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
+
+    /* ===== MAIN LAYOUT ===== */
+    .app-layout { display: flex; flex-direction: column; height: calc(100vh - 56px); overflow: hidden; }
+    .app-content { display: flex; flex: 1; overflow: hidden; }
+
+    /* ===== LEFT PANEL ===== */
+    .nav-panel {
+      width: var(--sidebar-width); min-width: var(--sidebar-width);
+      border-right: 1px solid var(--grey-300); background: #fff;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .nav-panel-header {
+      padding: 16px 16px 12px; border-bottom: 1px solid var(--grey-200); flex-shrink: 0;
+    }
+    .nav-panel-title {
+      font-size: 18px; font-weight: 500; line-height: 1.6;
+      letter-spacing: 0.15px; color: var(--text-primary);
+      margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+    }
+    .nav-panel-title .material-icons-outlined { font-size: 22px; color: var(--primary-main); }
+    .nav-search {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--grey-50); border: 1px solid var(--neutral-100);
+      border-radius: var(--radius-input); padding: 8px 12px; transition: border-color 200ms;
+    }
+    .nav-search:focus-within { border-color: var(--primary-main); }
+    .nav-search .material-icons-outlined { font-size: 18px; color: var(--neutral-300); }
+    .nav-search input {
+      background: none; border: none; outline: none;
+      font-size: 14px; font-family: inherit; width: 100%; color: var(--text-primary);
+    }
+    .nav-search input::placeholder { color: var(--text-disabled); }
+    .nav-tree { flex: 1; overflow-y: auto; padding: 8px 0; }
+    .nav-tree::-webkit-scrollbar { width: 4px; }
+    .nav-tree::-webkit-scrollbar-thumb { background: var(--grey-300); border-radius: 4px; }
+
+    .nav-empty-state {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; text-align: center;
+      padding: 40px 24px; color: var(--text-secondary);
+    }
+    .nav-empty-state .material-icons-outlined { font-size: 48px; color: var(--grey-300); margin-bottom: 12px; }
+    .nav-empty-state p { font-size: 14px; line-height: 1.57; }
+
+    /* Flat category → guides (no sub-categories) */
+    .nav-category { margin-bottom: 2px; }
+    .nav-category-header {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px; cursor: pointer; user-select: none;
+      font-size: 14px; font-weight: 500; color: var(--text-primary);
+      letter-spacing: 0.17px; line-height: 1.43; transition: background 150ms;
+      border: none; background: none; width: 100%; text-align: left; font-family: inherit;
+    }
+    .nav-category-header:hover { background: var(--grey-100); }
+    .nav-category-header .chevron {
+      font-size: 18px; color: var(--text-secondary);
+      transition: transform 200ms ease; margin-left: auto; flex-shrink: 0;
+    }
+    .nav-category-header .cat-icon { font-size: 20px; color: var(--primary-main); }
+    .nav-category.expanded > .nav-category-header .chevron { transform: rotate(90deg); }
+    .nav-category.expanded > .nav-category-header { color: var(--primary-main); background: var(--primary-25); }
+    .nav-guides { display: none; }
+    .nav-category.expanded > .nav-guides { display: block; }
+    .nav-doc-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 16px 8px 48px;
+      cursor: pointer; border-radius: var(--radius-nav);
+      font-size: 13px; color: var(--text-primary); line-height: 1.43;
+      letter-spacing: 0.17px; transition: background 150ms;
+      border: none; background: none; width: 100%; text-align: left;
+      font-family: inherit;
+    }
+    .nav-doc-item:hover { background: var(--grey-100); }
+    .nav-doc-item.active { background: var(--primary-25); color: var(--primary-main); font-weight: 500; }
+    .nav-doc-item .doc-type-icon { font-size: 18px; flex-shrink: 0; }
+    .nav-doc-item .doc-type-icon.doc { color: #2B5797; }
+    .nav-doc-item .doc-type-icon.pdf { color: #D32F2F; }
+    .nav-doc-item .doc-type-icon.ppt { color: #D04423; }
+    .nav-doc-item .doc-type-icon.video { color: #7B1FA2; }
+    .nav-doc-item .doc-type-icon.url { color: #0288D1; }
+    .nav-doc-item .doc-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
+    .doc-count {
+      font-size: 11px; font-weight: 500; background: var(--grey-200);
+      color: var(--text-secondary); border-radius: 10px;
+      padding: 1px 7px; flex-shrink: 0;
+    }
+
+    /* ===== RIGHT PANEL ===== */
+    .viewer-panel {
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden; background: var(--grey-50); min-width: 0;
+    }
+    .viewer-header {
+      padding: 16px 24px 12px; background: #fff;
+      border-bottom: 1px solid var(--grey-200); flex-shrink: 0;
+    }
+    .viewer-title-row {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 16px; flex-wrap: wrap;
+    }
+    .viewer-title-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
+    .viewer-title-top { display: flex; align-items: center; gap: 10px; }
+    .viewer-title {
+      font-size: 20px; font-weight: 500; line-height: 1.6;
+      letter-spacing: 0.15px; color: var(--text-primary);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .viewer-desc {
+      font-size: 13px; color: var(--text-secondary); line-height: 1.5;
+      margin: 0;
+    }
+    .viewer-updated {
+      font-size: 12px; color: var(--text-disabled); line-height: 1.5;
+      margin: 2px 0 0; display: flex; align-items: center; gap: 4px;
+    }
+    .viewer-updated .material-icons-outlined { font-size: 14px; }
+    .viewer-type-chip {
+      font-size: 12px; font-weight: 500; letter-spacing: 0.16px;
+      padding: 2px 10px; border-radius: var(--radius-chip);
+      display: inline-flex; align-items: center; gap: 4px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .viewer-type-chip.doc { background: #E3F0FF; color: #2B5797; }
+    .viewer-type-chip.pdf { background: #FFEBEE; color: #D32F2F; }
+    .viewer-type-chip.ppt { background: #FBE9E7; color: #D04423; }
+    .viewer-type-chip.video { background: #F3E5F5; color: #7B1FA2; }
+    .viewer-type-chip.url { background: #E0F7FA; color: #0288D1; }
+    .viewer-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .btn {
+      font-family: inherit; font-size: 13px; font-weight: 500;
+      letter-spacing: 0.46px; text-transform: uppercase;
+      padding: 8px 16px; border-radius: var(--radius-btn);
+      cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+      transition: background 150ms, border-color 150ms; line-height: 22px;
+    }
+    .btn-primary { background: var(--primary-main); color: #fff; border: none; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-outlined { background: transparent; color: var(--primary-main); border: 1px solid var(--primary-main); }
+    .btn-outlined:hover { background: var(--primary-25); }
+    .btn .material-icons-outlined { font-size: 18px; }
+
+    .viewer-content {
+      flex: 1; overflow-y: auto; padding: 24px;
+      display: flex; justify-content: center; align-items: flex-start;
+    }
+    .viewer-content::-webkit-scrollbar { width: 6px; }
+    .viewer-content::-webkit-scrollbar-thumb { background: var(--grey-300); border-radius: 4px; }
+
+    /* ===== STATES ===== */
+    .state-default, .state-empty {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; text-align: center;
+      padding: 60px 24px; max-width: 420px; margin: auto;
+    }
+    .state-default .state-icon, .state-empty .state-icon {
+      font-size: 72px; color: var(--grey-300); margin-bottom: 20px;
+    }
+    .state-default h3, .state-empty h3 {
+      font-size: 20px; font-weight: 500; color: var(--text-primary); margin-bottom: 8px;
+    }
+    .state-default p, .state-empty p {
+      font-size: 14px; color: var(--text-secondary); line-height: 1.57;
+    }
+    .state-loading {
+      display: none; flex-direction: column; align-items: center;
+      justify-content: center; padding: 60px 24px; margin: auto;
+    }
+    .skeleton-bar {
+      background: linear-gradient(90deg, var(--grey-200) 25%, var(--grey-100) 50%, var(--grey-200) 75%);
+      background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 4px;
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .skeleton-group { width: 100%; max-width: 700px; }
+    .skeleton-group .skeleton-bar { margin-bottom: 12px; }
+    .skeleton-title { width: 60%; height: 24px; }
+    .skeleton-text { width: 100%; height: 14px; }
+    .skeleton-text.short { width: 40%; }
+    .skeleton-rect { width: 100%; height: 300px; border-radius: var(--radius-card); margin-top: 8px; }
+    .state-error {
+      display: none; flex-direction: column; align-items: center;
+      justify-content: center; text-align: center;
+      padding: 60px 24px; max-width: 420px; margin: auto;
+    }
+    .state-error .state-icon { font-size: 64px; color: var(--error); margin-bottom: 16px; }
+    .state-error h3 { font-size: 18px; font-weight: 500; color: var(--text-primary); margin-bottom: 8px; }
+    .state-error p { font-size: 14px; color: var(--text-secondary); line-height: 1.57; margin-bottom: 20px; }
+
+    /* ===== DOC PREVIEW (improved) ===== */
+    .preview-doc {
+      display: none; width: 100%; max-width: 820px;
+      background: #fff; border: 1px solid var(--grey-200);
+      border-radius: var(--radius-card); padding: 48px 56px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 24px;
+    }
+    .preview-doc .doc-header-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 0 16px; margin-bottom: 20px; border-bottom: 2px solid var(--primary-main);
+    }
+    .preview-doc .doc-header-bar .doc-logo {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 500; color: var(--primary-800); text-transform: uppercase; letter-spacing: 1px;
+    }
+    .preview-doc .doc-header-bar .doc-logo .material-icons-outlined { font-size: 20px; color: var(--primary-main); }
+    .preview-doc .doc-header-bar .doc-ref { font-size: 12px; color: var(--text-disabled); }
+    .preview-doc h1 { font-size: 28px; font-weight: 500; margin-bottom: 8px; line-height: 1.35; color: var(--primary-800); }
+    .preview-doc h2 { font-size: 22px; font-weight: 500; margin: 28px 0 12px; line-height: 1.4; color: var(--primary-800); }
+    .preview-doc h3 { font-size: 18px; font-weight: 500; margin: 24px 0 8px; line-height: 1.5; }
+    .preview-doc p { font-size: 15px; line-height: 1.7; color: #333; margin-bottom: 14px; }
+    .preview-doc ul, .preview-doc ol { padding-left: 24px; margin-bottom: 14px; }
+    .preview-doc li { font-size: 15px; line-height: 1.7; color: #333; margin-bottom: 4px; }
+    .preview-doc .doc-meta {
+      font-size: 12px; color: var(--text-secondary);
+      margin-bottom: 24px; padding-bottom: 16px;
+      border-bottom: 1px solid var(--grey-200); display: flex; gap: 16px; flex-wrap: wrap;
+    }
+    .preview-doc .doc-meta span { display: inline-flex; align-items: center; gap: 4px; }
+    .preview-doc .doc-meta .material-icons-outlined { font-size: 14px; }
+    .preview-doc table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+    .preview-doc table th {
+      background: var(--primary-25); font-weight: 500; text-align: left;
+      padding: 10px 16px; border-bottom: 2px solid var(--primary-main); color: var(--primary-800);
+    }
+    .preview-doc table td { padding: 10px 16px; border-bottom: 1px solid var(--grey-200); }
+    .preview-doc table tr:hover td { background: var(--grey-50); }
+    .preview-doc .doc-footer {
+      margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--grey-200);
+      font-size: 12px; color: var(--text-disabled); display: flex; justify-content: space-between;
+    }
+
+    /* ===== PDF PREVIEW (improved) ===== */
+    .preview-pdf { display: none; width: 100%; max-width: 960px; flex-direction: column; margin-bottom: 24px; }
+    .pdf-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #323639; color: #fff; padding: 8px 16px;
+      border-radius: var(--radius-card) var(--radius-card) 0 0; font-size: 13px;
+    }
+    .pdf-toolbar-group { display: flex; align-items: center; gap: 8px; }
+    .pdf-btn {
+      background: rgba(255,255,255,.1); border: none; color: #fff;
+      padding: 6px 8px; border-radius: 4px; cursor: pointer;
+      font-size: 13px; font-family: inherit;
+      display: flex; align-items: center; gap: 4px; transition: background 150ms;
+    }
+    .pdf-btn:hover { background: rgba(255,255,255,.2); }
+    .pdf-btn .material-icons-outlined { font-size: 18px; }
+    .pdf-page-info { font-size: 13px; color: rgba(255,255,255,.8); }
+    .pdf-page-input {
+      background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25);
+      color: #fff; width: 40px; text-align: center; padding: 3px; border-radius: 4px;
+      font-size: 13px; font-family: inherit; outline: none;
+    }
+    .pdf-zoom-select {
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+      color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 13px;
+      font-family: inherit; cursor: pointer;
+    }
+    .pdf-viewer-area {
+      background: #525659; min-height: 0;
+      display: flex; align-items: flex-start; justify-content: center;
+      border-radius: 0 0 var(--radius-card) var(--radius-card); padding: 24px;
+    }
+    .pdf-page-mock {
+      background: #fff; width: 595px; max-width: 100%; min-height: 842px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.35); padding: 48px 56px;
+      font-size: 14px; line-height: 1.7; color: #333; position: relative;
+    }
+    .pdf-page-mock h2 { font-size: 20px; font-weight: 500; margin-bottom: 12px; color: var(--primary-800); }
+    .pdf-page-mock p { margin-bottom: 10px; }
+    .pdf-page-mock .pdf-watermark {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-35deg);
+      font-size: 72px; color: rgba(0,0,0,0.03); font-weight: 700; pointer-events: none;
+      text-transform: uppercase; letter-spacing: 12px;
+    }
+
+    /* ===== PPT PREVIEW (improved) ===== */
+    .preview-ppt { display: none; width: 100%; max-width: 960px; flex-direction: column; margin-bottom: 24px; }
+    .ppt-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #B7472A; color: #fff; padding: 8px 16px;
+      border-radius: var(--radius-card) var(--radius-card) 0 0; font-size: 13px;
+    }
+    .ppt-toolbar-group { display: flex; align-items: center; gap: 8px; }
+    .ppt-btn {
+      background: rgba(255,255,255,.15); border: none; color: #fff;
+      padding: 6px 8px; border-radius: 4px; cursor: pointer;
+      font-size: 13px; font-family: inherit;
+      display: flex; align-items: center; gap: 4px; transition: background 150ms;
+    }
+    .ppt-btn:hover { background: rgba(255,255,255,.25); }
+    .ppt-btn .material-icons-outlined { font-size: 18px; }
+    .ppt-slide-counter { font-size: 13px; color: rgba(255,255,255,.9); }
+    .ppt-viewer-area {
+      background: #2c2c2c; display: flex;
+      border-radius: 0 0 var(--radius-card) var(--radius-card); overflow: hidden;
+      min-height: 0;
+    }
+    .ppt-thumbnails {
+      width: 140px; background: #1e1e1e; padding: 12px 8px;
+      display: flex; flex-direction: column; gap: 8px;
+      overflow-y: auto; flex-shrink: 0;
+    }
+    .ppt-thumb {
+      background: #fff; border: 2px solid transparent; border-radius: 4px;
+      padding: 0; cursor: pointer; aspect-ratio: 16/9;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; color: var(--text-secondary);
+      transition: border-color 200ms; overflow: hidden; position: relative;
+    }
+    .ppt-thumb.active { border-color: var(--primary-main); }
+    .ppt-thumb:hover { border-color: var(--primary-200); }
+    .ppt-thumb-num { position: absolute; bottom: 2px; right: 4px; font-size: 9px; color: var(--text-disabled); }
+    .ppt-main-slide {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      padding: 32px; min-height: 400px;
+    }
+    .ppt-slide {
+      background: #fff; width: 100%; max-width: 720px;
+      aspect-ratio: 16/9; border-radius: 4px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 40px 48px;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .ppt-slide h2 { font-size: 28px; font-weight: 500; margin-bottom: 16px; color: var(--primary-800); }
+    .ppt-slide p { font-size: 16px; color: var(--text-secondary); line-height: 1.6; }
+    .ppt-slide .slide-num { position: absolute; bottom: 12px; right: 16px; font-size: 11px; color: var(--text-disabled); }
+    .ppt-slide-indicator {
+      background: linear-gradient(135deg, var(--primary-main), var(--primary-800));
+      height: 6px; width: 100%; position: absolute; top: 0; left: 0;
+    }
+    .ppt-slide-logo {
+      position: absolute; bottom: 12px; left: 16px;
+      font-size: 10px; color: var(--text-disabled); display: flex; align-items: center; gap: 4px;
+    }
+    .ppt-slide-logo .material-icons-outlined { font-size: 14px; }
+
+    /* ===== VIDEO PREVIEW (improved) ===== */
+    .preview-video { display: none; width: 100%; max-width: 880px; flex-direction: column; margin-bottom: 24px; }
+    .video-container {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      aspect-ratio: 16/9;
+      border-radius: var(--radius-card) var(--radius-card) 0 0;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .video-play-overlay {
+      width: 72px; height: 72px; background: rgba(255,255,255,.9);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: transform 200ms, background 200ms;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .video-play-overlay:hover { transform: scale(1.08); background: #fff; }
+    .video-play-overlay .material-icons-outlined { font-size: 36px; color: var(--primary-main); margin-left: 3px; }
+    .video-poster-text { position: absolute; bottom: 24px; left: 24px; color: #fff; font-size: 13px; opacity: .7; }
+    .video-title-overlay {
+      position: absolute; top: 24px; left: 24px; color: #fff;
+    }
+    .video-title-overlay h3 { font-size: 18px; font-weight: 500; margin-bottom: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.4); }
+    .video-title-overlay span { font-size: 12px; opacity: 0.7; }
+    .video-controls {
+      background: #1a1a1a; padding: 12px 16px;
+      border-radius: 0 0 var(--radius-card) var(--radius-card);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .video-progress {
+      width: 100%; height: 4px; background: rgba(255,255,255,.2);
+      border-radius: 2px; position: relative; cursor: pointer;
+    }
+    .video-progress-fill {
+      width: 35%; height: 100%; background: var(--primary-main); border-radius: 2px; position: relative;
+    }
+    .video-progress-fill::after {
+      content: ''; width: 12px; height: 12px;
+      background: var(--primary-main); border-radius: 50%;
+      position: absolute; right: -6px; top: -4px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+    .video-controls-row { display: flex; align-items: center; justify-content: space-between; }
+    .video-controls-left { display: flex; align-items: center; gap: 12px; }
+    .video-controls-right { display: flex; align-items: center; gap: 12px; }
+    .video-ctrl-btn {
+      background: none; border: none; color: rgba(255,255,255,.8);
+      cursor: pointer; padding: 4px; border-radius: 4px;
+      display: flex; align-items: center; transition: color 150ms;
+    }
+    .video-ctrl-btn:hover { color: #fff; }
+    .video-ctrl-btn .material-icons-outlined { font-size: 24px; }
+    .video-time { font-size: 12px; color: rgba(255,255,255,.6); white-space: nowrap; }
+    .video-volume { display: flex; align-items: center; gap: 6px; }
+    .video-volume-bar { width: 60px; height: 3px; background: rgba(255,255,255,.2); border-radius: 2px; }
+    .video-volume-fill { width: 70%; height: 100%; background: #fff; border-radius: 2px; }
+
+    /* ===== URL PREVIEW (improved) ===== */
+    .preview-url { display: none; width: 100%; max-width: 640px; flex-direction: column; align-items: center; margin: 0 auto 24px; }
+    .url-card {
+      background: #fff; border: 1px solid var(--grey-300);
+      border-radius: var(--radius-card); overflow: hidden; width: 100%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .url-card-banner {
+      height: 180px; background: linear-gradient(135deg, var(--primary-800) 0%, var(--primary-main) 60%, #64B5F6 100%);
+      display: flex; align-items: center; justify-content: center; position: relative;
+    }
+    .url-card-banner .material-icons-outlined { font-size: 56px; color: rgba(255,255,255,.3); }
+    .url-card-banner .url-badge {
+      position: absolute; top: 16px; right: 16px;
+      background: rgba(255,255,255,.2); color: #fff; font-size: 11px;
+      padding: 4px 10px; border-radius: 12px; backdrop-filter: blur(4px);
+      display: flex; align-items: center; gap: 4px;
+    }
+    .url-card-banner .url-badge .material-icons-outlined { font-size: 14px; }
+    .url-card-body { padding: 24px; }
+    .url-card-body h3 { font-size: 18px; font-weight: 500; margin-bottom: 8px; }
+    .url-card-body p { font-size: 14px; color: var(--text-secondary); line-height: 1.57; margin-bottom: 16px; }
+    .url-card-link {
+      font-size: 12px; color: var(--primary-main); margin-bottom: 20px;
+      display: flex; align-items: center; gap: 4px; word-break: break-all;
+      background: var(--primary-25); padding: 8px 12px; border-radius: var(--radius-input);
+    }
+    .url-card-link .material-icons-outlined { font-size: 14px; flex-shrink: 0; }
+    .url-card-actions { display: flex; gap: 8px; }
+
+    /* ===== DEMO TOGGLE BAR ===== */
+    .demo-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: #263238; color: #fff; padding: 10px 24px;
+      display: flex; align-items: center; gap: 16px;
+      font-size: 13px; z-index: 300;
+      border-top: 2px solid var(--primary-main);
+    }
+    .demo-bar label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 500; }
+    .demo-bar .demo-hint { color: rgba(255,255,255,.5); font-size: 12px; }
+    .demo-bar input[type="checkbox"] { accent-color: var(--primary-main); width: 16px; height: 16px; }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed; top: 72px; left: 50%; transform: translateX(-50%);
+      background: #fff; padding: 12px 24px; border-radius: var(--radius-input);
+      font-size: 14px; box-shadow: 0 4px 16px rgba(0,0,0,.12);
+      z-index: 300; display: none; align-items: center; gap: 12px;
+      max-width: 540px; border: 1px solid var(--grey-300);
+    }
+    .toast.visible { display: flex; }
+    .toast.success { background: #E8F5E9; border-color: var(--success); color: var(--success); }
+
+    /* ===== RESPONSIVE ===== */
+
+    /* --- Tablet (max 1024px) — hide sidebar, show FAB --- */
+    @media (max-width: 1024px) {
+      .site-header { padding: 0 16px; }
+      .nav-panel { display: none; }
+      .mobile-nav-fab { display: flex; }
+      .header-search { width: 180px; }
+      .viewer-header { padding: 14px 16px 12px; }
+      .viewer-content { padding: 16px; }
+      .preview-doc { padding: 32px 28px; }
+    }
+
+    /* --- Tablet-small (max 768px) — compact header, match other prototypes --- */
+    @media (max-width: 768px) {
+      .site-header { padding: 0 16px; height: 52px; }
+      .header-nav a { padding: 12px 12px; font-size: 13px; }
+      .header-search { width: 180px; }
+      .header-left { gap: 12px; }
+
+      /* Viewer header: stack vertically */
+      .viewer-header { padding: 12px 16px 10px; }
+      .viewer-title-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .viewer-title-top { flex-wrap: wrap; gap: 8px; }
+      .viewer-title { font-size: 18px; white-space: normal; }
+      .viewer-desc { font-size: 13px; }
+      .viewer-updated { font-size: 12px; }
+      .viewer-actions { width: 100%; }
+      .viewer-actions .btn { flex: 1; justify-content: center; padding: 8px 14px; font-size: 13px; }
+
+      /* Viewer content */
+      .viewer-content { padding: 16px; }
+
+      /* DOC preview */
+      .preview-doc { padding: 28px 24px; }
+      .preview-doc h1 { font-size: 22px; }
+      .preview-doc h2 { font-size: 18px; }
+      .preview-doc h3 { font-size: 16px; }
+      .preview-doc p, .preview-doc li { font-size: 14px; }
+      .preview-doc .doc-header-bar { flex-wrap: wrap; gap: 8px; }
+      .preview-doc .doc-footer { flex-direction: column; gap: 4px; }
+
+      /* PDF preview */
+      .pdf-toolbar { padding: 6px 12px; flex-wrap: wrap; gap: 6px; }
+      .pdf-viewer-area { padding: 16px; }
+      .pdf-page-mock { width: 100%; padding: 28px 24px; min-height: 500px; }
+
+      /* PPT preview */
+      .ppt-thumbnails { display: none; }
+      .ppt-main-slide { padding: 20px; min-height: 300px; }
+      .ppt-slide { padding: 24px 28px; }
+      .ppt-slide h2 { font-size: 22px; }
+      .ppt-slide p { font-size: 14px; }
+
+      /* Video preview */
+      .video-play-overlay { width: 56px; height: 56px; }
+      .video-play-overlay .material-icons-outlined { font-size: 28px; }
+      .video-title-overlay h3 { font-size: 16px; }
+
+      /* URL preview */
+      .url-card-banner { height: 140px; }
+      .url-card-body { padding: 20px; }
+      .url-card-actions { flex-direction: column; }
+      .url-card-actions .btn { width: 100%; justify-content: center; }
+
+      /* Demo bar */
+      .demo-bar { padding: 8px 16px; gap: 10px; font-size: 12px; flex-wrap: wrap; }
+    }
+
+    /* --- Mobile (max 640px) — icon-only header, match other prototypes exactly --- */
+    @media (max-width: 640px) {
+      /* Header: compact, icon-only nav (same as dispensation-details, suspension-details) */
+      .site-header { padding: 0 8px; height: 48px; }
+      .header-left { gap: 8px; }
+      .header-divider { display: none; }
+      .header-search { display: none; }
+      .header-nav a { padding: 8px; font-size: 12px; letter-spacing: 0.2px; }
+      .header-nav a span.nav-text { display: none; }
+      .header-nav a svg { width: 24px; height: 24px; }
+      .header-right { gap: 4px; }
+      .font-toggle { display: none; }
+
+      /* FAB position adjustment */
+      .mobile-nav-fab { bottom: 56px; right: 12px; width: 48px; height: 48px; }
+      .mobile-nav-fab .material-icons-outlined { font-size: 24px; }
+
+      /* Viewer header */
+      .viewer-header { padding: 12px 16px 10px; }
+      .viewer-title { font-size: 16px; }
+      .viewer-type-chip { font-size: 11px; padding: 2px 8px; }
+      .viewer-desc { font-size: 12px; }
+      .viewer-updated { font-size: 11px; }
+      .viewer-actions .btn { padding: 8px 12px; font-size: 12px; }
+      .viewer-actions .btn .material-icons-outlined { font-size: 18px; }
+
+      /* Viewer content: 16px padding matching Figma */
+      .viewer-content { padding: 12px; }
+
+      /* States */
+      .state-default, .state-empty { padding: 40px 20px; }
+      .state-default .state-icon, .state-empty .state-icon { font-size: 56px; }
+      .state-default h3, .state-empty h3 { font-size: 18px; }
+      .state-default p, .state-empty p { font-size: 13px; }
+
+      /* DOC preview */
+      .preview-doc { padding: 20px 16px; }
+      .preview-doc h1 { font-size: 20px; }
+      .preview-doc h2 { font-size: 16px; margin: 20px 0 8px; }
+      .preview-doc p, .preview-doc li { font-size: 13px; }
+      .preview-doc .doc-header-bar .doc-logo { font-size: 12px; }
+      .preview-doc .doc-header-bar .doc-ref { font-size: 11px; }
+      .preview-doc .doc-meta { font-size: 12px; gap: 8px; }
+      .preview-doc table { font-size: 12px; }
+      .preview-doc table th, .preview-doc table td { padding: 8px 10px; }
+      .preview-doc .doc-footer { font-size: 11px; }
+
+      /* PDF preview */
+      .pdf-toolbar { font-size: 12px; padding: 6px 10px; }
+      .pdf-viewer-area { padding: 12px; }
+      .pdf-page-mock { padding: 20px 16px; min-height: 400px; font-size: 13px; }
+      .pdf-page-mock h2 { font-size: 16px; }
+      .pdf-page-mock .pdf-watermark { font-size: 48px; }
+
+      /* PPT preview */
+      .ppt-toolbar { font-size: 12px; padding: 6px 10px; }
+      .ppt-main-slide { padding: 16px; min-height: 240px; }
+      .ppt-slide { padding: 20px 24px; }
+      .ppt-slide h2 { font-size: 18px; }
+      .ppt-slide p { font-size: 13px; }
+
+      /* Video preview */
+      .video-play-overlay { width: 48px; height: 48px; }
+      .video-play-overlay .material-icons-outlined { font-size: 24px; }
+      .video-title-overlay { top: 12px; left: 12px; }
+      .video-title-overlay h3 { font-size: 14px; }
+      .video-title-overlay span { font-size: 11px; }
+      .video-poster-text { bottom: 12px; left: 12px; font-size: 11px; }
+      .video-controls { padding: 8px 12px; }
+      .video-controls-left { gap: 8px; }
+      .video-controls-right { gap: 6px; }
+      .video-ctrl-btn .material-icons-outlined { font-size: 20px; }
+      .video-volume-bar { width: 40px; }
+      .video-time { font-size: 11px; }
+
+      /* URL preview */
+      .preview-url { max-width: 100%; }
+      .url-card-banner { height: 110px; }
+      .url-card-banner .material-icons-outlined { font-size: 36px; }
+      .url-card-body { padding: 16px; }
+      .url-card-body h3 { font-size: 16px; }
+      .url-card-body p { font-size: 13px; }
+      .url-card-link { font-size: 11px; padding: 6px 10px; }
+
+      /* Demo bar */
+      .demo-bar { flex-direction: column; align-items: flex-start; padding: 8px 12px; gap: 4px; font-size: 11px; }
+      .demo-bar .demo-hint { display: none; }
+
+      /* Toast */
+      .toast { max-width: calc(100vw - 24px); font-size: 13px; padding: 10px 16px; }
+      .profile-dropdown { min-width: 200px; right: -4px; }
+    }
+    :focus-visible { outline: 2px solid var(--primary-main); outline-offset: 2px; }
+    @media print {
+      .site-header, .nav-panel, .viewer-header, .demo-bar, .mobile-nav-fab, .mobile-sheet, .mobile-sheet-overlay { display: none !important; }
+      .viewer-content { padding: 0; }
+      .preview-doc { box-shadow: none; border: none; max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- ===== HEADER (matches other prototypes exactly) ===== -->
+  <header class="site-header" role="banner">
+    <div class="header-left">
+      <div class="logo">
+        <div class="logo-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" width="20" height="20"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor" opacity=".9"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        </div>
+      </div>
+      <div class="header-divider"></div>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="#" onclick="return false;"><span class="nav-text">My Applications</span></a>
+        <a href="#" onclick="return false;"><span class="nav-text">Vehicles</span></a>
+        <a href="#" onclick="return false;"><span class="nav-text">Documents</span></a>
+        <a href="#" onclick="return false;"><span class="nav-text">Payment</span></a>
+      </nav>
+    </div>
+    <div class="header-right">
+      <div class="header-search" aria-label="Search applications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <span>Search Application</span>
+      </div>
+      <div class="font-toggle" role="group" aria-label="Adjust text size">
+        <button onclick="setFontSize('normal')" class="active" aria-label="Normal text" id="font-normal">A</button>
+        <button onclick="setFontSize('large')" aria-label="Large text" id="font-large">A+</button>
+        <button onclick="setFontSize('xl')" aria-label="Extra large text" id="font-xl">A++</button>
+      </div>
+      <button class="header-bell" aria-label="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      </button>
+      <div class="profile-wrapper">
+        <div class="header-avatar" aria-label="User account" onclick="toggleProfileDropdown()" tabindex="0">JD</div>
+        <div class="profile-dropdown" id="profileDropdown">
+          <div class="profile-dropdown-header">
+            <div class="pd-avatar">JD</div>
+            <div class="pd-info">
+              <span class="pd-name">John Doe</span>
+              <span class="pd-email">john.doe@example.com</span>
+            </div>
+          </div>
+          <a href="#" onclick="return false;"><span class="material-icons-outlined pd-icon">person</span> My Profile</a>
+          <a href="#" onclick="return false;"><span class="material-icons-outlined pd-icon">settings</span> Account Settings</a>
+          <a href="#" class="active-link" onclick="return false;"><span class="material-icons-outlined pd-icon">menu_book</span> User Guides</a>
+          <div class="pd-divider"></div>
+          <a href="#" onclick="return false;"><span class="material-icons-outlined pd-icon">help_outline</span> Help &amp; Support</a>
+          <a href="#" onclick="return false;"><span class="material-icons-outlined pd-icon">logout</span> Sign Out</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-layout">
+    <!-- Mobile: FAB trigger for bottom sheet -->
+    <button class="mobile-nav-fab" id="mobileNavFab" aria-label="Browse guides" onclick="openMobileSheet()">
+      <span class="material-icons-outlined">menu_book</span>
+    </button>
+
+    <!-- Mobile: Bottom sheet overlay -->
+    <div class="mobile-sheet-overlay" id="mobileSheetOverlay" onclick="closeMobileSheet()"></div>
+
+    <!-- Mobile: Bottom sheet drawer for guide navigation -->
+    <div class="mobile-sheet" id="mobileSheet" role="dialog" aria-label="Browse User Guides">
+      <div class="mobile-sheet-handle"></div>
+      <div class="mobile-sheet-header">
+        <h3><span class="material-icons-outlined">menu_book</span> User Guides</h3>
+        <button class="mobile-sheet-close" onclick="closeMobileSheet()" aria-label="Close">
+          <span class="material-icons-outlined">close</span>
+        </button>
+      </div>
+      <div class="mobile-sheet-search">
+        <span class="material-icons-outlined">search</span>
+        <input type="text" placeholder="Filter guides…" aria-label="Filter guides" id="mobileSheetSearch" oninput="filterMobileSheet(this.value)" />
+      </div>
+      <div class="mobile-sheet-body" id="mobileSheetBody"></div>
+    </div>
+
+    <div class="app-content">
+      <!-- ===== LEFT PANEL: flat categories, no sub-categories, no description, no Published chip ===== -->
+      <aside class="nav-panel" role="navigation" aria-label="User guide navigation">
+        <div class="nav-panel-header">
+          <div class="nav-panel-title">
+            <span class="material-icons-outlined">menu_book</span> User Guides
+          </div>
+          <div class="nav-search">
+            <span class="material-icons-outlined">search</span>
+            <input type="text" placeholder="Filter guides…" aria-label="Filter guides" id="navSearchInput" oninput="filterDocs(this.value)" />
+          </div>
+        </div>
+        <div class="nav-tree" role="tree" id="navTree"></div>
+      </aside>
+
+      <!-- ===== RIGHT PANEL ===== -->
+      <main class="viewer-panel" id="main-content">
+        <div class="viewer-header" id="viewerHeader" style="display:none">
+          <div class="viewer-title-row">
+            <div class="viewer-title-left">
+              <div class="viewer-title-top">
+                <span class="viewer-title" id="viewerTitle">Document</span>
+                <span class="viewer-type-chip doc" id="viewerChip">
+                  <span class="material-icons-outlined" style="font-size:14px" id="viewerChipIcon">description</span>
+                  <span id="viewerChipLabel">DOC</span>
+                </span>
+              </div>
+              <p class="viewer-desc" id="viewerDesc"></p>
+              <p class="viewer-updated" id="viewerUpdated" style="display:none"><span class="material-icons-outlined">calendar_today</span> Updated: <span id="viewerUpdatedDate"></span></p>
+            </div>
+            <div class="viewer-actions" id="viewerActions">
+              <button class="btn btn-outlined" id="btnDownload" style="display:none">
+                <span class="material-icons-outlined">download</span> Download
+              </button>
+              <!-- URL guides: Open in New Tab + Copy Link -->
+              <button class="btn btn-primary" id="btnOpenNewTab" style="display:none">
+                <span class="material-icons-outlined">open_in_new</span> Open in New Tab
+              </button>
+              <button class="btn btn-outlined" id="btnCopyLink" style="display:none" onclick="copyLink()">
+                <span class="material-icons-outlined">content_copy</span> Copy Link
+              </button>
+            </div>
+          </div>
+        </div>
+
+      <div class="viewer-content">
+        <!-- DEFAULT: select a guide -->
+        <div class="state-default" id="stateDefault">
+          <span class="material-icons-outlined state-icon">auto_stories</span>
+          <h3>Select a guide to preview</h3>
+          <p>Browse categories in the navigation panel and click a guide to view it here. Supported formats include documents, PDFs, presentations, videos, and external links.</p>
+        </div>
+
+        <!-- EMPTY: no published guides -->
+        <div class="state-empty" id="stateEmpty" style="display:none">
+          <span class="material-icons-outlined state-icon">inbox</span>
+          <h3>No user guides available</h3>
+          <p>No user guides are available for this contract.</p>
+        </div>
+
+        <div class="state-loading" id="stateLoading">
+          <div class="skeleton-group">
+            <div class="skeleton-bar skeleton-title"></div>
+            <div class="skeleton-bar skeleton-text"></div>
+            <div class="skeleton-bar skeleton-text"></div>
+            <div class="skeleton-bar skeleton-text short"></div>
+            <div class="skeleton-bar skeleton-rect"></div>
+          </div>
+        </div>
+
+        <div class="state-error" id="stateError">
+          <span class="material-icons-outlined state-icon">error_outline</span>
+          <h3>Preview not available</h3>
+          <p>This guide cannot be previewed in the browser. You can download it or open it in a new tab.</p>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-outlined"><span class="material-icons-outlined">download</span> Download</button>
+            <button class="btn btn-primary"><span class="material-icons-outlined">open_in_new</span> Open in New Tab</button>
+          </div>
+        </div>
+
+        <!-- DOC PREVIEW (improved) -->
+        <div class="preview-doc" id="previewDoc">
+          <div class="doc-header-bar">
+            <div class="doc-logo"><span class="material-icons-outlined">verified</span> Customer Portal</div>
+            <span class="doc-ref">CP-DOC-2026-03 • v3.2</span>
+          </div>
+          <div class="doc-meta">
+            <span><span class="material-icons-outlined">person</span> Author: System Admin</span>
+            <span><span class="material-icons-outlined">calendar_today</span> Updated: 12 Mar 2026</span>
+            <span><span class="material-icons-outlined">description</span> Version 3.2</span>
+          </div>
+          <h1>Platform Overview</h1>
+          <p>Welcome to the Customer Portal — your centralised hub for managing permissions, licences, payments, and account activity.</p>
+          <h2>1. Dashboard</h2>
+          <p>Upon signing in, you will be presented with the main dashboard providing at-a-glance summaries of your active permissions, pending applications, recent activity, and upcoming renewal dates.</p>
+          <ul>
+            <li><strong>Active Permissions</strong> — view all current permissions with status indicators</li>
+            <li><strong>Pending Applications</strong> — track submissions awaiting review</li>
+            <li><strong>Recent Activity</strong> — timeline of actions taken in the last 30 days</li>
+            <li><strong>Renewal Alerts</strong> — upcoming expiration dates flagged for attention</li>
+          </ul>
+          <h2>2. Navigation Structure</h2>
+          <p>The platform uses a consistent navigation pattern across all sections.</p>
+          <h2>3. Key Features</h2>
+          <table>
+            <thead><tr><th>Feature</th><th>Description</th><th>Access Level</th></tr></thead>
+            <tbody>
+              <tr><td>Permission Applications</td><td>Submit new applications</td><td>All Users</td></tr>
+              <tr><td>Payment Processing</td><td>View fees and make payments</td><td>All Users</td></tr>
+              <tr><td>User Management</td><td>Add, edit, remove team members</td><td>Admin Only</td></tr>
+              <tr><td>Reporting Dashboard</td><td>Generate custom reports</td><td>Admin / Manager</td></tr>
+              <tr><td>Suspension Requests</td><td>Request temporary suspension</td><td>All Users</td></tr>
+            </tbody>
+          </table>
+          <div class="doc-footer">
+            <span>Customer Portal — Internal Document</span>
+            <span>Page 1 of 4</span>
+          </div>
+        </div>
+
+        <!-- PDF PREVIEW (improved with sidebar thumbs) -->
+        <div class="preview-pdf" id="previewPdf">
+          <div class="pdf-toolbar">
+            <div class="pdf-toolbar-group">
+              <button class="pdf-btn" aria-label="Previous page" onclick="pdfNav(-1)"><span class="material-icons-outlined">chevron_left</span></button>
+              <span class="pdf-page-info"><input class="pdf-page-input" type="text" value="1" id="pdfPageInput" aria-label="Current page" /> / <span id="pdfTotalPages">8</span></span>
+              <button class="pdf-btn" aria-label="Next page" onclick="pdfNav(1)"><span class="material-icons-outlined">chevron_right</span></button>
+            </div>
+            <div class="pdf-toolbar-group">
+              <button class="pdf-btn" aria-label="Zoom out"><span class="material-icons-outlined">remove</span></button>
+              <select class="pdf-zoom-select" aria-label="Zoom level">
+                <option>75%</option><option selected>100%</option><option>125%</option><option>150%</option><option>Fit Width</option>
+              </select>
+              <button class="pdf-btn" aria-label="Zoom in"><span class="material-icons-outlined">add</span></button>
+              <span style="width:1px;height:18px;background:rgba(255,255,255,.2)"></span>
+              <button class="pdf-btn" aria-label="Download PDF"><span class="material-icons-outlined">download</span></button>
+              <button class="pdf-btn" aria-label="Print PDF"><span class="material-icons-outlined">print</span></button>
+              <button class="pdf-btn" aria-label="Rotate"><span class="material-icons-outlined">rotate_right</span></button>
+            </div>
+          </div>
+          <div class="pdf-viewer-area">
+            <div class="pdf-page-mock">
+                <div class="pdf-watermark">DRAFT</div>
+                <h2>Setup Instructions</h2>
+                <p><strong>Document Reference:</strong> CP-SETUP-2026-03 &nbsp;|&nbsp; <strong>Classification:</strong> Internal</p><br>
+                <p><strong>1. System Requirements</strong></p>
+                <p>Ensure your environment meets the following minimum requirements:</p>
+                <p style="padding-left:16px">• Chrome 100+, Firefox 98+, Edge 100+, Safari 16+<br>• Stable internet (min 2 Mbps)<br>• Resolution 1280×720+<br>• JavaScript enabled</p><br>
+                <p><strong>2. Account Activation</strong></p>
+                <p>You will receive an activation email within 24 hours of registration.</p><br>
+                <p><strong>3. Initial Configuration</strong></p>
+                <p>Navigate to Settings → Organisation Profile to configure your details.</p><br>
+                <p style="text-align:center;color:#757575;font-size:12px;margin-top:40px">Page 1 of 8 &nbsp;|&nbsp; CP Setup v3.2 &nbsp;|&nbsp; Confidential</p>
+              </div>
+            </div>
+        </div>
+
+        <!-- PPT PREVIEW (improved with slide logo) -->
+        <div class="preview-ppt" id="previewPpt">
+          <div class="ppt-toolbar">
+            <div class="ppt-toolbar-group">
+              <button class="ppt-btn" aria-label="Previous slide" onclick="pptNav(-1)"><span class="material-icons-outlined">chevron_left</span></button>
+              <span class="ppt-slide-counter" id="pptSlideCounter">Slide 1 of 5</span>
+              <button class="ppt-btn" aria-label="Next slide" onclick="pptNav(1)"><span class="material-icons-outlined">chevron_right</span></button>
+            </div>
+            <div class="ppt-toolbar-group">
+              <button class="ppt-btn" aria-label="Download"><span class="material-icons-outlined">download</span></button>
+              <button class="ppt-btn" aria-label="Presenter view"><span class="material-icons-outlined">present_to_all</span></button>
+              <button class="ppt-btn" aria-label="Fullscreen"><span class="material-icons-outlined">fullscreen</span></button>
+            </div>
+          </div>
+          <div class="ppt-viewer-area">
+            <div class="ppt-thumbnails" role="list" aria-label="Slide thumbnails">
+              <div class="ppt-thumb active" role="listitem" onclick="goToSlide(0)" aria-label="Slide 1"><span style="font-size:8px;font-weight:500;color:#22497D">Welcome</span><span class="ppt-thumb-num">1</span></div>
+              <div class="ppt-thumb" role="listitem" onclick="goToSlide(1)" aria-label="Slide 2"><span style="font-size:8px;color:#757575">About</span><span class="ppt-thumb-num">2</span></div>
+              <div class="ppt-thumb" role="listitem" onclick="goToSlide(2)" aria-label="Slide 3"><span style="font-size:8px;color:#757575">Features</span><span class="ppt-thumb-num">3</span></div>
+              <div class="ppt-thumb" role="listitem" onclick="goToSlide(3)" aria-label="Slide 4"><span style="font-size:8px;color:#757575">Timeline</span><span class="ppt-thumb-num">4</span></div>
+              <div class="ppt-thumb" role="listitem" onclick="goToSlide(4)" aria-label="Slide 5"><span style="font-size:8px;color:#757575">Next Steps</span><span class="ppt-thumb-num">5</span></div>
+            </div>
+            <div class="ppt-main-slide">
+              <div class="ppt-slide" id="pptSlide">
+                <div class="ppt-slide-indicator"></div>
+                <h2 id="pptSlideTitle">Welcome to Customer Portal</h2>
+                <p id="pptSlideContent">Your centralised platform for managing permissions, payments, and compliance.</p>
+                <div class="ppt-slide-logo"><span class="material-icons-outlined">verified</span> Customer Portal</div>
+                <span class="slide-num" id="pptSlideNum">1 / 5</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIDEO PREVIEW (improved with chapters and title overlay) -->
+        <div class="preview-video" id="previewVideo">
+          <div class="video-container">
+            <div class="video-title-overlay">
+              <h3 id="videoOverlayTitle">Getting Started Tutorial</h3>
+              <span>Customer Portal • User Guide</span>
+            </div>
+            <div class="video-play-overlay" role="button" aria-label="Play video" tabindex="0">
+              <span class="material-icons-outlined">play_arrow</span>
+            </div>
+            <span class="video-poster-text">3:42 &nbsp;•&nbsp; HD 1080p</span>
+          </div>
+          <div class="video-controls">
+            <div class="video-progress" role="slider" aria-label="Video progress" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100">
+              <div class="video-progress-fill"></div>
+            </div>
+            <div class="video-controls-row">
+              <div class="video-controls-left">
+                <button class="video-ctrl-btn" aria-label="Play"><span class="material-icons-outlined">play_arrow</span></button>
+                <button class="video-ctrl-btn" aria-label="Next"><span class="material-icons-outlined">skip_next</span></button>
+                <div class="video-volume">
+                  <button class="video-ctrl-btn" aria-label="Volume"><span class="material-icons-outlined">volume_up</span></button>
+                  <div class="video-volume-bar"><div class="video-volume-fill"></div></div>
+                </div>
+                <span class="video-time">1:18 / 3:42</span>
+              </div>
+              <div class="video-controls-right">
+                <button class="video-ctrl-btn" aria-label="Captions"><span class="material-icons-outlined">closed_caption</span></button>
+                <button class="video-ctrl-btn" aria-label="Settings"><span class="material-icons-outlined">settings</span></button>
+                <button class="video-ctrl-btn" aria-label="PiP"><span class="material-icons-outlined">picture_in_picture_alt</span></button>
+                <button class="video-ctrl-btn" aria-label="Fullscreen"><span class="material-icons-outlined">fullscreen</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- URL PREVIEW (improved with gradient banner and badge) -->
+        <div class="preview-url" id="previewUrl">
+          <div class="url-card">
+            <div class="url-card-banner">
+              <span class="material-icons-outlined">language</span>
+              <div class="url-badge"><span class="material-icons-outlined">open_in_new</span> External Link</div>
+            </div>
+            <div class="url-card-body">
+              <h3 id="urlCardTitle">Knowledge Base Portal</h3>
+              <p id="urlCardDesc">Access our comprehensive knowledge base for FAQs, troubleshooting guides, and community discussions.</p>
+              <div class="url-card-link">
+                <span class="material-icons-outlined">link</span>
+                <span id="urlCardLink">https://support.customerportal.example.com/knowledge-base</span>
+              </div>
+              <div class="url-card-actions">
+                <button class="btn btn-primary" onclick="window.open('#','_blank')">
+                  <span class="material-icons-outlined">open_in_new</span> Open in New Tab
+                </button>
+                <button class="btn btn-outlined" onclick="copyLink()">
+                  <span class="material-icons-outlined">content_copy</span> Copy Link
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast success" id="toast">
+    <span class="material-icons-outlined">check_circle</span>
+    <span id="toastMsg">Link copied to clipboard</span>
+  </div>
+
+  <!-- ===== DEMO CONTROL BAR ===== -->
+  <div class="demo-bar">
+    <span class="material-icons-outlined" style="font-size:18px">science</span>
+    <strong>Prototype Demo Controls</strong>
+    <span class="demo-hint">|</span>
+    <label>
+      <input type="checkbox" id="togglePublished" checked onchange="renderNav()">
+      Show Published Guides (uncheck to simulate empty state)
+    </label>
+    <span class="demo-hint">— Uncheck to see: "No user guides are available for this contract."</span>
+  </div>
+
+  <script>
+    /* =========================================================================
+       DATA MODEL — Flat: 4 categories, each with published guides directly.
+       No sub-categories / topics.
+       ========================================================================= */
+    var guidesData = [
+      {
+        category: 'Account Settings',
+        icon: 'manage_accounts',
+        guides: [
+          { name: 'Managing User Accounts', type: 'doc', status: 'published', description: 'Step-by-step instructions for adding, editing, and deactivating user accounts in your organisation.', lastUpdated: '12 Mar 2026' },
+          { name: 'Roles & Permissions Guide', type: 'pdf', status: 'published', description: 'Comprehensive reference of all role definitions, permission levels, and access-control policies.', lastUpdated: '12 Mar 2026' },
+          { name: 'Two-Factor Authentication Setup', type: 'doc', status: 'published', description: 'How to enable and configure two-factor authentication for enhanced security on your account.', lastUpdated: '12 Mar 2026' },
+          { name: 'Security Best Practices', type: 'video', status: 'published', description: 'Video walkthrough of recommended security practices including password management and session controls.', lastUpdated: '12 Mar 2026' }
+        ]
+      },
+      {
+        category: 'Permit',
+        icon: 'badge',
+        guides: [
+          { name: 'Permit Application Guide', type: 'doc', status: 'published', description: 'Complete guide for submitting, tracking, and managing permit applications through the portal.', lastUpdated: '12 Mar 2026' },
+          { name: 'Fee Schedule 2026', type: 'pdf', status: 'published', description: 'Official fee schedule for all permit types effective from 1 January 2026.', lastUpdated: '12 Mar 2026' },
+          { name: 'Permit Overview Presentation', type: 'ppt', status: 'published', description: 'Overview presentation covering the permit application lifecycle and key requirements.', lastUpdated: '12 Mar 2026' },
+          { name: 'Getting Started Tutorial', type: 'video', status: 'published', description: 'Introductory video tutorial on setting up your account and submitting your first permit application.', lastUpdated: '12 Mar 2026' },
+          { name: 'Knowledge Base Portal', type: 'url', status: 'published', url: 'https://support.customerportal.example.com/knowledge-base', description: 'Access our comprehensive knowledge base for FAQs, troubleshooting guides, and community discussions.', lastUpdated: '12 Mar 2026' }
+        ]
+      },
+      {
+        category: 'Suspension',
+        icon: 'pause_circle',
+        guides: [
+          { name: 'Suspension Application Guide', type: 'doc', status: 'published', description: 'Detailed instructions for applying for a temporary suspension of your permit or licence.', lastUpdated: '12 Mar 2026' },
+          { name: 'Required Documents Checklist', type: 'pdf', status: 'published', description: 'Checklist of all supporting documents required when submitting a suspension application.', lastUpdated: '12 Mar 2026' },
+          { name: 'Suspension Overview Presentation', type: 'ppt', status: 'published', description: 'Presentation covering the suspension process, timelines, and reinstatement procedures.', lastUpdated: '12 Mar 2026' },
+          { name: 'Suspension Policy Video', type: 'video', status: 'published', description: 'Video explanation of suspension policies, conditions, and common scenarios.', lastUpdated: '12 Mar 2026' },
+          { name: 'Suspension Status Tracker', type: 'url', status: 'published', url: 'https://portal.example.com/suspensions/tracker', description: 'Real-time status tracker for monitoring your suspension application progress.', lastUpdated: '12 Mar 2026' }
+        ]
+      },
+      {
+        category: 'Dispensation',
+        icon: 'verified',
+        guides: [
+          { name: 'Dispensation Application Guide', type: 'doc', status: 'published', description: 'Guide for requesting dispensation including eligibility criteria and application steps.', lastUpdated: '12 Mar 2026' },
+          { name: 'Fee Schedule 2026', type: 'pdf', status: 'published', description: 'Official dispensation fee schedule effective from 1 January 2026.', lastUpdated: '12 Mar 2026' },
+          { name: 'Dispensation FAQ', type: 'url', status: 'published', url: 'https://support.example.com/dispensation-faq', description: 'Frequently asked questions about dispensation applications, processing times, and requirements.', lastUpdated: '12 Mar 2026' }
+        ]
+      }
+    ];
+
+    var typeConfig = {
+      doc:   { label: 'DOC', icon: 'description', chipClass: 'doc', isFile: true },
+      pdf:   { label: 'PDF', icon: 'picture_as_pdf', chipClass: 'pdf', isFile: true },
+      ppt:   { label: 'PPT', icon: 'slideshow', chipClass: 'ppt', isFile: true },
+      video: { label: 'VIDEO', icon: 'videocam', chipClass: 'video', isFile: true },
+      url:   { label: 'URL', icon: 'link', chipClass: 'url', isFile: false }
+    };
+
+    /* ===== RENDER NAV (published-only, flat categories, no description, no Published chip) ===== */
+    function renderNav() {
+      var showPublished = document.getElementById('togglePublished').checked;
+      var tree = document.getElementById('navTree');
+      tree.innerHTML = '';
+      var totalPublished = 0;
+
+      guidesData.forEach(function(cat) {
+        var pubGuides = cat.guides.filter(function(g) {
+          return showPublished && g.status === 'published';
+        });
+        if (pubGuides.length === 0) return;
+        totalPublished += pubGuides.length;
+
+        var catDiv = document.createElement('div');
+        catDiv.className = 'nav-category';
+        catDiv.setAttribute('role', 'treeitem');
+        catDiv.setAttribute('aria-expanded', 'false');
+        catDiv.setAttribute('data-catname', cat.category);
+
+        var catBtn = document.createElement('button');
+        catBtn.className = 'nav-category-header';
+        catBtn.setAttribute('aria-expanded', 'false');
+        catBtn.onclick = function() { toggleCategory(this); };
+        catBtn.innerHTML =
+          '<span class="material-icons-outlined cat-icon">' + cat.icon + '</span>' +
+          escapeHtml(cat.category) +
+          '<span class="doc-count">' + pubGuides.length + '</span>' +
+          '<span class="material-icons-outlined chevron">chevron_right</span>';
+        catDiv.appendChild(catBtn);
+
+        var guidesDiv = document.createElement('div');
+        guidesDiv.className = 'nav-guides';
+        guidesDiv.setAttribute('role', 'group');
+
+        pubGuides.forEach(function(guide) {
+          var tc = typeConfig[guide.type];
+          var docBtn = document.createElement('button');
+          docBtn.className = 'nav-doc-item';
+          docBtn.setAttribute('role', 'treeitem');
+          docBtn.setAttribute('data-docname', guide.name);
+          docBtn.setAttribute('data-doctype', guide.type);
+          docBtn.setAttribute('data-docurl', guide.url || '');
+          docBtn.setAttribute('data-docdesc', guide.description || '');
+          docBtn.setAttribute('data-docupdated', guide.lastUpdated || '');
+          docBtn.setAttribute('data-catname', cat.category);
+          docBtn.onclick = function() { selectGuide(this); };
+          docBtn.innerHTML =
+            '<span class="material-icons-outlined doc-type-icon ' + tc.chipClass + '">' + tc.icon + '</span>' +
+            '<span class="doc-name">' + escapeHtml(guide.name) + '</span>';
+          guidesDiv.appendChild(docBtn);
+        });
+        catDiv.appendChild(guidesDiv);
+        tree.appendChild(catDiv);
+      });
+
+      // Mobile bottom sheet
+      renderMobileSheet();
+
+      // Empty state
+      if (totalPublished === 0) {
+        tree.innerHTML =
+          '<div class="nav-empty-state">' +
+            '<span class="material-icons-outlined">inbox</span>' +
+            '<p>No user guides are available for this contract.</p>' +
+          '</div>';
+        hideAll();
+        document.getElementById('viewerHeader').style.display = 'none';
+        document.getElementById('stateDefault').style.display = 'none';
+        document.getElementById('stateEmpty').style.display = 'flex';
+        document.getElementById('mobileSheetBody').innerHTML = '';
+      } else {
+        hideAll();
+        document.getElementById('viewerHeader').style.display = 'none';
+        document.getElementById('stateDefault').style.display = 'flex';
+        document.getElementById('stateEmpty').style.display = 'none';
+      }
+    }
+
+    /* ===== MOBILE BOTTOM SHEET (replaces old category bar + guide list) ===== */
+
+    function renderMobileSheet() {
+      var body = document.getElementById('mobileSheetBody');
+      body.innerHTML = '';
+      var showPublished = document.getElementById('togglePublished').checked;
+
+      guidesData.forEach(function(cat, catIndex) {
+        var pubGuides = cat.guides.filter(function(g) { return showPublished && g.status === 'published'; });
+        if (pubGuides.length === 0) return;
+
+        var catDiv = document.createElement('div');
+        catDiv.className = 'mobile-sheet-cat' + (catIndex === 0 ? ' expanded' : '');
+
+        var catBtn = document.createElement('button');
+        catBtn.className = 'mobile-sheet-cat-header';
+        catBtn.onclick = function() {
+          catDiv.classList.toggle('expanded');
+        };
+        catBtn.innerHTML =
+          '<span class="material-icons-outlined cat-icon">' + cat.icon + '</span>' +
+          escapeHtml(cat.category) +
+          '<span class="doc-count">' + pubGuides.length + '</span>' +
+          '<span class="material-icons-outlined chevron">chevron_right</span>';
+        catDiv.appendChild(catBtn);
+
+        var guidesDiv = document.createElement('div');
+        guidesDiv.className = 'mobile-sheet-guides';
+
+        pubGuides.forEach(function(guide) {
+          var tc = typeConfig[guide.type];
+          var docBtn = document.createElement('button');
+          docBtn.className = 'mobile-sheet-guide';
+          docBtn.setAttribute('data-docname', guide.name);
+          docBtn.setAttribute('data-doctype', guide.type);
+          docBtn.setAttribute('data-docurl', guide.url || '');
+          docBtn.setAttribute('data-docdesc', guide.description || '');
+          docBtn.setAttribute('data-docupdated', guide.lastUpdated || '');
+          docBtn.setAttribute('data-catname', cat.category);
+          docBtn.onclick = function() {
+            selectGuide(docBtn);
+            closeMobileSheet();
+          };
+          docBtn.innerHTML =
+            '<span class="material-icons-outlined doc-type-icon ' + tc.chipClass + '">' + tc.icon + '</span>' +
+            '<span class="doc-name">' + escapeHtml(guide.name) + '</span>';
+          guidesDiv.appendChild(docBtn);
+        });
+
+        catDiv.appendChild(guidesDiv);
+        body.appendChild(catDiv);
+      });
+    }
+
+    function openMobileSheet() {
+      document.getElementById('mobileSheetOverlay').classList.add('open');
+      var sheet = document.getElementById('mobileSheet');
+      sheet.style.display = 'flex';
+      // Force reflow then add open class for animation
+      sheet.offsetHeight;
+      sheet.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMobileSheet() {
+      document.getElementById('mobileSheetOverlay').classList.remove('open');
+      var sheet = document.getElementById('mobileSheet');
+      sheet.classList.remove('open');
+      setTimeout(function() {
+        sheet.style.display = '';
+        document.body.style.overflow = '';
+      }, 300);
+    }
+
+    function filterMobileSheet(query) {
+      var q = query.toLowerCase().trim();
+      document.querySelectorAll('.mobile-sheet-guide').forEach(function(item) {
+        var n = (item.getAttribute('data-docname') || '').toLowerCase();
+        item.style.display = (!q || n.includes(q)) ? '' : 'none';
+      });
+      if (q) {
+        document.querySelectorAll('.mobile-sheet-cat').forEach(function(cat) {
+          if (cat.querySelector('.mobile-sheet-guide:not([style*="display: none"])')) {
+            cat.classList.add('expanded');
+          }
+        });
+      }
+    }
+
+    function escapeHtml(text) {
+      var d = document.createElement('div');
+      d.appendChild(document.createTextNode(text));
+      return d.innerHTML;
+    }
+
+    /* ===== NAV INTERACTIONS ===== */
+    function toggleCategory(btn) {
+      var cat = btn.closest('.nav-category');
+      var exp = cat.classList.toggle('expanded');
+      btn.setAttribute('aria-expanded', exp);
+    }
+
+    function filterDocs(query) {
+      var q = query.toLowerCase().trim();
+      document.querySelectorAll('.nav-doc-item').forEach(function(item) {
+        var n = (item.getAttribute('data-docname') || '').toLowerCase();
+        item.style.display = (!q || n.includes(q)) ? '' : 'none';
+      });
+      if (q) {
+        document.querySelectorAll('.nav-category').forEach(function(cat) {
+          if (cat.querySelector('.nav-doc-item:not([style*="display: none"])')) {
+            cat.classList.add('expanded');
+          }
+        });
+      }
+    }
+
+    /* ===== PROFILE DROPDOWN ===== */
+    function toggleProfileDropdown() {
+      document.getElementById('profileDropdown').classList.toggle('open');
+    }
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.profile-wrapper')) {
+        document.getElementById('profileDropdown').classList.remove('open');
+      }
+    });
+
+    /* ===== FONT SIZE ===== */
+    function setFontSize(size) {
+      document.body.classList.remove('font-large', 'font-xl');
+      if (size === 'large') document.body.classList.add('font-large');
+      if (size === 'xl') document.body.classList.add('font-xl');
+      document.querySelectorAll('.font-toggle button').forEach(function(b) { b.classList.remove('active'); });
+      document.getElementById('font-' + size).classList.add('active');
+    }
+
+    /* ===== SELECT GUIDE ===== */
+    var previews = ['previewDoc','previewPdf','previewPpt','previewVideo','previewUrl'];
+    var states = ['stateDefault','stateEmpty','stateLoading','stateError'];
+
+    function hideAll() {
+      previews.concat(states).forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+    }
+
+    function selectGuide(btn) {
+      var docName = btn.getAttribute('data-docname');
+      var docType = btn.getAttribute('data-doctype');
+      var docUrl  = btn.getAttribute('data-docurl');
+      var docDesc = btn.getAttribute('data-docdesc') || '';
+      var docUpdated = btn.getAttribute('data-docupdated') || '';
+      var catName = btn.getAttribute('data-catname') || '';
+      var tc = typeConfig[docType];
+
+      // If from desktop nav, get catName from parent
+      if (!catName) {
+        var catEl = btn.closest('.nav-category');
+        catName = catEl ? catEl.getAttribute('data-catname') || '' : '';
+      }
+
+      // Deselect all
+      document.querySelectorAll('.nav-doc-item, .mobile-sheet-guide').forEach(function(i) { i.classList.remove('active'); });
+      btn.classList.add('active');
+      // Also highlight matching desktop/mobile item
+      document.querySelectorAll('[data-docname="' + docName + '"][data-catname="' + catName + '"]').forEach(function(i) { i.classList.add('active'); });
+
+      hideAll();
+      document.getElementById('stateLoading').style.display = 'flex';
+      document.getElementById('viewerHeader').style.display = 'none';
+
+      setTimeout(function() {
+        hideAll();
+        document.getElementById('viewerHeader').style.display = '';
+
+        document.getElementById('viewerTitle').textContent = docName;
+        document.getElementById('viewerDesc').textContent = docDesc;
+        document.getElementById('viewerDesc').style.display = docDesc ? '' : 'none';
+
+        var updatedEl = document.getElementById('viewerUpdated');
+        document.getElementById('viewerUpdatedDate').textContent = docUpdated;
+        updatedEl.style.display = docUpdated ? 'flex' : 'none';
+
+        var chip = document.getElementById('viewerChip');
+        chip.className = 'viewer-type-chip ' + tc.chipClass;
+        document.getElementById('viewerChipIcon').textContent = tc.icon;
+        document.getElementById('viewerChipLabel').textContent = tc.label;
+
+        document.getElementById('btnDownload').style.display   = tc.isFile ? '' : 'none';
+        document.getElementById('btnOpenNewTab').style.display  = !tc.isFile ? '' : 'none';
+        document.getElementById('btnCopyLink').style.display    = !tc.isFile ? '' : 'none';
+
+        var map = { doc:'previewDoc', pdf:'previewPdf', ppt:'previewPpt', video:'previewVideo', url:'previewUrl' };
+        var el = document.getElementById(map[docType]);
+        if (el) el.style.display = (docType === 'doc') ? 'block' : 'flex';
+
+        if (docType === 'url') {
+          document.getElementById('urlCardTitle').textContent = docName;
+          document.getElementById('urlCardDesc').textContent  = docDesc;
+          document.getElementById('urlCardLink').textContent   = docUrl || '#';
+        }
+        if (docType === 'video') {
+          document.getElementById('videoOverlayTitle').textContent = docName;
+        }
+
+        document.querySelector('.viewer-content').scrollTop = 0;
+      }, 500);
+    }
+
+    function copyLink() {
+      var t = document.getElementById('urlCardLink').textContent;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(t);
+        showToast('Link copied to clipboard');
+      }
+    }
+
+    function showToast(msg) {
+      var toast = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      toast.classList.add('visible');
+      setTimeout(function() { toast.classList.remove('visible'); }, 2500);
+    }
+
+    /* ===== PDF / PPT nav ===== */
+    var pdfPage = 1, pdfTotal = 8;
+    function pdfNav(d) {
+      pdfPage = Math.max(1, Math.min(pdfTotal, pdfPage + d));
+      document.getElementById('pdfPageInput').value = pdfPage;
+    }
+
+    var pptSlide = 0;
+    var pptSlides = [
+      { title:'Welcome to Customer Portal', content:'Your centralised platform for managing permissions, payments, and compliance.' },
+      { title:'About the Platform', content:'Enterprise-scale permission management with real-time tracking and automated workflows.' },
+      { title:'Key Features', content:'Application Management • Payment Processing • Suspension Handling • Reporting & Analytics • RBAC' },
+      { title:'Implementation Timeline', content:'Phase 1: Core (Q1) → Phase 2: Onboarding (Q2) → Phase 3: Advanced (Q3) → Phase 4: Optimise (Q4)' },
+      { title:'Next Steps', content:'Complete account setup, review guides, contact your account manager.' }
+    ];
+    function pptNav(d) { pptSlide = Math.max(0, Math.min(pptSlides.length-1, pptSlide+d)); updatePptSlide(); }
+    function goToSlide(i) { pptSlide = i; updatePptSlide(); }
+    function updatePptSlide() {
+      var s = pptSlides[pptSlide];
+      document.getElementById('pptSlideTitle').textContent = s.title;
+      document.getElementById('pptSlideContent').textContent = s.content;
+      document.getElementById('pptSlideNum').textContent = (pptSlide+1)+' / '+pptSlides.length;
+      document.getElementById('pptSlideCounter').textContent = 'Slide '+(pptSlide+1)+' of '+pptSlides.length;
+      document.querySelectorAll('.ppt-thumb').forEach(function(t,i) { t.classList.toggle('active', i===pptSlide); });
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        document.getElementById('profileDropdown').classList.remove('open');
+        closeMobileSheet();
+      }
+    });
+
+    // Init
+    renderNav();
+  </script>
+</body>
+</html>

@@ -1,14 +1,12 @@
-customer-portal-prototype<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Map Purchase Application</title>
+  <title>Suspension Purchase</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <style>
     /* ===== DESIGN TOKENS (from Theme_and_Design_Guidelines.md + Figma) ===== */
     :root {
@@ -467,27 +465,48 @@ customer-portal-prototype<!DOCTYPE html>
       font-size: 14px;
     }
 
-    /* ===== BAY ROW ENTRY (two-row layout: header + fields) ===== */
+    /* ===== P3 FLEXIBLE DURATION — PRICING TABLE ===== */
+    .pricing-table {
+      border: 1px solid var(--grey-300); border-radius: var(--radius-card); overflow: hidden;
+    }
+    .pricing-table-header {
+      display: flex; justify-content: space-between; padding: 10px 16px;
+      font-size: 13px; font-weight: 500; color: var(--text-secondary);
+      border-bottom: 1px solid var(--grey-300); background: var(--grey-50);
+    }
+    .pricing-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 16px; border-bottom: 1px solid var(--grey-200);
+      cursor: pointer; transition: background 150ms; margin: 0;
+    }
+    .pricing-row:last-child { border-bottom: none; }
+    .pricing-row:hover { background: var(--grey-50); }
+    .pricing-row.selected { background: #EBF3FC; }
+    .pricing-row-left {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 14px; color: var(--text-primary);
+    }
+    .pricing-row-left input[type="radio"] {
+      width: 18px; height: 18px; accent-color: var(--primary-main); margin: 0; cursor: pointer;
+    }
+    .pricing-row-price {
+      font-size: 14px; font-weight: 500; color: var(--primary-main);
+    }
+    .pricing-row:not(.selected) .pricing-row-price { color: var(--text-primary); }
+
+    /* ===== BAY ROW ENTRY (single-row grid layout) ===== */
     .bay-row-entry {
       margin-bottom: 8px; padding: 12px;
       background: var(--grey-50); border-radius: var(--radius-input);
       border: 1px solid var(--grey-300);
+      display: grid; grid-template-columns: 2fr 1fr 80px auto;
+      gap: 12px; align-items: end;
     }
-    .bay-row-header {
-      display: flex; gap: 8px; align-items: end; margin-bottom: 8px;
+    .bay-row-entry.bay-row-no-price {
+      grid-template-columns: 2fr 1fr auto;
     }
     .bay-row-remove {
       flex-shrink: 0; align-self: flex-end; margin-bottom: 2px;
-    }
-    .bay-row-fields {
-      display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: end;
-    }
-    .bay-row-grid {
-      display: grid; grid-template-columns: 2fr 1fr auto auto;
-      gap: 12px; align-items: end;
-    }
-    .bay-row-grid.bay-row-no-price {
-      grid-template-columns: 2fr 1fr auto;
     }
 
     /* ===== PRICING BREAKDOWN (Figma: right-aligned amounts, bordered card) ===== */
@@ -718,7 +737,7 @@ customer-portal-prototype<!DOCTYPE html>
       background: #fff; border-top: 1px solid var(--grey-300);
       padding: 12px 180px; display: none; align-items: center;
       justify-content: space-between;
-      box-shadow: 0 -2px 8px rgba(0,0,0,.08); z-index: 1050;
+      box-shadow: 0 -2px 8px rgba(0,0,0,.08); z-index: 90;
       flex-wrap: wrap; gap: 12px;
     }
     .sticky-nav-bar.visible { display: flex; }
@@ -987,43 +1006,36 @@ customer-portal-prototype<!DOCTYPE html>
       .address-mode-option + .address-mode-option { border-left: none; border-top: 1px solid var(--grey-300); }
       .address-mode-option { padding: 12px 14px; font-size: 14px; }
 
-      /* Bay rows — close on bay type row, spaces+price below */
-      .bay-row-entry { padding: 12px; }
-      .bay-row-header { margin-bottom: 8px; }
-      .bay-row-fields { grid-template-columns: 1fr auto; gap: 16px; }
+      /* Town+Street — single column on mobile */
+      .street-town-row { grid-template-columns: 1fr !important; gap: 12px !important; }
+      #town-select, #street-select { font-size: 16px; }
+
+      /* Bay rows — 2-row mobile: Row 1 Bay Type | Row 2 Spaces+Price+Close */
+      .bay-row-entry {
+        padding: 12px;
+        grid-template-columns: 1fr auto auto;
+        grid-template-rows: auto auto;
+        gap: 8px;
+      }
+      /* Row 1: Bay Type — full width */
+      .bay-row-entry > .form-group:first-child {
+        grid-column: 1 / -1; grid-row: 1;
+      }
+      /* Row 2: Spaces | Price | Close */
+      .bay-row-entry > .form-group:nth-child(2) { grid-column: 1; grid-row: 2; }
+      .bay-row-entry .bay-price-col {
+        grid-column: 2; grid-row: 2;
+        flex-direction: row; align-items: end; gap: 4px;
+      }
+      .bay-row-entry .bay-price-col > label { display: none; }
+      .bay-row-entry .bay-price-col .bay-row-price { padding: 8px 0 !important; font-size: 14px !important; }
+      .bay-row-entry .bay-row-remove {
+        grid-column: 3; grid-row: 2;
+        align-self: end; margin-bottom: 2px;
+      }
+      .bay-row-entry .bay-row-remove::before { display: none; }
       .bay-table th, .bay-table td { padding: 6px 8px; font-size: 13px; }
       .bay-table th:nth-child(4), .bay-table td:nth-child(4) { padding: 6px 4px; }
-
-      /* Map selected bay items — two-row layout on mobile */
-      .map-selected-bay-item {
-        display: flex !important;
-        flex-direction: column;
-        gap: 8px;
-      }
-      .map-selected-bay-item .bay-detail {
-        flex: 1;
-      }
-      .map-selected-bay-item .bay-actions {
-        display: flex !important;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 16px;
-        border-top: 1px solid var(--grey-200);
-        padding-top: 8px;
-      }
-      .map-selected-bay-item .bay-spaces-col {
-        flex-direction: row;
-        gap: 8px;
-      }
-      .map-selected-bay-item .bay-price-col {
-        flex-direction: row;
-        align-items: center;
-        gap: 8px;
-        min-width: auto;
-      }
-      .map-selected-bay-item .bay-price-col .bay-price-value {
-        padding: 0;
-      }
 
       /* Pricing card */
       .price-card { padding: 16px; }
@@ -1234,16 +1246,9 @@ customer-portal-prototype<!DOCTYPE html>
         flex-wrap: wrap; gap: 8px;
       }
 
-      /* Bay rows — close on bay type row, spaces+price below */
+      /* Bay rows — single row on tablet */
       .bay-row-entry { padding: 12px; }
-      .bay-row-header { margin-bottom: 8px; }
-      .bay-row-fields { grid-template-columns: 1fr auto; gap: 12px; }
-      .bay-row-price { text-align: right !important; font-size: 14px !important; }
-
-      /* Map selected bay items — small mobile refinements */
-      .map-selected-bay-item .bay-actions { gap: 10px; }
-      .map-selected-bay-item .bay-spaces-input { width: 56px; padding: 6px; font-size: 13px; }
-      .map-selected-bay-item .bay-price-col .bay-price-value { font-size: 14px; }
+      .bay-row-price { font-size: 14px !important; }
 
       /* Summary card — Figma: border #dee8f7, rounded 8px, shadow, h3:20px */
       .summary-card {
@@ -1433,235 +1438,6 @@ customer-portal-prototype<!DOCTYPE html>
       .address-mode-cards { flex-direction: column; padding: 0; }
       .header-search { display: none; }
     }
-
-    /* ===== MAP INTEGRATION STYLES (TRO/TMO Azure Map) ===== */
-    .map-container {
-      border: 1px solid var(--grey-300); border-radius: var(--radius-card);
-      overflow: hidden; margin-bottom: 20px; position: relative;
-      background: var(--grey-100);
-    }
-    .map-canvas {
-      width: 100%; height: 380px; position: relative;
-      background: #e8e8e8; cursor: crosshair;
-    }
-    .map-canvas svg { width: 100%; height: 100%; }
-    .map-street {
-      cursor: pointer; transition: opacity 150ms, stroke-width 150ms;
-    }
-    .map-street:hover { opacity: 0.8; stroke-width: 8; }
-    .map-street.highlighted { stroke: var(--error); stroke-width: 6; }
-    .map-street.selected { stroke: var(--primary-main); stroke-width: 8; }
-    .map-bay-marker {
-      cursor: pointer; transition: transform 150ms;
-    }
-    .map-bay-marker:hover { transform: scale(1.2); }
-    .map-bay-marker.selected { fill: var(--primary-main); stroke: #fff; stroke-width: 2; }
-    .map-legend {
-      display: flex; gap: 16px; padding: 10px 16px;
-      background: #fff; border-top: 1px solid var(--grey-200);
-      font-size: 12px; color: var(--text-secondary);
-      flex-wrap: wrap;
-    }
-    .map-legend-item {
-      display: flex; align-items: center; gap: 6px;
-    }
-    .map-legend-dot {
-      width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
-    }
-    .map-toolbar {
-      display: flex; gap: 8px; padding: 10px 16px;
-      background: #fff; border-bottom: 1px solid var(--grey-200);
-      align-items: center;
-    }
-    .map-toolbar .btn-icon-map {
-      background: none; border: 1px solid var(--grey-300); border-radius: 6px;
-      padding: 6px 10px; cursor: pointer; font-size: 14px; color: var(--text-secondary);
-      transition: background 150ms, border-color 150ms;
-    }
-    .map-toolbar .btn-icon-map:hover { background: var(--grey-100); border-color: var(--grey-400); }
-    .map-toolbar .btn-icon-map.active { background: var(--primary-25); border-color: var(--primary-main); color: var(--primary-main); }
-    .map-selection-info {
-      display: flex; gap: 12px; padding: 12px 16px;
-      background: var(--primary-25); border-radius: var(--radius-input);
-      font-size: 14px; line-height: 1.43; margin-bottom: 16px;
-      align-items: center; border: 1px solid var(--primary-100);
-    }
-    .map-selection-info svg { width: 20px; height: 20px; flex-shrink: 0; color: var(--primary-main); }
-    .map-selection-info .info-text { flex: 1; color: var(--text-primary); }
-
-    .map-selected-bays {
-      margin-top: 16px;
-    }
-    .map-selected-bay-item {
-      display: grid; grid-template-columns: 1fr auto auto auto;
-      align-items: center; gap: 16px;
-      padding: 14px 16px; background: var(--grey-50);
-      border: 1px solid var(--grey-200); border-radius: var(--radius-input);
-      margin-bottom: 8px; font-size: 14px;
-    }
-    .map-selected-bay-item.no-price {
-      grid-template-columns: 1fr auto auto;
-    }
-    .map-selected-bay-item .bay-detail { min-width: 0; }
-    .map-selected-bay-item .bay-detail strong { display: block; font-size: 14px; font-weight: 500; }
-    .map-selected-bay-item .bay-detail span { font-size: 12px; color: var(--text-secondary); }
-    .map-selected-bay-item .bay-detail .bay-town { color: var(--text-secondary); font-size: 12px; }
-    .map-selected-bay-item .bay-actions {
-      display: contents;
-    }
-    .map-selected-bay-item .bay-spaces-col { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-    .map-selected-bay-item .bay-spaces-col label { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
-    .map-selected-bay-item .bay-spaces-input {
-      width: 80px; text-align: center; padding: 8px; font-size: 14px;
-      border: 1px solid var(--grey-400); border-radius: var(--radius-input);
-    }
-    .map-selected-bay-item .bay-price-col { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; min-width: 80px; }
-    .map-selected-bay-item .bay-price-col label { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
-    .map-selected-bay-item .bay-price-col .bay-price-value { font-weight: 600; font-size: 16px; padding: 8px 0; white-space: nowrap; }
-    .map-selected-bay-item .bay-remove-btn {
-      background: none; border: none; color: var(--error); cursor: pointer;
-      font-size: 18px; padding: 4px 8px; border-radius: var(--radius-input);
-    }
-    .map-selected-bay-item .bay-remove-btn:hover { background: rgba(211,47,47,.08); }
-    .map-availability-badge {
-      font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: var(--radius-chip);
-      display: inline-block; margin-left: 8px;
-    }
-    .map-availability-badge.available { background: #E8F5E9; color: var(--success); }
-    .map-availability-badge.limited { background: #FFF3E0; color: var(--warning); }
-    .map-availability-badge.unavailable { background: #FFEBEE; color: var(--error); }
-
-    .map-mode-toggle {
-      display: flex; gap: 0; margin-bottom: 16px;
-      border: 1px solid var(--grey-300); border-radius: var(--radius-input);
-      overflow: hidden;
-    }
-    .map-mode-option {
-      flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 12px 16px; cursor: pointer; background: #fff; border: none;
-      font-size: 14px; font-weight: 500; color: var(--text-primary);
-      transition: background 150ms; font-family: inherit;
-    }
-    .map-mode-option + .map-mode-option { border-left: 1px solid var(--grey-300); }
-    .map-mode-option:hover { background: var(--grey-50); }
-    .map-mode-option.selected { background: var(--primary-25); color: var(--primary-main); }
-    .map-mode-option svg { width: 18px; height: 18px; }
-
-    /* ===== MAP HOVER TOOLTIP (lightweight, follows cursor) ===== */
-    .map-hover-tooltip {
-      position: absolute;
-      pointer-events: none;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 12px rgba(0,0,0,.15);
-      padding: 12px 16px;
-      min-width: 180px;
-      max-width: 260px;
-      z-index: 60;
-      display: none;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-    .map-hover-tooltip.visible { display: block; }
-    .map-hover-tooltip .tooltip-street {
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--text-primary);
-      margin-bottom: 6px;
-    }
-    .map-hover-tooltip .tooltip-bay-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    .map-hover-tooltip .tooltip-bay-list li {
-      font-size: 13px;
-      color: var(--text-secondary);
-      padding: 2px 0;
-    }
-
-    /* ===== MAP CLICK POPUP (anchored near street, with checkboxes) ===== */
-    .map-click-popup {
-      position: absolute;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 20px rgba(0,0,0,.18);
-      padding: 0;
-      min-width: 280px;
-      max-width: 340px;
-      z-index: 65;
-      display: none;
-      font-size: 14px;
-      overflow: hidden;
-    }
-    .map-click-popup.visible { display: block; }
-    .map-click-popup .popup-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 16px 10px;
-      border-bottom: 1px solid var(--grey-200);
-    }
-    .map-click-popup .popup-street {
-      font-size: 16px;
-      font-weight: 500;
-      color: var(--text-primary);
-    }
-    .map-click-popup .popup-close {
-      background: none;
-      border: none;
-      font-size: 20px;
-      cursor: pointer;
-      color: var(--text-secondary);
-      padding: 2px 6px;
-      border-radius: 4px;
-      line-height: 1;
-    }
-    .map-click-popup .popup-close:hover { background: var(--grey-100); }
-    .map-click-popup .popup-body {
-      padding: 8px 0;
-    }
-    .map-click-popup .popup-bay-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 16px;
-      cursor: pointer;
-      transition: background 120ms;
-    }
-    .map-click-popup .popup-bay-row:hover { background: var(--grey-50); }
-    .map-click-popup .popup-bay-row input[type="checkbox"] {
-      accent-color: var(--primary-main);
-      width: 18px;
-      height: 18px;
-      flex-shrink: 0;
-      cursor: pointer;
-    }
-    .map-click-popup .popup-bay-info {
-      flex: 1;
-      min-width: 0;
-    }
-    .map-click-popup .popup-bay-name {
-      font-size: 14px;
-      font-weight: 400;
-      color: var(--text-primary);
-      display: block;
-    }
-    .map-click-popup .popup-bay-avail {
-      font-size: 12px;
-      color: var(--text-secondary);
-    }
-
-
-    @media (max-width: 640px) {
-      .map-canvas { height: 260px; }
-      .map-legend { flex-direction: column; gap: 8px; }
-      .map-toolbar { flex-wrap: wrap; }
-      .map-selected-bay-item {\n        grid-template-columns: 1fr;\n        grid-template-rows: auto auto;\n        gap: 8px;\n      }\n      .map-selected-bay-item .bay-spaces-col,\n      .map-selected-bay-item .bay-price-col { flex-direction: row; align-items: center; }\n      .map-selected-bay-item .bay-price-col .bay-price-value { padding: 0 !important; font-size: 14px !important; }
-
-      .map-click-popup { min-width: 240px; max-width: 280px; }
-      .map-hover-tooltip { min-width: 150px; }
-    }
   </style>
 </head>
 <body>
@@ -1754,7 +1530,7 @@ customer-portal-prototype<!DOCTYPE html>
 
       <!-- Page heading with FAQ & Help buttons -->
       <div class="page-heading-row" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0; flex-wrap:nowrap; gap:8px;">
-        <h1 class="page-heading" style="margin-bottom:0; flex:1; min-width:0;">Purchase New Permit (Map Integration)</h1>
+        <h1 class="page-heading" style="margin-bottom:0; flex:1; min-width:0;">Purchase New Permit</h1>
         <div class="page-heading-actions" style="display:flex; gap:10px; align-items:center;">
           <a href="suspension-faq.html" target="_blank" class="btn btn-secondary btn-sm heading-action-btn" style="text-decoration:none;" title="FAQ">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="vertical-align:middle;"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
@@ -1768,27 +1544,16 @@ customer-portal-prototype<!DOCTYPE html>
       </div>
       <hr style="border:none; border-top:1px solid var(--grey-300); margin:16px 0 16px;">
 
-      <!-- Pricing Rule Switcher + Map Config (for reviewer/demo purposes) -->
-      <div class="demo-config-bar" style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; padding:10px 24px; background:repeating-linear-gradient(45deg, #FFF3E0, #FFF3E0 10px, #FFE0B2 10px, #FFE0B2 20px); border:1px solid var(--warning); border-radius:var(--radius-card); margin-bottom:16px; font-size:13px;">
-        <span style="display:inline-flex; align-items:center; gap:6px;">
-          <span style="width:10px; height:10px; border-radius:50%; border:2px solid var(--warning); display:inline-block;"></span>
-          <strong style="color:var(--text-primary);">Demo:</strong>
-        </span>
-        <span style="display:inline-flex; align-items:center; gap:8px;">
-          <span style="color:var(--text-secondary);">Pricing Rule &mdash;</span>
-          <select id="pricing-rule-select" onchange="switchPricingRule(this.value)" style="padding:6px 12px; border-radius:6px; border:1px solid var(--grey-400); font-size:13px; background:#fff; min-width:320px; cursor:pointer;">
-            <option value="P1" selected>P1 &mdash; Standard Pricing (Bay Price &times; Spaces &times; Duration)</option>
-            <option value="P2">P2 &mdash; Min + Incremental (Min Charge &times; Spaces + Rate &times; Extra)</option>
-            <option value="P3-UC1">P3 &mdash; Flexible Duration with Fixed Price (Flat fee)</option>
-            <option value="P3-UC2">P3 &mdash; Single Fixed Price (No Duration)</option>
-          </select>
-        </span>
-        <span style="color:var(--grey-400);">|</span>
-        <span style="display:inline-flex; align-items:center; gap:8px;">
-          <span style="color:var(--text-secondary);">Multi Bay Type &mdash;</span>
-          <select id="multi-bay-toggle" onchange="toggleMultiBayType(this.value === 'true')" style="padding:6px 12px; border-radius:6px; border:1px solid var(--grey-400); font-size:13px; background:#fff; cursor:pointer;">
-            <option value="true" selected>Enabled</option>
-            <option value="false">Disabled</option>
+      <!-- Pricing Rule Switcher (for reviewer/demo purposes) -->
+      <div class="notice notice-warning" style="margin-bottom:16px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        <span style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <strong>Demo:</strong> Pricing Rule &mdash;
+          <select id="pricing-rule-select" onchange="switchPricingRule(this.value)" style="padding:4px 8px; border-radius:4px; border:1px solid var(--grey-400); font-size:13px;">
+            <option value="P1" selected>P1 — Standard Pricing (Bay Price &times; Spaces &times; Duration)</option>
+            <option value="P2">P2 — Min + Incremental (Min Charge &times; Spaces + Rate &times; Spaces &times; Extra Units)</option>
+            <option value="P3-UC1">P3 — Flexible Duration with Fixed Price (Flat fee per duration)</option>
+            <option value="P3-UC2">P3 — Single Fixed Price (No Duration)</option>
           </select>
         </span>
       </div>
@@ -2117,22 +1882,22 @@ customer-portal-prototype<!DOCTYPE html>
             </div>
           </div>
 
-          <!-- ====== STEP 3: BAY DETAILS (Map Integration — TRO/TMO API with Azure Map) ====== -->
+          <!-- ====== STEP 3: BAY DETAILS (Street, Bays, Duration, Dates, Price) ====== -->
           <div id="step-3" class="step-content hidden">
             <div class="card">
               <h2>Bay Details</h2>
-              <p class="subtitle">Set duration and dates, select streets and bays from the map or manually, and review pricing.</p>
-
-              <!-- Map Integration Notice -->
-              <div class="notice notice-info" style="margin-bottom:16px;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-                <span><strong>Map Integration Enabled:</strong> Streets and bays are provided via TRO/TMO API. Select streets on the map to view available bays. Red-highlighted streets contain bookable bays.</span>
-              </div>
+              <p class="subtitle">Set duration and dates, select the street, choose bay type and quantity, and review pricing.</p>
 
               <!-- G11: P3 UC1 — Predefined duration selection (hidden by default) -->
               <div class="form-group hidden" id="p3-duration-options">
-                <label>Select Duration</label>
-                <div style="display:flex; flex-wrap:wrap; gap:8px;" id="p3-duration-buttons"></div>
+                <label style="font-size:14px; font-weight:500; margin-bottom:8px;">Pricing Section</label>
+                <div class="pricing-table" id="p3-duration-table">
+                  <div class="pricing-table-header">
+                    <span>Duration</span>
+                    <span>Permit Price</span>
+                  </div>
+                  <!-- rows rendered dynamically by renderP3DurationOptions() -->
+                </div>
               </div>
 
               <!-- G2: Duration + Period Type (inline) -->
@@ -2141,8 +1906,8 @@ customer-portal-prototype<!DOCTYPE html>
                   <label for="duration" id="duration-label">Number of Day(s)</label>
                   <input type="number" id="duration" min="1" max="90" value="1" onchange="calculateEndDate()" oninput="calculateEndDate()" />
                   <div class="error-msg" id="duration-error">Please enter the duration</div>
-                  <div class="error-msg" id="duration-min-error">The selected suspension duration is below the minimum allowed. Please increase the duration.</div>
-                  <div class="error-msg" id="duration-max-error">The selected suspension duration exceeds the maximum allowed. Please reduce the duration.</div>
+                  <div class="error-msg" id="duration-min-error">The selected suspension duration is below the minimum allowed. Please select at least <span id="duration-min-val"></span>.</div>
+                  <div class="error-msg" id="duration-max-error">The selected suspension duration exceeds the maximum allowed. Please select a duration up to <span id="duration-max-val"></span>.</div>
                 </div>
                 <div class="form-group" id="period-type-group">
                   <label for="period-type-select">Period Type</label>
@@ -2173,93 +1938,59 @@ customer-portal-prototype<!DOCTYPE html>
                 </div>
               </div>
 
-              <!-- ===== MAP SELECTION MODE ===== -->
-              <div id="map-selection-panel">
+              <!-- G26: Purchase limit inline error (triggered when High Street selected) -->
+              <div class="error-msg" id="purchase-limit-error" style="margin-bottom:12px; padding:12px 16px; background:rgba(211,47,47,.06); border:1px solid rgba(211,47,47,.2); border-radius:var(--radius-input); font-size:14px; line-height:1.43; letter-spacing:0.17px;">You have reached the maximum number of suspensions allowed for this street during the selected time.</div>
 
-                <!-- Map Instruction (moved above map) -->
-                <div class="map-selection-info" id="map-select-prompt">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-                  <span class="info-text"><strong>Hover</strong> over a red-highlighted street to see available bay types. <strong>Click</strong> a street to select bays for your suspension.</span>
+              <div class="street-town-row" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label for="street-select">Street <span style="color:var(--error);">*</span></label>
+                  <select id="street-select" onchange="onStreetSelectChange(this.value)">
+                    <option value="">Select Street</option>
+                  </select>
+                  <div class="error-msg" id="street-error">Please select a street</div>
                 </div>
-
-                <!-- Search Address to Zoom -->
-                <div class="form-group" style="margin-bottom:12px;">
-                  <label for="map-address-search">Search street to zoom</label>
-                  <div class="address-search-wrapper">
-                    <input type="text" id="map-address-search" placeholder="Start typing a street name or postcode&hellip;"
-                           autocomplete="off" aria-expanded="false" aria-controls="map-address-results" />
-                    <div id="map-address-results" class="address-search-results" role="listbox"></div>
-                  </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label for="town-select">Town <span style="color:var(--error);">*</span></label>
+                  <select id="town-select" onchange="onTownSelectChange(this.value)">
+                    <option value="">Select Town</option>
+                    <option value="Camden">Camden</option>
+                    <option value="Westminster">Westminster</option>
+                    <option value="Islington">Islington</option>
+                    <option value="Hackney">Hackney</option>
+                    <option value="Southwark">Southwark</option>
+                    <option value="Lambeth">Lambeth</option>
+                    <option value="Greenwich">Greenwich</option>
+                    <option value="Lewisham">Lewisham</option>
+                  </select>
+                  <div class="error-msg" id="town-error">Please select a town</div>
                 </div>
-
-                <!-- Map Container with Leaflet + TRO/TMO Data -->
-                <div class="map-container">
-                  <div style="display:flex; align-items:center; gap:8px; padding:8px 16px; background:#fff; border-bottom:1px solid var(--grey-200); font-size:12px; color:var(--text-secondary);">
-                    <span style="flex:1;"></span>
-                    <span>TRO/TMO Data: Live</span>
-                    <span style="width:8px; height:8px; border-radius:50%; background:var(--success); display:inline-block;"></span>
-                  </div>
-                  <div id="leaflet-map" style="width:100%; height:400px; position:relative; z-index:1;"></div>
-                  <div class="map-legend">
-                    <div class="map-legend-item">
-                      <div class="map-legend-dot" style="background:var(--error);"></div>
-                      <span>Streets with bays (clickable)</span>
-                    </div>
-                    <div class="map-legend-item">
-                      <div class="map-legend-dot" style="background:var(--primary-main);"></div>
-                      <span>Selected street/bay</span>
-                    </div>
-                    <div class="map-legend-item">
-                      <div class="map-legend-dot" style="background:var(--success);"></div>
-                      <span>Available</span>
-                    </div>
-                    <div class="map-legend-item">
-                      <div class="map-legend-dot" style="background:var(--warning);"></div>
-                      <span>Limited availability</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Hover Tooltip (positioned over the map by JS) -->
-                <div class="map-hover-tooltip" id="map-hover-tooltip" style="position:fixed;">
-                  <div class="tooltip-street" id="tooltip-street-name"></div>
-                  <ul class="tooltip-bay-list" id="tooltip-bay-list"></ul>
-                </div>
-                <!-- Click Popup (positioned over the map by JS) -->
-                <div class="map-click-popup" id="map-click-popup" style="position:fixed; z-index:1100;">
-                  <div class="popup-header">
-                    <span class="popup-street" id="popup-street-name"></span>
-                    <button class="popup-close" onclick="closeMapPopup()" aria-label="Close">&times;</button>
-                  </div>
-                  <div class="popup-body" id="popup-body"></div>
-                </div>
-
-                <!-- Bay Selection heading -->
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-top:16px; margin-bottom:8px;">
-                  <h3 style="font-size:16px; font-weight:500; letter-spacing:0.15px; margin:0;">Bay Selection</h3>
-                  <span id="bay-selection-rule-hint" style="font-size:12px; color:var(--text-secondary); font-style:italic;"></span>
-                </div>
-
-                <!-- Map Selection Info / Instruction (moved to top of map panel) -->
-                <div class="error-msg" id="map-bay-error">Please select a bay from the map</div>
-
-                <!-- Selected Bays from Map (auto-populated from map click) -->
-                <div class="map-selected-bays" id="map-selected-bays">
-                  <!-- Dynamically populated -->
-                </div>
-
               </div>
 
+              <!-- Bay Selection -->
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; margin-top:8px;">
+                <h3 style="font-size:16px; font-weight:500; letter-spacing:0.15px;">Bay Selection</h3>
+                <button class="btn btn-secondary btn-sm" onclick="addNewBayRow()">+ Add New Bay</button>
+              </div>
 
+              <div id="bay-rows-container">
+                <!-- Bay rows are added dynamically -->
+              </div>
+              <div style="font-size:12px; color:var(--text-disabled); letter-spacing:0.4px; margin-bottom:16px;" id="pricing-rule-hint">
+                Bay Price &times; Spaces &times; Duration Units
+              </div>
 
-              <!-- Multiple Bay Type Configuration Notice -->
-              <div class="notice notice-info hidden" id="multi-bay-type-notice" style="margin-top:12px;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-                <span id="multi-bay-type-msg">Multiple bay types can be selected per street.</span>
+              <div class="error-msg" id="bay-error" style="margin-top:4px;">Please select a bay type</div>
+
+              <!-- Hidden bay table kept for renderBayTable compatibility -->
+              <div id="bay-list-container" style="display:none;">
+                <table class="bay-table hidden" id="bay-table">
+                  <thead><tr><th>Bay Type</th><th>Spaces</th><th>Bay Price</th><th></th></tr></thead>
+                  <tbody id="bay-table-body"></tbody>
+                </table>
               </div>
 
               <!-- Pricing Summary -->
-              <div class="price-card" id="price-summary-step2" style="margin-top:16px;">
+              <div class="price-card" id="price-summary-step2">
                 <div class="price-line"><span class="p-label">Subtotal:</span><span class="p-value" id="ps-subtotal">&pound;0.00</span></div>
                 <div class="price-line discount" id="ps-discount-row" style="display:none;"><span class="p-label">New shop owner Discount (10%):</span><span class="p-value" id="ps-discount">-&pound;0.00</span></div>
                 <div class="price-line"><span class="p-label">Short Notice Fee:</span><span class="p-value" id="ps-short-notice">&pound;0.00</span></div>
@@ -2372,19 +2103,7 @@ customer-portal-prototype<!DOCTYPE html>
           <div class="summary-card">
             <h3>Summary</h3>
             <div style="padding:16px;">
-            <div id="summary-map-placeholder" style="background:var(--grey-100); border-radius:var(--radius-input); height:141px; margin-bottom:16px; overflow:hidden; position:relative;">
-              <!-- Mini map preview showing selected streets -->
-              <svg viewBox="0 0 320 141" width="100%" height="100%" style="background:#e8e8e8;">
-                <rect width="320" height="141" fill="#f0f0f0"/>
-                <line x1="20" y1="70" x2="300" y2="70" stroke="#ccc" stroke-width="2"/>
-                <line x1="160" y1="10" x2="160" y2="130" stroke="#D32F2F" stroke-width="3" id="mini-baker"/>
-                <line x1="40" y1="35" x2="280" y2="35" stroke="#D32F2F" stroke-width="3" id="mini-high"/>
-                <line x1="40" y1="105" x2="280" y2="105" stroke="#D32F2F" stroke-width="3" id="mini-victoria"/>
-                <line x1="240" y1="10" x2="240" y2="130" stroke="#D32F2F" stroke-width="3" id="mini-abbey"/>
-                <text x="160" y="145" text-anchor="middle" font-size="8" fill="#999">TRO/TMO Map</text>
-              </svg>
-              <div style="position:absolute; bottom:4px; right:8px; font-size:10px; color:var(--text-disabled); background:rgba(255,255,255,.8); padding:1px 6px; border-radius:4px;">Map Integration</div>
-            </div>
+            <div id="summary-map-placeholder" style="background:var(--grey-100); border-radius:var(--radius-input); height:141px; margin-bottom:16px; overflow:hidden;"></div>
             <div id="summary-content">
               <div class="summary-row"><span class="s-label">Address</span><span class="s-value" id="sum-address">&mdash;</span></div>
               <div class="summary-divider"></div>
@@ -2554,6 +2273,9 @@ var pricingConfig = {
   // Duration limits (G10)
   minDuration: 1,
   maxDuration: 90,
+  // P2-specific min/max (#249939 AC1/AC2 — only enforced when P2 is active)
+  p2MinDurationHard: 2,
+  p2MaxDurationHard: 10,
   // Saved vehicles (G5)
   savedVehicles: [
     { vrm: 'AB12 CDE', type: 'Personal' },
@@ -2666,8 +2388,18 @@ function setMinDate () {
 
 function populateStreets () {
   var sel = document.getElementById('street-select');
-  if (!sel) return;
-  ['Baker Street', 'High Street', 'Victoria Avenue', 'London Road', 'Abbey Hill'].forEach(function (s) {
+  var allStreets = [
+    'Baker Street', 'High Street', 'Victoria Avenue', 'London Road', 'Abbey Hill',
+    'Camden High Street', 'Kentish Town Road', 'Chalk Farm Road', 'Parkway', 'Delancey Street', 'Royal College Street',
+    'Victoria Street', 'Buckingham Palace Road', 'Horseferry Road', 'Warwick Way', 'Lupus Street',
+    'Upper Street', 'Essex Road', 'Liverpool Road', 'Holloway Road', 'Caledonian Road', 'Pentonville Road',
+    'Mare Street', 'Kingsland Road', 'Dalston Lane', 'Graham Road', 'Morning Lane', 'Well Street',
+    'Borough High Street', 'Tower Bridge Road', 'Old Kent Road', 'Walworth Road', 'Camberwell New Road', 'Peckham Road',
+    'Brixton Road', 'Kennington Road', 'Clapham Road', 'Streatham High Road', 'Norwood Road', 'Tulse Hill',
+    'Trafalgar Road', 'Woolwich Road', 'Blackheath Hill', 'Creek Road', 'Romney Road', 'Nelson Road',
+    'Lewisham High Street', 'Lee High Road', 'Bromley Road', 'Catford Hill', 'Rushey Green', 'Brownhill Road'
+  ];
+  allStreets.sort().forEach(function (s) {
     var opt = document.createElement('option');
     opt.value = s; opt.textContent = s;
     sel.appendChild(opt);
@@ -2973,20 +2705,23 @@ function updatePricingRuleView () {
 }
 
 function renderP3DurationOptions () {
-  var container = document.getElementById('p3-duration-buttons');
-  container.innerHTML = '';
+  var table = document.getElementById('p3-duration-table');
+  // Remove old rows but keep header
+  var oldRows = table.querySelectorAll('.pricing-row');
+  oldRows.forEach(function (r) { r.remove(); });
+
   var periodLabels = { hour: 'Hour(s)', day: 'Day(s)', week: 'Week(s)', month: 'Month(s)' };
   pricingConfig.p3Durations.forEach(function (d, i) {
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'btn btn-secondary';
-    btn.textContent = d.frequency + ' ' + (periodLabels[d.period] || d.period) + ' \u2014 \u00A3' + d.price.toFixed(2);
-    btn.style.cssText = 'min-width:120px;';
-    if (pricingConfig.p3SelectedDuration === i) {
-      btn.className = 'btn btn-primary';
-    }
-    btn.onclick = function () { selectP3Duration(i); };
-    container.appendChild(btn);
+    var label = document.createElement('label');
+    label.className = 'pricing-row' + (pricingConfig.p3SelectedDuration === i ? ' selected' : '');
+    label.onclick = function () { selectP3Duration(i); };
+    label.innerHTML =
+      '<span class="pricing-row-left">' +
+        '<input type="radio" name="p3-duration-radio" value="' + i + '"' + (pricingConfig.p3SelectedDuration === i ? ' checked' : '') + ' />' +
+        ' ' + d.frequency + ' ' + (periodLabels[d.period] || d.period) +
+      '</span>' +
+      '<span class="pricing-row-price">\u00A3' + d.price.toFixed(2) + '</span>';
+    table.appendChild(label);
   });
 }
 
@@ -3006,7 +2741,6 @@ function selectP3Duration (index) {
 /* === Adapt Bay UI based on pricing rule === */
 function updateBayUIForRule (rule) {
   var bayRowsContainer = document.getElementById('bay-rows-container');
-  if (!bayRowsContainer) return;
   var baySection = document.querySelector('#step-3 .card');
   var spacesHeader = document.querySelector('#bay-table thead th:nth-child(2)');
 
@@ -3131,13 +2865,6 @@ function goToStep (step) {
   }
 
   updateSummary();
-  if (step === 3) {
-    // Lazy-init Leaflet map on first visit; invalidateSize every time
-    if (!leafletMap) initLeafletMap();
-    if (leafletMap) {
-      setTimeout(function () { leafletMap.invalidateSize(); }, 150);
-    }
-  }
   if (step === 4) populateReview();
   window.scrollTo({ top: 0 });
 }
@@ -3300,7 +3027,6 @@ function selectFindAddress (addr) {
 
 function autoSelectStreet (streetName) {
   var sel = document.getElementById('street-select');
-  if (!sel) return;
   for (var i = 0; i < sel.options.length; i++) {
     if (sel.options[i].value === streetName) { sel.value = streetName; return; }
   }
@@ -3310,7 +3036,6 @@ function autoSelectStreet (streetName) {
 function onSameStreetChange () {
   var cb = document.getElementById('same-street-check');
   var sel = document.getElementById('street-select');
-  if (!sel) return;
   if (!cb.checked) { sel.disabled = false; sel.value = ''; return; }
   // Checked — auto-populate street from correspondence address
   var addrStreet = '';
@@ -3418,18 +3143,19 @@ function calculateEndDate () {
   document.getElementById('duration-error').classList.remove('visible');
 
   if (rule !== 'P3-UC2' && rule !== 'P3-UC1') {
-    // Determine min/max limits — use P2 per-period limits if available (BR-07, BR-08)
+    // Determine min/max limits — use P2 hardcoded limits when P2 is active (#249939 AC1/AC2)
     var minLimit = pricingConfig.minDuration;
     var maxLimit = pricingConfig.maxDuration;
-    if (rule === 'P2' && pricingConfig.p2DurationLimits && pricingConfig.p2DurationLimits[currentPeriodType]) {
-      var periodLimit = pricingConfig.p2DurationLimits[currentPeriodType];
-      if (periodLimit.min != null) minLimit = periodLimit.min;
-      if (periodLimit.max != null) maxLimit = periodLimit.max;
+    if (rule === 'P2') {
+      minLimit = pricingConfig.p2MinDurationHard || 2;
+      maxLimit = pricingConfig.p2MaxDurationHard || 10;
     }
     if (duration < minLimit) {
+      updateDurationLimitMessages(minLimit, maxLimit);
       document.getElementById('duration-min-error').classList.add('visible');
     }
     if (duration > maxLimit) {
+      updateDurationLimitMessages(minLimit, maxLimit);
       document.getElementById('duration-max-error').classList.add('visible');
     }
   }
@@ -3582,17 +3308,25 @@ function validateStep3 (action) {
   var periodLabels = { hour: 'Hours', day: 'Days', week: 'Weeks', month: 'Months' };
 
   // Clear all step-3 errors first
+  clearFieldError('town-select', 'town-error');
   clearFieldError('street-select', 'street-error');
   clearFieldError('start-date', 'start-date-error');
   clearFieldError('duration', 'duration-error');
   clearFieldError('duration', 'duration-min-error');
   clearFieldError('duration', 'duration-max-error');
-  var bayErrorEl = document.getElementById('bay-error');
-  if (bayErrorEl) bayErrorEl.classList.remove('visible');
+  document.getElementById('bay-error').classList.remove('visible');
   // Clear per-row error highlights
   document.querySelectorAll('#bay-rows-container .bay-type-sel.error, #bay-rows-container .bay-spaces-inp.error').forEach(function (el) {
     el.classList.remove('error');
   });
+
+  // Town validation
+  var townSel = document.getElementById('town-select');
+  var townVal = townSel ? townSel.value.trim() : '';
+  if (!townVal) {
+    setFieldError('town-select', 'town-error');
+    valid = false;
+  }
 
   // Street validation
   if (!streetVal) {
@@ -3616,10 +3350,10 @@ function validateStep3 (action) {
   if (pricingConfig.rule !== 'P3-UC1' && pricingConfig.rule !== 'P3-UC2') {
     var minLimit = pricingConfig.minDuration;
     var maxLimit = pricingConfig.maxDuration;
-    if (pricingConfig.rule === 'P2' && pricingConfig.p2DurationLimits && pricingConfig.p2DurationLimits[currentPeriodType]) {
-      var periodLimit = pricingConfig.p2DurationLimits[currentPeriodType];
-      if (periodLimit.min != null) minLimit = periodLimit.min;
-      if (periodLimit.max != null) maxLimit = periodLimit.max;
+    // Use P2 hardcoded limits when P2 is active (#249939 AC1/AC2)
+    if (pricingConfig.rule === 'P2') {
+      minLimit = pricingConfig.p2MinDurationHard || 2;
+      maxLimit = pricingConfig.p2MaxDurationHard || 10;
     }
     if (!duration || duration <= 0) {
       var durationErrorEl = document.getElementById('duration-error');
@@ -3627,9 +3361,11 @@ function validateStep3 (action) {
       setFieldError('duration', 'duration-error');
       valid = false;
     } else if (duration < minLimit) {
+      updateDurationLimitMessages(minLimit, maxLimit);
       setFieldError('duration', 'duration-min-error');
       valid = false;
     } else if (duration > maxLimit) {
+      updateDurationLimitMessages(minLimit, maxLimit);
       setFieldError('duration', 'duration-max-error');
       valid = false;
     }
@@ -3643,8 +3379,8 @@ function validateStep3 (action) {
 
   if (rows.length === 0) {
     // No bay rows at all
-    var bayErr1 = document.getElementById('bay-error');
-    if (bayErr1) { bayErr1.textContent = 'Please add at least one bay'; bayErr1.classList.add('visible'); }
+    document.getElementById('bay-error').textContent = 'Please add at least one bay';
+    document.getElementById('bay-error').classList.add('visible');
     valid = false;
   } else {
     rows.forEach(function (row) {
@@ -3667,12 +3403,12 @@ function validateStep3 (action) {
     });
     if (!hasValidBay && valid) {
       // All rows exist but none have valid data
-      var bayErr2 = document.getElementById('bay-error');
-      if (bayErr2) { bayErr2.textContent = 'Please select a bay type'; bayErr2.classList.add('visible'); }
+      document.getElementById('bay-error').textContent = 'Please select a bay type';
+      document.getElementById('bay-error').classList.add('visible');
       valid = false;
     } else if (firstBayError) {
-      var bayErr3 = document.getElementById('bay-error');
-      if (bayErr3) { bayErr3.textContent = 'Please complete all bay selections'; bayErr3.classList.add('visible'); }
+      document.getElementById('bay-error').textContent = 'Please complete all bay selections';
+      document.getElementById('bay-error').classList.add('visible');
     }
   }
 
@@ -3693,37 +3429,32 @@ function addNewBayRow () {
   var rowId = 'bay-row-' + bayRowCounter;
   var div = document.createElement('div');
   div.id = rowId;
-  div.className = 'bay-row-entry';
+  div.className = 'bay-row-entry' + (hidePrice ? ' bay-row-no-price' : '');
   var hidePrice = pricingConfig.rule === 'P3-UC2';
   div.innerHTML =
-    '<div class="bay-row-header">' +
-      '<div class="form-group" style="margin-bottom:0; flex:1; min-width:0;">' +
-        '<label>Bay Type</label>' +
-        '<select class="bay-type-sel" onchange="onBayRowChange(\'' + rowId + '\')"><option value="">Select bay type</option>' +
-        '<option value="PB">Paid bay (meter/pay-and-display)</option>' +
-        '<option value="RB">Resident bay</option>' +
-        '<option value="PO">Permit-only bay</option>' +
-        '<option value="LW">Limited waiting bay</option>' +
-        '<option value="LB">Loading bay</option>' +
-        '<option value="EV">EV charging bay</option>' +
-        '<option value="DB">Disabled bay</option>' +
-        '<option value="FP">Free parking bay</option></select>' +
-      '</div>' +
-      '<button class="btn btn-secondary btn-sm bay-row-remove" onclick="removeBayRow(\'' + rowId + '\')" title="Remove" style="color:var(--error); border-color:var(--error);">\u2715</button>' +
+    '<div class="form-group" style="margin-bottom:0; min-width:0;">' +
+      '<label>Bay Type</label>' +
+      '<select class="bay-type-sel" onchange="onBayRowChange(\'' + rowId + '\')"><option value="">Select bay type</option>' +
+      '<option value="PB">Paid bay (meter/pay-and-display)</option>' +
+      '<option value="RB">Resident bay</option>' +
+      '<option value="PO">Permit-only bay</option>' +
+      '<option value="LW">Limited waiting bay</option>' +
+      '<option value="LB">Loading bay</option>' +
+      '<option value="EV">EV charging bay</option>' +
+      '<option value="DB">Disabled bay</option>' +
+      '<option value="FP">Free parking bay</option></select>' +
     '</div>' +
-    '<div class="bay-row-fields">' +
-      '<div class="form-group" style="margin-bottom:0;">' +
-        '<label>Spaces</label>' +
-        '<input type="number" class="bay-spaces-inp" min="1" max="10" value="1" style="text-align:center;" onchange="onBayRowChange(\'' + rowId + '\')" oninput="onBayRowChange(\'' + rowId + '\')" onclick="onBayRowChange(\'' + rowId + '\')"/>' +
-      '</div>' +
-      '<div class="form-group" style="margin-bottom:0;' + (hidePrice ? ' display:none;' : '') + '">' +
-        '<label>Price</label>' +
-        '<div class="bay-row-price" style="padding:10px 0; font-weight:500; font-size:16px; text-align:right;">\u00A30.00</div>' +
-      '</div>' +
-    '</div>';
+    '<div class="form-group" style="margin-bottom:0;">' +
+      '<label>Spaces</label>' +
+      '<input type="number" class="bay-spaces-inp" min="1" max="10" value="1" style="text-align:center;" onchange="onBayRowChange(\'' + rowId + '\')" oninput="onBayRowChange(\'' + rowId + '\')" onclick="onBayRowChange(\'' + rowId + '\')"/>' +
+    '</div>' +
+    '<div class="form-group bay-price-col" style="margin-bottom:0;' + (hidePrice ? ' display:none;' : '') + '">' +
+      '<label>Price</label>' +
+      '<div class="bay-row-price" style="padding:10px 0; font-weight:500; font-size:16px; white-space:nowrap;">\u00A30.00</div>' +
+    '</div>' +
+    '<button class="btn btn-secondary btn-sm bay-row-remove" data-price="\u00A30.00" onclick="removeBayRow(\'' + rowId + '\')" title="Remove" style="color:var(--error); border-color:var(--error); align-self:end; margin-bottom:2px;">\u2715</button>';
   container.appendChild(div);
-  var bayErrAdd = document.getElementById('bay-error');
-  if (bayErrAdd) bayErrAdd.classList.remove('visible');
+  document.getElementById('bay-error').classList.remove('visible');
 }
 
 function onBayRowChange (rowId) {
@@ -3734,8 +3465,7 @@ function onBayRowChange (rowId) {
   // Clear error styling on change
   typeSel.classList.remove('error');
   spacesInp.classList.remove('error');
-  var bayErrChg = document.getElementById('bay-error');
-  if (bayErrChg) bayErrChg.classList.remove('visible');
+  document.getElementById('bay-error').classList.remove('visible');
   // Update price display
   updateBayRowPrice(rowId);
   // Sync appState.bays from all bay rows
@@ -3762,17 +3492,25 @@ function updateBayRowPrice (rowId) {
   if (priceGroup) priceGroup.style.display = '';
   if (rule === 'P3-UC1') {
     var sel = pricingConfig.p3SelectedDuration;
+    var p3Text;
     if (sel !== null && pricingConfig.p3Durations[sel]) {
-      priceEl.textContent = '\u00A3' + pricingConfig.p3Durations[sel].price.toFixed(2);
+      p3Text = '\u00A3' + pricingConfig.p3Durations[sel].price.toFixed(2);
     } else {
-      priceEl.textContent = '\u00A30.00';
+      p3Text = '\u00A30.00';
     }
+    priceEl.textContent = p3Text;
+    var rmBtn = row.querySelector('.bay-row-remove');
+    if (rmBtn) rmBtn.setAttribute('data-price', p3Text);
     return;
   }
   var type = row.querySelector('.bay-type-sel').value;
   var spaces = parseInt(row.querySelector('.bay-spaces-inp').value, 10) || 0;
   var price = type ? calculateBayPrice(type, spaces, appState.duration || 1) : 0;
-  priceEl.textContent = '\u00A3' + price.toFixed(2);
+  var priceText = '\u00A3' + price.toFixed(2);
+  priceEl.textContent = priceText;
+  // Sync data-price on remove button for mobile ::before display
+  var removeBtn = row.querySelector('.bay-row-remove');
+  if (removeBtn) removeBtn.setAttribute('data-price', priceText);
 }
 
 function syncBaysFromRows () {
@@ -3802,7 +3540,6 @@ function removeBay (index) { appState.bays.splice(index, 1); renderBayTable(); }
 function renderBayTable () {
   var tbody = document.getElementById('bay-table-body');
   var table = document.getElementById('bay-table');
-  if (!table || !tbody) { updatePriceSummary(); updateSummary(); return; }
   if (appState.bays.length === 0) { table.classList.add('hidden'); updatePriceSummary(); updateSummary(); return; }
   table.classList.remove('hidden');
   tbody.innerHTML = '';
@@ -3933,12 +3670,10 @@ function updatePriceSummary () {
 
   // Update pricing rule hint
   var hint = document.getElementById('pricing-rule-hint');
-  if (hint) {
-    if (rule === 'P1') hint.textContent = 'Bay Price \u00D7 Spaces \u00D7 Duration Units';
-    else if (rule === 'P2') hint.textContent = 'Min Charge \u00D7 Spaces + Rate \u00D7 Spaces \u00D7 Extra Units';
-    else if (rule === 'P3-UC1') hint.textContent = 'Flat fee per duration (does not scale with spaces)';
-    else if (rule === 'P3-UC2') hint.textContent = 'Single Fixed Price (\u00A3' + pricingConfig.p3FixedPrice.toFixed(2) + ')';
-  }
+  if (rule === 'P1') hint.textContent = 'Bay Price \u00D7 Spaces \u00D7 Duration Units';
+  else if (rule === 'P2') hint.textContent = 'Min Charge \u00D7 Spaces + Rate \u00D7 Spaces \u00D7 Extra Units';
+  else if (rule === 'P3-UC1') hint.textContent = 'Flat fee per duration (does not scale with spaces)';
+  else if (rule === 'P3-UC2') hint.textContent = 'Single Fixed Price (\u00A3' + pricingConfig.p3FixedPrice.toFixed(2) + ')';
 }
 
 function handleFileSelect (e) {
@@ -4113,11 +3848,56 @@ function calculateVat (subtotal) {
 
 /* === G26: Purchase limit validation === */
 function checkPurchaseLimit () {
+  var errorEl = document.getElementById('purchase-limit-error');
   if (pricingConfig.currentPurchases + 1 > pricingConfig.purchaseLimit) {
-    alert('Purchase limit reached. You have used ' + pricingConfig.currentPurchases + ' of ' + pricingConfig.purchaseLimit + ' allowed purchases for this permission. Please contact the council to request additional capacity.');
+    document.getElementById('purchase-limit-used').textContent = pricingConfig.currentPurchases;
+    document.getElementById('purchase-limit-max').textContent = pricingConfig.purchaseLimit;
+    errorEl.classList.add('visible');
+    errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return false;
   }
+  errorEl.classList.remove('visible');
   return true;
+}
+
+/* === Town → Street population === */
+var townStreets = {
+  'Camden': ['Camden High Street', 'Kentish Town Road', 'Chalk Farm Road', 'Parkway', 'Delancey Street', 'Royal College Street'],
+  'Westminster': ['High Street', 'Victoria Street', 'Buckingham Palace Road', 'Horseferry Road', 'Warwick Way', 'Lupus Street'],
+  'Islington': ['Upper Street', 'Essex Road', 'Liverpool Road', 'Holloway Road', 'Caledonian Road', 'Pentonville Road'],
+  'Hackney': ['Mare Street', 'Kingsland Road', 'Dalston Lane', 'Graham Road', 'Morning Lane', 'Well Street'],
+  'Southwark': ['Borough High Street', 'Tower Bridge Road', 'Old Kent Road', 'Walworth Road', 'Camberwell New Road', 'Peckham Road'],
+  'Lambeth': ['Brixton Road', 'Kennington Road', 'Clapham Road', 'Streatham High Road', 'Norwood Road', 'Tulse Hill'],
+  'Greenwich': ['Trafalgar Road', 'Woolwich Road', 'Blackheath Hill', 'Creek Road', 'Romney Road', 'Nelson Road'],
+  'Lewisham': ['Lewisham High Street', 'Lee High Road', 'Bromley Road', 'Catford Hill', 'Rushey Green', 'Brownhill Road']
+};
+
+function onTownSelectChange (townVal) {
+  // Town is independent — does not filter or replace street options
+  clearFieldError('town-select', 'town-error');
+}
+
+/* === G26: Street-based purchase limit trigger (#249939 AC4) === */
+function onStreetSelectChange (streetVal) {
+  var errorEl = document.getElementById('purchase-limit-error');
+  // Hardcoded: "High Street" triggers the suspension limit error
+  if (streetVal === 'High Street') {
+    errorEl.classList.add('visible');
+    errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } else {
+    errorEl.classList.remove('visible');
+  }
+  clearFieldError('street-select', 'street-error');
+}
+
+/* === Dynamic min/max duration error messages (#249939 AC1/AC2) === */
+function updateDurationLimitMessages (minLimit, maxLimit) {
+  var periodLabels = { hour: 'Hour(s)', day: 'Day(s)', week: 'Week(s)', month: 'Month(s)' };
+  var unitLabel = periodLabels[currentPeriodType] || 'Day(s)';
+  var minValEl = document.getElementById('duration-min-val');
+  var maxValEl = document.getElementById('duration-max-val');
+  if (minValEl) minValEl.textContent = minLimit + ' ' + unitLabel;
+  if (maxValEl) maxValEl.textContent = maxLimit + ' ' + unitLabel;
 }
 
 /* === Init: Update dynamic labels on load === */
@@ -4267,835 +4047,6 @@ function toggleMobileSummary () {
     btn.querySelector('span:first-child').textContent = '📋 Hide Summary';
   }
 }
-
-/* ===================================================================
-   MAP INTEGRATION — TRO/TMO API with Azure Map
-   User Story #198903
-   =================================================================== */
-
-/* === Demo toggle for multi bay type === */
-function toggleMultiBayType (enabled) {
-  mapConfig.allowMultipleBayTypes = enabled;
-  updateMultiBayTypeNotice();
-  // Clear selections if switching to single mode with multiple types selected
-  if (!enabled) {
-    var streetGroups = {};
-    mapConfig.selectedBays.forEach(function (b) {
-      if (!streetGroups[b.street]) streetGroups[b.street] = [];
-      streetGroups[b.street].push(b);
-    });
-    Object.keys(streetGroups).forEach(function (street) {
-      if (streetGroups[street].length > 1) {
-        // Keep only the first bay type per street
-        var keep = streetGroups[street][0];
-        mapConfig.selectedBays = mapConfig.selectedBays.filter(function (b) {
-          return b.street !== street || (b.street === street && b.bayType === keep.bayType);
-        });
-        // Deselect removed Leaflet markers
-        Object.keys(leafletBayMarkers).forEach(function (key) {
-          var parts = key.split('|');
-          if (parts[0] === street && parts[1] !== keep.bayType) {
-            updateLeafletMarkerStyle(parts[0], parts[1], false);
-          }
-        });
-      }
-    });
-    renderMapSelectedBays();
-    syncMapBaysToAppState();
-  }
-}
-
-var mapConfig = {
-  mapEnabled: true,
-  selectionMode: 'map', // 'map' or 'manual'
-  allowMultipleBayTypes: true, // configurable from Permission Builder
-  selectedStreet: null,
-  selectedBays: [], // [{street, bayType, baySpaces, maxSpaces, availableSpaces}]
-
-  // Simulated town mapping per street
-  streetTownMap: {
-    'Baker Street': 'Westminster',
-    'High Street': 'Camden',
-    'Victoria Avenue': 'Kensington',
-    'Abbey Hill': 'Greenwich',
-  },
-
-  // Simulated TRO/TMO API data — streets, bay types, total spaces
-  troTmoData: {
-    'Baker Street': [
-      { bayType: 'PB', totalSpaces: 4, bookedSpaces: 1 },
-      { bayType: 'RB', totalSpaces: 6, bookedSpaces: 0 },
-      { bayType: 'LW', totalSpaces: 3, bookedSpaces: 2 },
-      { bayType: 'DB', totalSpaces: 2, bookedSpaces: 0 },
-    ],
-    'High Street': [
-      { bayType: 'PB', totalSpaces: 8, bookedSpaces: 3 },
-      { bayType: 'PO', totalSpaces: 5, bookedSpaces: 5 },
-      { bayType: 'EV', totalSpaces: 3, bookedSpaces: 1 },
-    ],
-    'Victoria Avenue': [
-      { bayType: 'RB', totalSpaces: 4, bookedSpaces: 0 },
-      { bayType: 'LB', totalSpaces: 3, bookedSpaces: 1 },
-    ],
-    'Abbey Hill': [
-      { bayType: 'FP', totalSpaces: 5, bookedSpaces: 0 },
-      { bayType: 'PB', totalSpaces: 6, bookedSpaces: 4 },
-    ],
-  },
-
-  // Simulated existing suspensions for overlap validation
-  existingSuspensions: [
-    { street: 'High Street', bayType: 'PO', startDate: '2026-04-10', endDate: '2026-04-15', spaces: 5, status: 'Active' },
-    { street: 'Baker Street', bayType: 'LW', startDate: '2026-04-08', endDate: '2026-04-12', spaces: 2, status: 'Submitted' },
-    { street: 'Abbey Hill', bayType: 'PB', startDate: '2026-04-05', endDate: '2026-04-20', spaces: 4, status: 'Active' },
-  ],
-};
-
-/* === Selection Mode (map only) === */
-function setSelectionMode (mode) {
-  mapConfig.selectionMode = 'map';
-}
-
-function clearManualBays () {
-  var container = document.getElementById('bay-rows-container');
-  if (container) container.innerHTML = '';
-  appState.bays = [];
-  updatePriceSummary();
-  updateSummary();
-}
-
-function clearMapSelections () {
-  mapConfig.selectedStreet = null;
-  mapConfig.selectedBays = [];
-  // Reset Leaflet marker visual states
-  Object.keys(leafletBayMarkers).forEach(function (key) {
-    leafletBayMarkers[key].setStyle({ fillColor: '#FF5252', radius: 7, weight: 2 });
-  });
-  Object.keys(leafletStreetLayers).forEach(function (key) {
-    leafletStreetLayers[key].setStyle({ color: '#D32F2F' });
-  });
-  closeMapPopup();
-  hideStreetTooltip();
-  renderMapSelectedBays();
-  syncMapBaysToAppState();
-}
-
-/* === Map Street Selection === */
-function selectMapStreet (streetName) {
-  // Reset all street polylines
-  Object.keys(leafletStreetLayers).forEach(function (key) {
-    leafletStreetLayers[key].setStyle({ color: '#D32F2F', weight: 6 });
-  });
-  // Highlight the selected street
-  var poly = leafletStreetLayers[streetName];
-  if (poly) poly.setStyle({ color: '#3276CF', weight: 8 });
-  mapConfig.selectedStreet = streetName;
-
-  // Update instruction
-  var prompt = document.getElementById('map-select-prompt');
-  prompt.querySelector('.info-text').innerHTML = 'Street <strong>' + sanitize(streetName) + '</strong> selected. Use the popup to select bay types for your suspension.';
-}
-
-/* ===== HOVER TOOLTIP — now driven by Leaflet events above ===== */
-function showStreetTooltip () {}
-function moveStreetTooltip () {}
-
-function hideStreetTooltip () {
-  document.getElementById('map-hover-tooltip').classList.remove('visible');
-}
-
-/* ===== CLICK POPUP — now driven by Leaflet events above ===== */
-var _activePopupStreet = null;
-
-function openStreetPopup (event, streetName) {
-  // Fallback for non-Leaflet calls
-  openStreetPopupLeaflet({ originalEvent: event }, streetName);
-}
-
-function closeMapPopup () {
-  var popup = document.getElementById('map-click-popup');
-  popup.classList.remove('visible');
-  _activePopupStreet = null;
-}
-
-/* === Toggle bay from popup checkbox === */
-function togglePopupBay (checkbox, streetName, bayType, totalSpaces, availableSpaces) {
-  if (checkbox.checked) {
-    // Validate multiple bay type restriction
-    if (!mapConfig.allowMultipleBayTypes) {
-      var existingTypesOnStreet = mapConfig.selectedBays.filter(function (b) { return b.street === streetName; });
-      if (existingTypesOnStreet.length > 0 && existingTypesOnStreet[0].bayType !== bayType) {
-        showMapError('Only one bay type can be selected for this street');
-        checkbox.checked = false;
-        return;
-      }
-    }
-
-    if (availableSpaces <= 0) {
-      showMapError('No bay spaces available for ' + bayTypeNames[bayType] + ' on ' + streetName);
-      checkbox.checked = false;
-      return;
-    }
-
-    // Add to selectedBays
-    mapConfig.selectedBays.push({
-      street: streetName,
-      bayType: bayType,
-      baySpaces: availableSpaces,
-      maxSpaces: totalSpaces,
-      availableSpaces: availableSpaces,
-    });
-
-    // Highlight marker on map
-    updateLeafletMarkerStyle(streetName, bayType, true);
-  } else {
-    // Remove from selectedBays
-    mapConfig.selectedBays = mapConfig.selectedBays.filter(function (b) {
-      return !(b.street === streetName && b.bayType === bayType);
-    });
-
-    // Un-highlight marker
-    updateLeafletMarkerStyle(streetName, bayType, false);
-  }
-
-  clearMapError();
-  renderMapSelectedBays();
-  syncMapBaysToAppState();
-}
-
-/* === Update bay spaces from popup input === */
-function updatePopupBaySpaces (streetName, bayType, inputEl) {
-  var bay = mapConfig.selectedBays.find(function (b) {
-    return b.street === streetName && b.bayType === bayType;
-  });
-  if (!bay) return;
-
-  var value = parseInt(inputEl.value, 10);
-  if (isNaN(value) || value < 1) {
-    inputEl.classList.add('error');
-    return;
-  }
-  if (value > bay.availableSpaces) {
-    inputEl.classList.add('error');
-    showMapError('Only ' + bay.availableSpaces + ' bay spaces are available for ' + bayTypeNames[bayType] + ' on ' + streetName);
-    inputEl.value = bay.availableSpaces;
-    bay.baySpaces = bay.availableSpaces;
-  } else {
-    inputEl.classList.remove('error');
-    clearMapError();
-    bay.baySpaces = value;
-  }
-
-  renderMapSelectedBays();
-  syncMapBaysToAppState();
-}
-
-/* === Map Bay Marker Selection (kept for compatibility, now driven by popup) === */
-function selectMapBay (markerEl) {
-  var street = markerEl.getAttribute('data-street');
-  // Open the popup for the street instead
-  openStreetPopup({ clientX: 0, clientY: 0 }, street);
-}
-
-/* === Overlap / Availability Validation === */
-function checkOverlappingSuspension (street, bayType) {
-  var result = { fullyRestricted: false, remainingSpaces: Infinity };
-  var startDate = appState.startDate;
-  var endDate = appState.endDate;
-
-  if (!startDate || !endDate) return result;
-
-  var troData = mapConfig.troTmoData[street];
-  var bayInfo = troData ? troData.find(function (b) { return b.bayType === bayType; }) : null;
-  if (!bayInfo) return result;
-
-  var totalSpaces = bayInfo.totalSpaces;
-  var overlappingBookedSpaces = 0;
-
-  mapConfig.existingSuspensions.forEach(function (sus) {
-    if (sus.street !== street || sus.bayType !== bayType) return;
-    if (sus.status !== 'Active' && sus.status !== 'Submitted') return;
-
-    // Check date overlap
-    var susStart = new Date(sus.startDate);
-    var susEnd = new Date(sus.endDate);
-    var reqStart = new Date(startDate);
-    var reqEnd = new Date(endDate);
-
-    if (reqStart < susEnd && reqEnd > susStart) {
-      overlappingBookedSpaces += sus.spaces;
-    }
-  });
-
-  var remaining = totalSpaces - bayInfo.bookedSpaces - overlappingBookedSpaces + bayInfo.bookedSpaces;
-  remaining = totalSpaces - overlappingBookedSpaces;
-
-  if (remaining <= 0) {
-    result.fullyRestricted = true;
-    result.remainingSpaces = 0;
-  } else {
-    result.remainingSpaces = remaining;
-  }
-
-  return result;
-}
-
-/* === Error display for map === */
-function showMapError (msg) {
-  var errorEl = document.getElementById('map-bay-error');
-  errorEl.textContent = msg;
-  errorEl.classList.add('visible');
-  errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
-
-function clearMapError () {
-  document.getElementById('map-bay-error').classList.remove('visible');
-}
-
-/* === Render selected bays list === */
-function renderMapSelectedBays () {
-  var container = document.getElementById('map-selected-bays');
-  container.innerHTML = '';
-  var rule = pricingConfig.rule;
-  var hidePrice = (rule === 'P3-UC2' || rule === 'P3-UC1');
-
-  // Update rule hint
-  var hintEl = document.getElementById('bay-selection-rule-hint');
-  if (hintEl) {
-    if (rule === 'P1') hintEl.textContent = 'Bay Price \u00D7 Spaces \u00D7 Duration';
-    else if (rule === 'P2') hintEl.textContent = 'Min Charge \u00D7 Spaces + Rate \u00D7 Spaces \u00D7 Extra Units';
-    else if (rule === 'P3-UC1') hintEl.textContent = 'Flat fee per selected duration (price not affected by spaces)';
-    else if (rule === 'P3-UC2') hintEl.textContent = 'Single fixed price (\u00A3' + pricingConfig.p3FixedPrice.toFixed(2) + ')';
-  }
-
-  if (mapConfig.selectedBays.length === 0) {
-    container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-disabled); font-size:14px;">No bays selected. Click a street on the map to select bays.</div>';
-    return;
-  }
-
-  mapConfig.selectedBays.forEach(function (bay, idx) {
-    var availBadgeClass = bay.availableSpaces > 3 ? 'available' : bay.availableSpaces > 0 ? 'limited' : 'unavailable';
-    var availText = bay.availableSpaces + ' of ' + bay.maxSpaces + ' available';
-
-    // Calculate price per bay based on pricing rule
-    var bayPrice = calculateBayPrice(bay.bayType, bay.baySpaces, appState.duration || 1);
-    var priceDisplay = '';
-    if (rule === 'P3-UC1') {
-      var selDur = pricingConfig.p3SelectedDuration;
-      if (selDur !== null && pricingConfig.p3Durations[selDur]) {
-        priceDisplay = '\u00A3' + pricingConfig.p3Durations[selDur].price.toFixed(2);
-      } else {
-        priceDisplay = '\u00A30.00';
-      }
-    } else if (rule === 'P3-UC2') {
-      priceDisplay = '\u00A3' + pricingConfig.p3FixedPrice.toFixed(2);
-    } else {
-      priceDisplay = '\u00A3' + bayPrice.toFixed(2);
-    }
-
-    var townName = mapConfig.streetTownMap[bay.street] || '';
-    var item = document.createElement('div');
-    item.className = 'map-selected-bay-item' + (hidePrice ? ' no-price' : '');
-    item.innerHTML =
-      '<div class="bay-detail">' +
-        '<strong>' + sanitize(bayTypeNames[bay.bayType] || bay.bayType) + '</strong>' +
-        '<span>' + sanitize(bay.street) + (townName ? ', <span class="bay-town">' + sanitize(townName) + '</span>' : '') +
-          ' &nbsp; <span class="map-availability-badge ' + availBadgeClass + '">' + availText + '</span></span>' +
-      '</div>' +
-      '<div class="bay-actions">' +
-      '<div class="bay-spaces-col">' +
-        '<label>Spaces</label>' +
-        '<input type="number" class="bay-spaces-input" min="1" max="' + bay.availableSpaces + '" value="' + bay.baySpaces + '" ' +
-          'onchange="updateMapBaySpaces(' + idx + ', this)" oninput="updateMapBaySpaces(' + idx + ', this)" />' +
-      '</div>' +
-      (hidePrice ? '' :
-        '<div class="bay-price-col">' +
-          '<label>Price</label>' +
-          '<div class="bay-price-value">' + priceDisplay + '</div>' +
-        '</div>') +
-      '<button class="bay-remove-btn" onclick="removeMapBay(' + idx + ')" title="Remove bay" aria-label="Remove ' + sanitize(bayTypeNames[bay.bayType]) + '">\u00D7</button>' +
-      '</div>';
-
-    container.appendChild(item);
-  });
-}
-
-/* === Update bay spaces from map selection === */
-function updateMapBaySpaces (index, inputEl) {
-  var bay = mapConfig.selectedBays[index];
-  if (!bay) return;
-
-  var value = parseInt(inputEl.value, 10);
-  if (isNaN(value) || value < 1) {
-    inputEl.classList.add('error');
-    return;
-  }
-
-  // Validate against available spaces
-  if (value > bay.availableSpaces) {
-    inputEl.classList.add('error');
-    showMapError('Only ' + bay.availableSpaces + ' bay spaces are available for the selected street and time range');
-    inputEl.value = bay.availableSpaces;
-    bay.baySpaces = bay.availableSpaces;
-  } else {
-    inputEl.classList.remove('error');
-    clearMapError();
-    bay.baySpaces = value;
-  }
-
-  syncMapBaysToAppState();
-  // Update price display in-place (avoid full re-render which loses input focus)
-  var rule = pricingConfig.rule;
-  if (rule !== 'P3-UC1' && rule !== 'P3-UC2') {
-    var item = inputEl.closest('.map-selected-bay-item');
-    if (item) {
-      var priceVal = item.querySelector('.bay-price-value');
-      if (priceVal) {
-        var newPrice = calculateBayPrice(bay.bayType, bay.baySpaces, appState.duration || 1);
-        priceVal.textContent = '\u00A3' + newPrice.toFixed(2);
-      }
-    }
-  }
-}
-
-/* === Remove bay from map selection === */
-function removeMapBay (index) {
-  var bay = mapConfig.selectedBays[index];
-  if (bay) {
-    updateLeafletMarkerStyle(bay.street, bay.bayType, false);
-  }
-  mapConfig.selectedBays.splice(index, 1);
-  renderMapSelectedBays();
-  syncMapBaysToAppState();
-}
-
-/* === Sync map bays to appState for pricing === */
-function syncMapBaysToAppState () {
-  appState.bays = mapConfig.selectedBays.map(function (bay) {
-    return {
-      type: bay.bayType,
-      spaces: bay.baySpaces,
-      price: calculateBayPrice(bay.bayType, bay.baySpaces, appState.duration || 1),
-    };
-  });
-  updatePriceSummary();
-  updateSummary();
-}
-
-/* === Map toolbar actions — now use Leaflet === */
-var leafletMap = null;
-var leafletStreetLayers = {};  // { streetName: polyline }
-var leafletBayMarkers = {};    // { 'streetName|bayType': circleMarker }
-
-function mapZoomIn () { if (leafletMap) leafletMap.zoomIn(); }
-function mapZoomOut () { if (leafletMap) leafletMap.zoomOut(); }
-function mapResetView () { if (leafletMap) leafletMap.setView([51.5362, 0.7139], 16); }
-
-/* Street geo data — simulated positions on real map (Southend-on-Sea area) */
-var streetGeoData = {
-  'Baker Street': {
-    coords: [[51.5375, 0.7115], [51.5350, 0.7115]],
-    bayPositions: {
-      'PB': [51.5372, 0.7117], 'RB': [51.5366, 0.7117],
-      'LW': [51.5360, 0.7117], 'DB': [51.5354, 0.7117],
-    }
-  },
-  'High Street': {
-    coords: [[51.5370, 0.7080], [51.5370, 0.7200]],
-    bayPositions: {
-      'PB': [51.5371, 0.7100], 'PO': [51.5371, 0.7140],
-      'EV': [51.5371, 0.7175],
-    }
-  },
-  'Victoria Avenue': {
-    coords: [[51.5350, 0.7080], [51.5350, 0.7200]],
-    bayPositions: {
-      'RB': [51.5351, 0.7110], 'LB': [51.5351, 0.7160],
-    }
-  },
-  'Abbey Hill': {
-    coords: [[51.5375, 0.7180], [51.5345, 0.7180]],
-    bayPositions: {
-      'FP': [51.5368, 0.7182], 'PB': [51.5355, 0.7182],
-    }
-  },
-};
-
-function initLeafletMap () {
-  var mapEl = document.getElementById('leaflet-map');
-  if (!mapEl || !window.L) return;
-
-  leafletMap = L.map('leaflet-map', {
-    center: [51.5362, 0.7139],
-    zoom: 16,
-    zoomControl: true,
-    scrollWheelZoom: true,
-  });
-
-  // Use CartoDB Voyager tiles (fast CDN, no referer restriction)
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
-    maxZoom: 20,
-    subdomains: 'abcd',
-  }).addTo(leafletMap);
-
-  // Draw streets as polylines
-  Object.keys(streetGeoData).forEach(function (streetName) {
-    var geo = streetGeoData[streetName];
-    // Invisible wider polyline for easy clicking
-    var hitArea = L.polyline(geo.coords, {
-      color: 'transparent', weight: 24, opacity: 0,
-    }).addTo(leafletMap);
-
-    var polyline = L.polyline(geo.coords, {
-      color: '#D32F2F', weight: 6, opacity: 0.85,
-    }).addTo(leafletMap);
-
-    // Store reference
-    leafletStreetLayers[streetName] = polyline;
-
-    // Bind events to both visible polyline and invisible hit area
-    [polyline, hitArea].forEach(function (layer) {
-      layer.on('mouseover', function (e) {
-        showStreetTooltipLeaflet(e, streetName);
-        polyline.setStyle({ weight: 8, opacity: 1 });
-      });
-      layer.on('mousemove', function (e) {
-        moveStreetTooltipLeaflet(e);
-      });
-      layer.on('mouseout', function () {
-        hideStreetTooltip();
-        polyline.setStyle({ weight: 6, opacity: 0.85 });
-      });
-      layer.on('click', function (e) {
-        L.DomEvent.stopPropagation(e);
-        openStreetPopupLeaflet(e, streetName);
-      });
-    });
-
-    // Add street label
-    var mid = [
-      (geo.coords[0][0] + geo.coords[1][0]) / 2,
-      (geo.coords[0][1] + geo.coords[1][1]) / 2,
-    ];
-    L.marker(mid, {
-      icon: L.divIcon({
-        className: 'leaflet-street-label',
-        html: '<span style="background:rgba(255,255,255,.85); padding:1px 6px; border-radius:3px; font-size:11px; font-weight:500; color:#D32F2F; white-space:nowrap;">' + streetName + '</span>',
-        iconSize: [0, 0],
-        iconAnchor: [-8, 8],
-      }),
-      interactive: false,
-    }).addTo(leafletMap);
-
-    // Bay markers removed — selection happens via street click popup
-  });
-
-  // Setup map address search
-  setupMapAddressSearch();
-}
-
-/* === Map Address Search — zoom to street on selection === */
-function setupMapAddressSearch () {
-  var input = document.getElementById('map-address-search');
-  var results = document.getElementById('map-address-results');
-  if (!input || !results) return;
-  var debounceTimer;
-
-  // Build searchable list: streets with geo data + sample addresses
-  var streetNames = Object.keys(streetGeoData);
-
-  input.addEventListener('input', function () {
-    clearTimeout(debounceTimer);
-    var query = this.value.trim().toLowerCase();
-    if (query.length < 2) { results.classList.remove('open'); input.setAttribute('aria-expanded', 'false'); return; }
-    debounceTimer = setTimeout(function () {
-      // Match streets from geo data
-      var streetMatches = streetNames.filter(function (s) { return s.toLowerCase().indexOf(query) !== -1; });
-      // Match from sample addresses
-      var addrMatches = sampleAddresses.filter(function (a) {
-        return a.text.toLowerCase().indexOf(query) !== -1 && streetMatches.indexOf(a.street) === -1;
-      });
-
-      results.innerHTML = '';
-
-      if (streetMatches.length === 0 && addrMatches.length === 0) {
-        results.innerHTML = '<div class="no-results">No matching streets found.</div>';
-      } else {
-        // Show matched streets (with bays on map)
-        streetMatches.forEach(function (streetName) {
-          var div = document.createElement('div');
-          div.className = 'result-item';
-          div.setAttribute('role', 'option');
-          div.innerHTML = '<strong>' + streetName + '</strong> <span style="color:var(--text-secondary); font-size:12px;">\u2014 bays available on map</span>';
-          div.addEventListener('click', function () { zoomToStreet(streetName); results.classList.remove('open'); input.value = streetName; });
-          results.appendChild(div);
-        });
-        // Show matched addresses (zoom to street if it exists on map)
-        addrMatches.forEach(function (addr) {
-          var div = document.createElement('div');
-          div.className = 'result-item';
-          div.setAttribute('role', 'option');
-          div.textContent = addr.text;
-          var hasGeo = !!streetGeoData[addr.street];
-          if (!hasGeo) {
-            div.innerHTML = addr.text + ' <span style="color:var(--grey-500); font-size:11px;">(not on map)</span>';
-          }
-          div.addEventListener('click', function () {
-            if (hasGeo) { zoomToStreet(addr.street); }
-            results.classList.remove('open');
-            input.value = addr.street;
-          });
-          results.appendChild(div);
-        });
-      }
-      results.classList.add('open');
-      input.setAttribute('aria-expanded', 'true');
-    }, 200);
-  });
-
-  // Close dropdown when clicking outside
-  document.addEventListener('click', function (e) {
-    if (!e.target.closest('#map-selection-panel .address-search-wrapper')) {
-      results.classList.remove('open');
-      input.setAttribute('aria-expanded', 'false');
-    }
-  });
-}
-
-function zoomToStreet (streetName) {
-  if (!leafletMap || !streetGeoData[streetName]) return;
-  var geo = streetGeoData[streetName];
-  var bounds = L.latLngBounds(geo.coords);
-  leafletMap.fitBounds(bounds.pad(0.3), { maxZoom: 18 });
-
-  // Highlight the street briefly
-  var polyline = leafletStreetLayers[streetName];
-  if (polyline) {
-    polyline.setStyle({ weight: 10, opacity: 1, color: '#1565C0' });
-    setTimeout(function () {
-      polyline.setStyle({ weight: 6, opacity: 0.85, color: '#D32F2F' });
-    }, 1500);
-  }
-}
-function updateLeafletMarkerStyle (streetName, bayType, selected) {
-  var key = streetName + '|' + bayType;
-  var cm = leafletBayMarkers[key];
-  if (cm) {
-    cm.setStyle({
-      fillColor: selected ? '#3276CF' : '#FF5252',
-      color: selected ? '#fff' : '#fff',
-      weight: selected ? 3 : 2,
-      radius: selected ? 9 : 7,
-    });
-  }
-}
-
-/* === Tooltip helpers for Leaflet events === */
-function showStreetTooltipLeaflet (e, streetName) {
-  var popup = document.getElementById('map-click-popup');
-  if (popup.classList.contains('visible') && popup.getAttribute('data-street') === streetName) return;
-
-  var tooltip = document.getElementById('map-hover-tooltip');
-  var streetLabel = document.getElementById('tooltip-street-name');
-  var bayList = document.getElementById('tooltip-bay-list');
-
-  streetLabel.textContent = streetName;
-  bayList.innerHTML = '';
-
-  var troData = mapConfig.troTmoData[streetName];
-  if (troData) {
-    troData.forEach(function (bay) {
-      var li = document.createElement('li');
-      li.textContent = bayTypeNames[bay.bayType] || bay.bayType;
-      bayList.appendChild(li);
-    });
-  }
-
-  tooltip.style.left = (e.originalEvent.clientX + 16) + 'px';
-  tooltip.style.top = (e.originalEvent.clientY + 12) + 'px';
-  tooltip.classList.add('visible');
-}
-
-function moveStreetTooltipLeaflet (e) {
-  var tooltip = document.getElementById('map-hover-tooltip');
-  if (!tooltip.classList.contains('visible')) return;
-  tooltip.style.left = (e.originalEvent.clientX + 16) + 'px';
-  tooltip.style.top = (e.originalEvent.clientY + 12) + 'px';
-}
-
-/* === Click popup positioned at screen coords from Leaflet event === */
-var _popupJustOpened = false;
-function openStreetPopupLeaflet (e, streetName) {
-  hideStreetTooltip();
-
-  var popup = document.getElementById('map-click-popup');
-  var popupStreetEl = document.getElementById('popup-street-name');
-  var popupBody = document.getElementById('popup-body');
-
-  if (popup.classList.contains('visible') && _activePopupStreet === streetName) {
-    closeMapPopup(); return;
-  }
-
-  _activePopupStreet = streetName;
-  popup.setAttribute('data-street', streetName);
-  popupStreetEl.textContent = streetName;
-  popupBody.innerHTML = '';
-
-  selectMapStreet(streetName);
-
-  var troData = mapConfig.troTmoData[streetName];
-  if (!troData) { closeMapPopup(); return; }
-
-  troData.forEach(function (bay) {
-    var overlapResult = checkOverlappingSuspension(streetName, bay.bayType);
-    var availableSpaces = bay.totalSpaces - bay.bookedSpaces;
-    availableSpaces = Math.min(availableSpaces, overlapResult.remainingSpaces);
-
-    var existingBay = mapConfig.selectedBays.find(function (b) {
-      return b.street === streetName && b.bayType === bay.bayType;
-    });
-    var isChecked = !!existingBay;
-
-    var rowId = 'popup-bay-' + streetName.replace(/\s+/g, '-') + '-' + bay.bayType;
-
-    var row = document.createElement('div');
-    row.className = 'popup-bay-row';
-    row.innerHTML =
-      '<input type="checkbox" id="' + rowId + '" ' + (isChecked ? 'checked' : '') + ' ' +
-        (availableSpaces <= 0 ? 'disabled' : '') +
-        ' onchange="togglePopupBay(this, \'' + sanitize(streetName) + '\', \'' + bay.bayType + '\', ' + bay.totalSpaces + ', ' + availableSpaces + ')" />' +
-      '<div class="popup-bay-info">' +
-        '<span class="popup-bay-name">' + sanitize(bayTypeNames[bay.bayType] || bay.bayType) + '</span>' +
-        '<span class="popup-bay-avail">' + availableSpaces + ' space' + (availableSpaces !== 1 ? 's' : '') + ' Available</span>' +
-      '</div>';
-    popupBody.appendChild(row);
-
-    row.addEventListener('click', function (ev) {
-      if (ev.target.tagName === 'INPUT') return;
-      var cb = row.querySelector('input[type="checkbox"]');
-      if (cb && !cb.disabled) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); }
-    });
-  });
-
-  // Position near the click
-  var x = e.originalEvent.clientX + 12;
-  var y = e.originalEvent.clientY - 20;
-  if (x + 300 > window.innerWidth) x = Math.max(8, x - 320);
-  if (y + 250 > window.innerHeight) y = Math.max(8, window.innerHeight - 270);
-  if (y < 8) y = 8;
-
-  popup.style.left = x + 'px';
-  popup.style.top = y + 'px';
-  popup.classList.add('visible');
-  // Set flag so the document click listener doesn't immediately close this
-  _popupJustOpened = true;
-  setTimeout(function () { _popupJustOpened = false; }, 0);
-}
-
-/* === Update multi bay type notice === */
-function updateMultiBayTypeNotice () {
-  var notice = document.getElementById('multi-bay-type-notice');
-  var msg = document.getElementById('multi-bay-type-msg');
-  if (mapConfig.allowMultipleBayTypes) {
-    msg.textContent = 'Multiple bay types can be selected per street.';
-  } else {
-    msg.textContent = 'Only one bay type can be selected per street (configured in Permission Builder).';
-  }
-  notice.classList.remove('hidden');
-}
-
-/* === Override validateStep3 for map mode === */
-var _originalValidateStep3 = validateStep3;
-validateStep3 = function (action) {
-  if (mapConfig.selectionMode === 'map') {
-    var valid = true;
-
-    // Clear errors
-    clearMapError();
-    clearFieldError('start-date', 'start-date-error');
-    clearFieldError('duration', 'duration-error');
-    clearFieldError('duration', 'duration-min-error');
-    clearFieldError('duration', 'duration-max-error');
-
-    var startDate = document.getElementById('start-date').value;
-    var duration = parseInt(document.getElementById('duration').value, 10) || 0;
-
-    // Start Date validation
-    if (!startDate) {
-      setFieldError('start-date', 'start-date-error');
-      valid = false;
-    }
-
-    // Duration validation (for non-P3 rules)
-    if (pricingConfig.rule !== 'P3-UC1' && pricingConfig.rule !== 'P3-UC2') {
-      var minLimit = pricingConfig.minDuration;
-      var maxLimit = pricingConfig.maxDuration;
-      if (!duration || duration <= 0) {
-        setFieldError('duration', 'duration-error');
-        valid = false;
-      } else if (duration < minLimit) {
-        setFieldError('duration', 'duration-min-error');
-        valid = false;
-      } else if (duration > maxLimit) {
-        setFieldError('duration', 'duration-max-error');
-        valid = false;
-      }
-    }
-
-    // Bay selection validation
-    if (mapConfig.selectedBays.length === 0) {
-      showMapError('Please select a bay from the map');
-      valid = false;
-    } else {
-      // Validate spaces for all selected bays
-      var hasInvalidSpaces = false;
-      mapConfig.selectedBays.forEach(function (bay) {
-        if (!bay.baySpaces || bay.baySpaces < 1) hasInvalidSpaces = true;
-        if (bay.baySpaces > bay.availableSpaces) hasInvalidSpaces = true;
-      });
-      if (hasInvalidSpaces) {
-        showMapError('Please enter valid bay spaces for all selected bays');
-        valid = false;
-      }
-    }
-
-    if (!valid) {
-      scrollToFirstError();
-      return;
-    }
-
-    appState.comments = document.getElementById('comments').value.trim();
-    syncMapBaysToAppState();
-    if (action === 'continue') goToStep(4);
-  } else {
-    // Use original validation for manual mode
-    _originalValidateStep3(action);
-  }
-};
-
-/* === Initialize map features on load === */
-var _originalDomReady = document.addEventListener;
-document.addEventListener('DOMContentLoaded', function () {
-  // Initialize map features
-  updateMultiBayTypeNotice();
-  mapConfig.selectionMode = 'map';
-  // Map init is deferred to goToStep(3) so the container is visible
-  // initLeafletMap(); — called lazily in goToStep
-
-  // Close popup when clicking outside of it
-  document.addEventListener('click', function (e) {
-    if (_popupJustOpened) return;
-    var popup = document.getElementById('map-click-popup');
-    if (!popup.classList.contains('visible')) return;
-    // Check if click is inside the popup
-    if (popup.contains(e.target)) return;
-    // Check if click is on the leaflet map container (street clicks handled separately)
-    var mapEl = document.getElementById('leaflet-map');
-    if (mapEl && mapEl.contains(e.target)) return;
-    closeMapPopup();
-  });
-});
 
 /* === Responsive bay row grid === */
 function addNewBayRowResponsive () {
