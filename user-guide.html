@@ -976,7 +976,7 @@
           btn.setAttribute('data-catname', cat.category);
           btn.innerHTML =
             '<span class="material-icons-outlined doc-type-icon ' + tc.chipClass + '">' + tc.icon + '</span>' +
-            '<span class="guide-name-text">' + escapeHtml(guide.name) + '</span>';
+            '<span class="guide-name-text" title="' + escapeHtml(guide.name) + '">' + escapeHtml(guide.name) + '</span>';
           btn.onclick = function() { selectGuide(guide, cat.category); };
           list.appendChild(btn);
         });
@@ -1037,12 +1037,16 @@
 
       if (totalPublished === 0) {
         container.innerHTML =
-          '<div class="state-empty">' +
+          '<div class="state-empty" style="min-height:calc(100vh - 360px);margin:auto">' +
             '<span class="material-icons-outlined state-icon">inbox</span>' +
             '<h3>No user guides available</h3>' +
             '<p>No user guides are available for this contract.</p>' +
           '</div>';
+        // Hide sidebar and center the empty state across full width
+        document.getElementById('sidebarNav').style.display = 'none';
         return;
+      } else {
+        document.getElementById('sidebarNav').style.display = '';
       }
 
       if (!currentSelection) {
@@ -1085,6 +1089,7 @@
       var tc = typeConfig[guide.type];
       var html = '<div class="guide-detail-header">';
       html += '<div class="guide-detail-left">';
+      html += '<h2 style="font-size:18px;font-weight:500;line-height:1.4;color:var(--text-primary);margin-bottom:6px">' + escapeHtml(guide.name) + '</h2>';
       html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">';
       html += '<span class="viewer-type-chip ' + tc.chipClass + '"><span class="material-icons-outlined" style="font-size:14px">' + tc.icon + '</span> ' + tc.label + '</span>';
       html += '</div>';
