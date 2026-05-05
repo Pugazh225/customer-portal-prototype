@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Car Parks — Discovery</title>
+  <title>New Parking Permit — Find Car Parks</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
-  <!-- Leaflet CSS for map -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
-    /* ===== DESIGN TOKENS (from Theme_and_Design_Guidelines.md + Figma) ===== */
+    /* ===== DESIGN TOKENS ===== */
     :root {
       --primary-main: #3276CF;
       --primary-dark: #2560A8;
@@ -36,7 +35,6 @@
       --bg-page: #FFFFFF;
       --yellow-500: #FFEB3B;
       --shadow-card: 0px 4px 6px rgba(0,0,0,0.1), 0px 2px 4px rgba(0,0,0,0.1);
-      --shadow-toast: 0 4px 12px rgba(0,0,0,0.15);
       --radius-btn: 10px;
       --radius-card: 10px;
       --radius-input: 8px;
@@ -44,416 +42,385 @@
       --radius-nav: 8px;
       --font-size-base: 16px;
     }
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
-    body {
-      font-size: var(--font-size-base);
-      font-family: 'Roboto', Helvetica, Arial, sans-serif;
-      color: var(--text-primary);
-      background: var(--bg-page);
-      line-height: 1.5;
-      letter-spacing: 0.15px;
-      min-height: 100vh;
-    }
+    body { font-size: var(--font-size-base); font-family: 'Roboto', Helvetica, Arial, sans-serif; color: var(--text-primary); background: var(--bg-page); line-height: 1.5; letter-spacing: 0.15px; min-height: 100vh; display: flex; flex-direction: column; }
     body.font-large { zoom: 1.15; }
     body.font-xl    { zoom: 1.3; }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; }
-    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; } }
 
-    /* ===== SKIP LINK ===== */
-    .skip-link {
-      position: absolute; left: -999px; top: 0;
-      background: var(--primary-main); color: #fff; padding: 8px 16px;
-      z-index: 1000; border-radius: 0 0 var(--radius-input) 0; font-size: 14px;
-    }
+    .skip-link { position: absolute; left: -999px; top: 0; background: var(--primary-main); color: #fff; padding: 8px 16px; z-index: 1000; border-radius: 0 0 var(--radius-input) 0; font-size: 14px; }
     .skip-link:focus { left: 0; }
 
     /* ===== HEADER ===== */
-    .site-header {
-      background: var(--primary-800);
-      border-bottom: 4px solid var(--primary-main);
-      padding: 0 40px;
-      display: flex; align-items: center; justify-content: space-between;
-      height: 56px; position: sticky; top: 0; z-index: 100;
-    }
+    .site-header { background: var(--primary-800); border-bottom: 4px solid var(--primary-main); padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 100; flex-shrink: 0; }
     .header-left { display: flex; align-items: center; gap: 24px; }
-    .site-header .logo { display: flex; align-items: center; gap: 12px; }
-    .site-header .logo-icon {
-      width: 36px; height: 36px; background: var(--yellow-500);
-      border-radius: 4px; display: flex; align-items: center; justify-content: center;
-      font-weight: 500; font-size: 14px; color: var(--primary-800);
-    }
+    .site-header .logo-icon { width: 36px; height: 36px; background: var(--yellow-500); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 500; font-size: 14px; color: var(--primary-800); }
     .header-divider { width: 1px; height: 24px; background: rgba(255,255,255,.3); }
-    .header-nav { display: flex; align-items: center; gap: 0; }
-    .header-nav a {
-      text-decoration: none; color: #fff; font-size: 14px;
-      font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px;
-      padding: 16px 20px; display: flex; align-items: center; gap: 8px;
-      transition: background 150ms ease; line-height: 24px;
-    }
+    .header-nav { display: flex; align-items: center; }
+    .header-nav a { text-decoration: none; color: #fff; font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px; padding: 16px 20px; display: flex; align-items: center; gap: 8px; transition: background 150ms ease; line-height: 24px; }
     .header-nav a:hover { background: rgba(255,255,255,.08); }
     .header-nav a.active { color: var(--yellow-500); }
     .header-nav a svg { width: 20px; height: 20px; }
     .header-right { display: flex; align-items: center; gap: 16px; }
-    .header-bell {
-      background: none; border: none; color: #fff; cursor: pointer;
-      padding: 8px; border-radius: var(--radius-nav); transition: background 150ms;
-    }
-    .header-bell:hover { background: rgba(255,255,255,.1); }
+    .header-bell { background: none; border: none; color: #fff; cursor: pointer; padding: 8px; border-radius: var(--radius-nav); }
     .header-bell svg { width: 24px; height: 24px; }
-    .header-avatar {
-      width: 32px; height: 32px; border-radius: 50%;
-      background: var(--avatar-bg); color: #fff;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 500; letter-spacing: 0.16px;
-    }
-    .font-toggle {
-      display: flex; gap: 2px; align-items: center;
-      border: 1px solid rgba(255,255,255,.4); border-radius: var(--radius-input);
-      padding: 2px; background: rgba(255,255,255,.08);
-    }
-    .font-toggle button {
-      background: none; border: none; padding: 3px 8px; cursor: pointer;
-      font-weight: 500; border-radius: 6px; color: rgba(255,255,255,.6);
-      font-size: 12px; transition: all 150ms; font-family: inherit;
-    }
+    .header-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; letter-spacing: 1.5px; }
+    .font-toggle { display: flex; gap: 2px; align-items: center; border: 1px solid rgba(255,255,255,.4); border-radius: var(--radius-input); padding: 2px; background: rgba(255,255,255,.08); }
+    .font-toggle button { background: none; border: none; padding: 3px 8px; cursor: pointer; font-weight: 500; border-radius: 6px; color: rgba(255,255,255,.6); font-size: 12px; transition: all 150ms; font-family: inherit; }
     .font-toggle button.active { background: rgba(255,255,255,.2); color: #fff; }
-    .font-toggle button:focus-visible { outline: 2px solid var(--primary-main); outline-offset: 1px; }
-    .hamburger-btn {
-      display: none; background: none; border: none; color: #fff;
-      cursor: pointer; padding: 8px; border-radius: var(--radius-nav);
-      transition: background 150ms; flex-shrink: 0;
-    }
-    .hamburger-btn:hover { background: rgba(255,255,255,.1); }
+    .hamburger-btn { display: none; background: none; border: none; color: #fff; cursor: pointer; padding: 8px; border-radius: var(--radius-nav); flex-shrink: 0; }
     .hamburger-btn svg { width: 24px; height: 24px; }
 
-    /* ===== MAIN LAYOUT ===== */
-    .page-wrapper { margin: 0 180px; padding: 24px 0 100px; }
-    .page-heading {
-      font-size: 24px; font-weight: 400; line-height: 1.33;
-      color: var(--text-primary); margin-bottom: 24px;
-    }
+    /* ===== SEARCH BAR (below header, full-width like reference) ===== */
+    .search-strip { background: #fff; border-bottom: 1px solid var(--grey-300); padding: 12px 40px; display: flex; align-items: stretch; gap: 12px; flex-wrap: wrap; flex-shrink: 0; }
+    .search-field { flex: 1; min-width: 200px; position: relative; }
+    .search-field label { display: block; font-size: 12px; color: var(--text-secondary); letter-spacing: 0.4px; margin-bottom: 4px; }
+    .search-field input { width: 100%; padding: 8px 12px 8px 36px; border: 1px solid var(--grey-400); border-radius: var(--radius-input); font-size: 14px; line-height: 24px; color: var(--text-primary); font-family: inherit; }
+    .search-field input:focus { outline: none; border-color: var(--primary-main); box-shadow: 0 0 0 1px var(--primary-main); }
+    .search-field .s-icon { position: absolute; left: 10px; bottom: 10px; width: 18px; height: 18px; color: var(--neutral-300); pointer-events: none; }
+    .search-date { min-width: 160px; }
+    .search-date label { display: block; font-size: 12px; color: var(--text-secondary); letter-spacing: 0.4px; margin-bottom: 4px; }
+    .search-date input, .search-date select { width: 100%; padding: 8px 12px; border: 1px solid var(--grey-400); border-radius: var(--radius-input); font-size: 14px; line-height: 24px; color: var(--text-primary); font-family: inherit; background: #fff; }
+    .search-date input:focus, .search-date select:focus { outline: none; border-color: var(--primary-main); box-shadow: 0 0 0 1px var(--primary-main); }
+    .search-date select { -webkit-appearance: none; -moz-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='2' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+    /* auto-suggest */
+    .autosuggest { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--grey-300); border-top: none; border-radius: 0 0 var(--radius-input) var(--radius-input); box-shadow: var(--shadow-card); z-index: 50; display: none; max-height: 240px; overflow-y: auto; }
+    .autosuggest.open { display: block; }
+    .autosuggest-item { padding: 10px 14px; cursor: pointer; font-size: 14px; color: var(--text-primary); display: flex; align-items: center; gap: 10px; transition: background 100ms; }
+    .autosuggest-item:hover { background: var(--primary-25); }
+    .autosuggest-item svg { width: 16px; height: 16px; color: var(--text-disabled); flex-shrink: 0; }
+    .autosuggest-item .suggest-type { font-size: 11px; color: var(--text-disabled); text-transform: uppercase; letter-spacing: 0.5px; background: var(--grey-100); padding: 1px 8px; border-radius: var(--radius-chip); }
 
-    /* ===== CARDS ===== */
-    .card {
-      background: #fff; border: 1px solid var(--grey-300);
-      border-radius: var(--radius-card); padding: 24px; margin-bottom: 20px;
-    }
-    .card h2 {
-      font-size: 20px; font-weight: 500; line-height: 1.6;
-      letter-spacing: 0.15px; margin-bottom: 4px; color: var(--text-primary);
-    }
-    .card .subtitle {
-      color: var(--text-secondary); font-size: 14px;
-      line-height: 1.43; letter-spacing: 0.17px; margin-bottom: 20px;
-    }
-
-    /* ===== BUTTONS ===== */
-    .btn {
-      padding: 8px 22px; border-radius: var(--radius-btn); font-size: 14px;
-      font-weight: 500; cursor: pointer; border: none;
-      text-transform: uppercase; letter-spacing: 0.4px; line-height: 24px;
-      transition: background 150ms ease; display: inline-flex; align-items: center; gap: 8px;
-      font-family: 'Roboto', Helvetica, Arial, sans-serif;
-    }
-    .btn:focus-visible { outline: 2px solid var(--primary-main); outline-offset: 2px; }
-    .btn-primary {
-      background: var(--primary-main); color: #fff; border: none;
-      font-size: 15px; line-height: 26px; letter-spacing: 0.46px; padding: 10px 24px;
-    }
-    .btn-primary:hover { background: var(--primary-dark); }
-    .btn-primary:disabled { background: var(--grey-400); cursor: not-allowed; }
-    .btn-secondary {
-      background: transparent; color: var(--primary-main);
-      border: 1px solid var(--primary-main);
-    }
-    .btn-secondary:hover { background: var(--primary-25); }
-    .btn-text { background: transparent; color: var(--primary-main); border: none; }
-    .btn-text:hover { background: var(--primary-25); }
-    .btn-sm { padding: 4px 10px; font-size: 13px; line-height: 22px; letter-spacing: 0.46px; }
-
-    /* ===== FORMS ===== */
-    .form-group { margin-bottom: 20px; }
-    .form-group label {
-      display: block; font-size: 14px; font-weight: 400;
-      line-height: 1.43; letter-spacing: 0.17px; margin-bottom: 6px; color: var(--text-primary);
-    }
-    input[type="text"], input[type="search"], select {
-      width: 100%; padding: 10px 14px;
-      border: 1px solid var(--grey-400); border-radius: var(--radius-input);
-      font-size: 16px; line-height: 24px; letter-spacing: 0.15px;
-      color: var(--text-primary); background: #fff;
-      font-family: 'Roboto', Helvetica, Arial, sans-serif;
-      transition: border-color 150ms ease, box-shadow 150ms ease;
-    }
-    select {
-      padding-right: 36px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='2' fill='none'/%3E%3C/svg%3E");
-      background-repeat: no-repeat; background-position: right 14px center;
-      -webkit-appearance: none; -moz-appearance: none; appearance: none;
-    }
-    input:focus, select:focus { outline: none; border-color: var(--primary-main); box-shadow: 0 0 0 1px var(--primary-main); }
-
-    /* ===== NOTICES ===== */
-    .notice {
-      display: flex; gap: 12px; padding: 12px 16px;
-      border-radius: var(--radius-input); font-size: 14px;
-      line-height: 1.43; letter-spacing: 0.17px; margin-bottom: 16px;
-    }
-    .notice-info { background: #E3F2FD; color: var(--info); }
-    .notice-warning { background: #FFF3E0; color: var(--warning); }
-    .notice svg { width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px; }
-    .notice span { color: var(--text-primary); }
-
-    /* ===== DISCOVERY TOOLBAR ===== */
-    .discovery-toolbar {
-      display: flex; align-items: center; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;
-    }
-    .search-box {
-      flex: 1; min-width: 200px; position: relative;
-    }
-    .search-box input {
-      padding-left: 40px;
-    }
-    .search-box .search-icon {
-      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
-      width: 20px; height: 20px; color: var(--neutral-300); pointer-events: none;
-    }
-    .postcode-box {
-      width: 180px;
-    }
-    .postcode-box input {
-      text-transform: uppercase;
-    }
-    .sort-box {
-      width: 200px;
-    }
-
-    /* ===== VIEW TOGGLE ===== */
-    .view-toggle {
-      display: flex; border: 1px solid var(--grey-300); border-radius: var(--radius-input); overflow: hidden;
-    }
-    .view-toggle button {
-      padding: 8px 16px; background: #fff; border: none; cursor: pointer;
-      font-size: 14px; font-weight: 500; color: var(--text-secondary);
-      display: flex; align-items: center; gap: 6px;
-      transition: background 150ms, color 150ms;
-      font-family: 'Roboto', Helvetica, Arial, sans-serif;
-    }
-    .view-toggle button + button { border-left: 1px solid var(--grey-300); }
-    .view-toggle button.active { background: var(--primary-main); color: #fff; }
-    .view-toggle button:hover:not(.active) { background: var(--grey-50); }
-    .view-toggle button svg { width: 18px; height: 18px; }
-
-    /* ===== RESULTS INFO ===== */
-    .results-info {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 16px; font-size: 14px; color: var(--text-secondary);
-    }
-    .results-count { font-weight: 500; color: var(--text-primary); }
-
-    /* ===== CAR PARK LIST ===== */
-    .carpark-list { display: grid; grid-template-columns: 1fr; gap: 16px; }
-
-    .carpark-card {
-      background: #fff; border: 1px solid var(--grey-300);
-      border-radius: var(--radius-card); padding: 20px 24px;
-      display: grid; grid-template-columns: 1fr auto; gap: 16px;
-      align-items: start; cursor: pointer;
-      transition: border-color 200ms, box-shadow 200ms;
-    }
-    .carpark-card:hover { border-color: var(--primary-200); box-shadow: 0 2px 8px rgba(50,118,207,.12); }
-    .carpark-card:focus-within { border-color: var(--primary-main); box-shadow: 0 0 0 2px rgba(50,118,207,.25); }
-
-    .carpark-info { display: flex; flex-direction: column; gap: 8px; }
-    .carpark-name {
-      font-size: 18px; font-weight: 500; line-height: 1.4;
-      color: var(--text-primary); display: flex; align-items: center; gap: 10px;
-    }
-    .carpark-name .type-badge {
-      font-size: 11px; font-weight: 500; padding: 2px 10px;
-      border-radius: var(--radius-chip); text-transform: uppercase; letter-spacing: 0.5px;
-    }
-    .type-badge.off-street { background: #E8F5E9; color: var(--success); }
-    .type-badge.on-street  { background: #E3F2FD; color: var(--info); }
-
-    .carpark-address {
-      font-size: 14px; color: var(--text-secondary);
-      line-height: 1.43; letter-spacing: 0.17px;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .carpark-address svg { width: 16px; height: 16px; flex-shrink: 0; }
-
-    .carpark-meta {
-      display: flex; flex-wrap: wrap; gap: 16px; margin-top: 4px;
-    }
-    .meta-item {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 13px; color: var(--text-secondary); letter-spacing: 0.16px;
-    }
-    .meta-item svg { width: 16px; height: 16px; color: var(--text-disabled); }
-    .meta-item .meta-value { font-weight: 500; color: var(--text-primary); }
-
-    .carpark-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
-    .bay-tag {
-      font-size: 12px; padding: 2px 10px; border-radius: var(--radius-chip);
-      background: var(--grey-100); color: var(--text-secondary);
-      letter-spacing: 0.4px;
-    }
-
-    .carpark-right {
-      display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
-      min-width: 140px;
-    }
-    .availability-badge {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 13px; font-weight: 500; padding: 4px 12px;
-      border-radius: var(--radius-chip);
-    }
-    .availability-badge.available { background: #E8F5E9; color: var(--success); }
-    .availability-badge.limited { background: #FFF3E0; color: var(--warning); }
-    .availability-badge .dot {
-      width: 8px; height: 8px; border-radius: 50%; background: currentColor;
-    }
-    .carpark-distance {
-      font-size: 13px; color: var(--text-secondary); letter-spacing: 0.16px;
-    }
-    .carpark-price {
-      font-size: 16px; font-weight: 500; color: var(--primary-main);
-    }
-    .carpark-price small {
-      font-size: 12px; font-weight: 400; color: var(--text-secondary);
-    }
-
-    /* ===== MAP CONTAINER ===== */
-    .map-container {
-      display: none; height: 500px; border-radius: var(--radius-card);
-      border: 1px solid var(--grey-300); overflow: hidden; margin-bottom: 20px;
-      position: relative;
-    }
-    .map-container.visible { display: block; }
+    /* ===== SPLIT PANEL LAYOUT ===== */
+    .split-panel { display: flex; flex: 1; min-height: 0; }
+    .list-panel { width: 420px; min-width: 360px; max-width: 480px; display: flex; flex-direction: column; border-right: 1px solid var(--grey-300); background: #fff; flex-shrink: 0; }
+    .map-panel { flex: 1; position: sticky; top: 56px; height: calc(100vh - 56px); min-height: 400px; z-index: 10; }
     #map { width: 100%; height: 100%; }
 
-    .map-fallback {
-      display: none; padding: 40px; text-align: center;
-      background: var(--grey-50); border-radius: var(--radius-card);
-      border: 1px solid var(--grey-300); margin-bottom: 20px;
-    }
-    .map-fallback.visible { display: block; }
-    .map-fallback svg { width: 48px; height: 48px; color: var(--text-disabled); margin-bottom: 12px; }
-    .map-fallback p { color: var(--text-secondary); font-size: 14px; }
+    /* ===== MAP DISABLED → GRID LAYOUT ===== */
+    .list-panel.map-disabled { width: 100%; max-width: none; min-width: 0; border-right: none; }
+    .list-panel.map-disabled .card-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .list-panel.map-disabled .card-list .cp-card { margin: 0; }
+    .list-panel.map-disabled .card-list .no-results { grid-column: 1 / -1; }
+
+    /* ===== DEMO CONFIG TOGGLE ===== */
+    .demo-config-bar { display: flex; align-items: center; gap: 12px; padding: 8px 16px; background: #FFF8E1; border-bottom: 1px solid #FFE082; font-size: 13px; color: var(--text-primary); flex-shrink: 0; }
+    .demo-config-bar label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 500; }
+    .demo-config-bar input[type="checkbox"] { accent-color: var(--primary-main); width: 16px; height: 16px; }
+    .demo-config-bar .demo-badge { font-size: 10px; background: var(--warning); color: #fff; padding: 1px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
+
+    /* ===== TOOLBAR (sort tabs + filter) ===== */
+    .list-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; border-bottom: 1px solid var(--grey-200); flex-shrink: 0; flex-wrap: wrap; gap: 4px; }
+    .sort-tabs { display: flex; gap: 0; }
+    .sort-tab { background: none; border: none; padding: 8px 16px; font-size: 14px; font-weight: 500; color: var(--text-secondary); cursor: pointer; border-bottom: 2px solid transparent; transition: all 150ms; font-family: inherit; }
+    .sort-tab:hover { color: var(--text-primary); }
+    .sort-tab.active { color: var(--primary-main); border-bottom-color: var(--primary-main); }
+    .filter-toggle-btn { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid var(--grey-300); border-radius: var(--radius-input); background: #fff; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-primary); font-family: inherit; transition: border-color 150ms; }
+    .filter-toggle-btn:hover { border-color: var(--primary-main); }
+    .filter-toggle-btn svg { width: 16px; height: 16px; }
+    .filter-toggle-btn .filter-count { background: var(--primary-main); color: #fff; font-size: 11px; padding: 0 6px; border-radius: 10px; line-height: 18px; display: none; }
+    .filter-toggle-btn .filter-count.visible { display: inline-block; }
+
+    /* ===== FILTER PANEL (collapsible) ===== */
+    .filter-panel-bar { display: none; padding: 10px 16px; border-bottom: 1px solid var(--grey-200); background: var(--grey-50); flex-shrink: 0; }
+    .filter-panel-bar.open { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .filter-panel-bar label { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; padding: 4px 8px; border-radius: var(--radius-chip); background: #fff; border: 1px solid var(--grey-300); transition: all 150ms; }
+    .filter-panel-bar label:has(input:checked) { background: var(--primary-25); border-color: var(--primary-main); color: var(--primary-main); }
+    .filter-panel-bar label input { accent-color: var(--primary-main); width: 14px; height: 14px; }
+    .filter-clear { background: none; border: none; color: var(--error); font-size: 12px; cursor: pointer; font-weight: 500; padding: 4px 8px; font-family: inherit; }
+
+    /* ===== RESULTS COUNT ===== */
+    .results-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--grey-200); flex-shrink: 0; }
+    .results-bar strong { color: var(--text-primary); }
+
+    /* ===== CARD LIST ===== */
+    .card-list { flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 10px; }
+    .cp-card { display: flex; flex-direction: column; padding: 16px 20px; border: 1px solid var(--grey-200); border-radius: var(--radius-card); cursor: pointer; transition: background 150ms, border-color 150ms, box-shadow 150ms; position: relative; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .cp-card:hover { background: var(--grey-50); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .cp-card.selected { background: var(--primary-25); border-color: var(--primary-main); box-shadow: 0 0 0 2px var(--primary-main); }
+    .cp-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .cp-card-info { flex: 1; min-width: 0; }
+    .cp-card-name { font-size: 15px; font-weight: 500; color: var(--primary-main); line-height: 1.4; text-decoration: none; display: block; }
+    .cp-card-name:hover { text-decoration: underline; }
+    .cp-card-address { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+    .cp-card-price { font-size: 20px; font-weight: 500; color: var(--text-primary); text-align: right; white-space: nowrap; }
+    .cp-card-price small { display: block; font-size: 12px; font-weight: 400; color: var(--text-disabled); }
+    .cp-card-meta { display: flex; align-items: center; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+    .meta-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; padding: 2px 10px; border-radius: var(--radius-chip); border: 1px solid var(--grey-300); color: var(--text-secondary); background: #fff; }
+    .meta-chip.type-chip { font-weight: 500; }
+    .meta-chip.type-chip.off-street { background: #E3F2FD; color: #1565C0; border-color: #90CAF9; }
+    .meta-chip.type-chip.on-street { background: #FFF3E0; color: #E65100; border-color: #FFCC80; }
+    .feature-dots { display: flex; gap: 4px; margin-top: 6px; }
+    .feature-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .feature-dot.ev { background: var(--success); }
+    .feature-dot.dis { background: var(--info); }
+    .feature-dot.h24 { background: #F9A825; }
+    .feature-dot.cov { background: #7B1FA2; }
+    .cp-card-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+    .cp-card-features { display: flex; gap: 6px; flex-wrap: wrap; }
+    .feat-tag { font-size: 11px; padding: 2px 8px; border-radius: var(--radius-chip); letter-spacing: 0.3px; }
+    .feat-tag.ev { background: #E8F5E9; color: var(--success); }
+    .feat-tag.dis { background: #E3F2FD; color: var(--info); }
+    .feat-tag.h24 { background: #FFF8E1; color: #F9A825; }
+    .feat-tag.cov { background: #F3E5F5; color: #7B1FA2; }
+    .buy-now-btn { display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--primary-main); background: #fff; font-size: 15px; font-weight: 500; text-decoration: none; text-transform: uppercase; letter-spacing: 0.4px; padding: 10px 16px; border: 1px solid var(--primary-main); border-radius: var(--radius-btn); cursor: pointer; font-family: inherit; transition: all 150ms; white-space: nowrap; width: 100%; }
+    .buy-now-btn:hover { background: var(--primary-25); border-color: var(--primary-dark); color: var(--primary-dark); }
+    .buy-now-btn.disabled { border-color: var(--grey-300); color: var(--text-disabled); background: var(--grey-50); pointer-events: none; }
+
+    /* ===== PRICING GRID (on card) ===== */
+    .cp-card-pricing { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+    .price-pill { font-size: 11px; padding: 3px 10px; border-radius: var(--radius-chip); background: var(--grey-100); color: var(--text-primary); border: 1px solid var(--grey-300); white-space: nowrap; letter-spacing: 0.3px; display: inline-flex; align-items: center; gap: 4px; }
+    .price-pill strong { font-weight: 500; }
+    .price-pill .dur { font-size: 10px; color: var(--text-secondary); }
+
+    /* ===== CARD BUY ROW (bottom) ===== */
+    .cp-card-buy-row { display: flex; margin-top: 14px; }
+
+    /* ===== MAP TOGGLE BTN ===== */
+    .map-toggle-bar { display: flex; align-items: center; justify-content: flex-end; padding: 6px 16px; border-bottom: 1px solid var(--grey-200); flex-shrink: 0; gap: 8px; }
+    .map-toggle-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 1px solid var(--grey-300); border-radius: var(--radius-input); background: #fff; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-primary); font-family: inherit; transition: border-color 150ms; }
+    .map-toggle-btn:hover { border-color: var(--primary-main); }
+    .map-toggle-btn.active { background: var(--primary-25); border-color: var(--primary-main); color: var(--primary-main); }
+    .map-toggle-btn svg { width: 16px; height: 16px; }
+
+    /* ===== CARD HIGHLIGHT ON MAP SELECT ===== */
+    .cp-card.map-highlighted { background: var(--primary-25); box-shadow: 0 0 0 2px var(--primary-main); border-color: var(--primary-main); }
 
     /* ===== NO RESULTS ===== */
-    .no-results {
-      text-align: center; padding: 60px 24px; color: var(--text-secondary);
-    }
-    .no-results svg { width: 64px; height: 64px; color: var(--grey-400); margin-bottom: 16px; }
-    .no-results h3 { font-size: 18px; font-weight: 500; color: var(--text-primary); margin-bottom: 8px; }
-    .no-results p { font-size: 14px; }
+    .no-results { text-align: center; padding: 48px 24px; color: var(--text-secondary); }
+    .no-results svg { width: 48px; height: 48px; color: var(--grey-400); margin-bottom: 12px; }
+    .no-results h3 { font-size: 16px; font-weight: 500; color: var(--text-primary); margin-bottom: 6px; }
+    .no-results p { font-size: 13px; max-width: 280px; margin: 0 auto; }
 
-    /* ===== NON-ENFORCEABLE TIMING ===== */
-    .timing-info {
-      font-size: 12px; color: var(--text-secondary);
-      display: flex; align-items: center; gap: 4px;
-      letter-spacing: 0.4px; margin-top: 4px;
-    }
-    .timing-info svg { width: 14px; height: 14px; }
+    /* ===== MAP PRICE MARKERS ===== */
+    .price-marker { background: var(--primary-800); color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,.3); border: 2px solid #fff; text-align: center; line-height: 1.3; }
+    .price-marker.highlighted { transform: scale(1.15); z-index: 999 !important; box-shadow: 0 3px 12px rgba(0,0,0,.4); }
+    .price-marker.selected { background: var(--error); transform: scale(1.25); z-index: 1000 !important; box-shadow: 0 3px 12px rgba(211,47,47,.5); border-color: #fff; }
+    .searched-dot { width: 20px; height: 20px; background: var(--primary-main); border: 3px solid #fff; border-radius: 50%; box-shadow: 0 0 8px rgba(50,118,207,.4); }
 
     /* ===== FOOTER ===== */
-    .site-footer {
-      background: var(--primary-800);
-      border-top: 4px solid var(--primary-main);
-      padding: 24px; text-align: center;
-    }
-    .site-footer p { font-size: 14px; line-height: 24px; letter-spacing: 0.07px; color: #fff; }
+    .site-footer { background: var(--primary-800); border-top: 4px solid var(--primary-main); padding: 16px; text-align: center; flex-shrink: 0; }
+    .site-footer p { font-size: 13px; line-height: 24px; color: #fff; }
     .site-footer a { color: #fff; text-decoration: none; }
     .site-footer a:hover { text-decoration: underline; }
 
-    /* ===== MOBILE NAV DRAWER ===== */
-    .mobile-nav-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 300; display: none;
-    }
+    /* ===== MOBILE NAV ===== */
+    .mobile-nav-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 300; display: none; }
     .mobile-nav-overlay.open { display: block; }
-    .mobile-nav-drawer {
-      position: fixed; top: 0; left: -280px; width: 260px;
-      height: 100vh; background: var(--primary-800);
-      z-index: 301; transition: left 250ms ease;
-      display: flex; flex-direction: column; overflow-y: auto;
-      box-shadow: 4px 0 24px rgba(0,0,0,.2);
-    }
+    .mobile-nav-drawer { position: fixed; top: 0; left: -280px; width: 260px; height: 100vh; background: var(--primary-800); z-index: 301; transition: left 250ms ease; display: flex; flex-direction: column; overflow-y: auto; box-shadow: 4px 0 24px rgba(0,0,0,.2); }
     .mobile-nav-drawer.open { left: 0; }
-    .mobile-nav-drawer .drawer-header {
-      padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,.15);
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .mobile-nav-drawer .drawer-close {
-      background: none; border: none; color: #fff; font-size: 22px;
-      cursor: pointer; padding: 4px 8px; border-radius: var(--radius-input);
-    }
-    .mobile-nav-drawer .drawer-close:hover { background: rgba(255,255,255,.1); }
+    .mobile-nav-drawer .drawer-header { padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,.15); display: flex; justify-content: space-between; align-items: center; }
+    .mobile-nav-drawer .drawer-close { background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; padding: 4px 8px; border-radius: var(--radius-input); }
     .mobile-nav-drawer .drawer-links { padding: 12px 0; }
-    .mobile-nav-drawer .drawer-links a {
-      display: flex; align-items: center; gap: 12px;
-      padding: 14px 20px; color: #fff; text-decoration: none;
-      font-size: 15px; font-weight: 500; text-transform: uppercase;
-      letter-spacing: 0.4px; transition: background 150ms;
-    }
+    .mobile-nav-drawer .drawer-links a { display: flex; align-items: center; gap: 12px; padding: 14px 20px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px; transition: background 150ms; }
     .mobile-nav-drawer .drawer-links a:hover { background: rgba(255,255,255,.08); }
     .mobile-nav-drawer .drawer-links a.active { color: var(--yellow-500); }
-    .mobile-nav-drawer .drawer-links a svg { width: 20px; height: 20px; flex-shrink: 0; }
 
-    /* ===== CONTRACT TOGGLE BANNER ===== */
-    .toggle-banner {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 16px; background: var(--primary-25);
-      border: 1px solid var(--primary-100); border-radius: var(--radius-input);
-      margin-bottom: 16px; font-size: 14px;
-    }
-    .toggle-banner .toggle-label { font-weight: 500; color: var(--text-primary); }
-    .toggle-switch {
-      position: relative; width: 44px; height: 24px;
-      background: var(--grey-400); border-radius: 12px;
-      cursor: pointer; transition: background 200ms; flex-shrink: 0;
-    }
-    .toggle-switch.on { background: var(--primary-main); }
-    .toggle-switch .toggle-knob {
-      position: absolute; top: 2px; left: 2px;
-      width: 20px; height: 20px; background: #fff;
-      border-radius: 50%; transition: left 200ms;
-    }
-    .toggle-switch.on .toggle-knob { left: 22px; }
-    .toggle-desc { color: var(--text-secondary); font-size: 13px; }
+    /* ===== MOBILE: COLLAPSIBLE SEARCH SUMMARY ===== */
+    .search-summary-bar { display: none; }
+
+    /* ===== MOBILE: BOTTOM SHEET ===== */
+    .mobile-bottom-sheet { display: none; }
+    .mobile-sheet-overlay { display: none; }
+    .mobile-selected-card-overlay { display: none; }
+    .mobile-results-count { display: none; }
+    .mobile-list-map-tabs { display: none; }
 
     /* ===== RESPONSIVE ===== */
     @media (max-width: 900px) {
-      .page-wrapper { margin: 0 24px; }
-      .discovery-toolbar { flex-direction: column; align-items: stretch; }
-      .search-box, .postcode-box, .sort-box { width: 100%; min-width: 0; }
+      .search-strip { padding: 10px 16px; }
+      .list-panel { width: 100%; max-width: none; min-width: 0; border-right: none; }
+      .list-panel.map-disabled .card-list { grid-template-columns: repeat(2, 1fr); }
+      .map-panel { display: none; }
+      .split-panel { flex-direction: column; }
+      .map-panel.mobile-visible { display: block; height: 300px; border-top: 1px solid var(--grey-300); position: relative; }
+      .map-panel.map-hidden { display: none; }
     }
+
     @media (max-width: 640px) {
-      .site-header { padding: 0; height: auto; min-height: 48px; }
-      .header-left { gap: 8px; flex: 1; min-width: 0; }
+      .site-header { padding: 0 12px; height: auto; min-height: 48px; }
+      .header-left { gap: 8px; flex: 1; }
       .header-divider { display: none; }
       .header-nav { display: none; }
       .hamburger-btn { display: flex; align-items: center; justify-content: center; }
-      .header-right { gap: 0; }
+      .header-right { gap: 4px; }
       .font-toggle { display: none; }
-      .page-wrapper { margin: 0; padding: 8px 16px 88px; }
-      .page-heading { font-size: 14px; font-weight: 400; line-height: 1.43; letter-spacing: 0.17px; }
-      .carpark-card { grid-template-columns: 1fr; gap: 12px; padding: 16px; }
-      .carpark-right { flex-direction: row; align-items: center; min-width: 0; gap: 12px; flex-wrap: wrap; }
-      .map-container { height: 300px; }
-      .view-toggle button { padding: 6px 12px; font-size: 13px; }
-    }
+      .site-footer { display: none; }
 
+      /* ===== COLLAPSIBLE SEARCH ===== */
+      .search-strip { display: none; }
+      .search-summary-bar {
+        display: flex; align-items: center; gap: 10px;
+        padding: 10px 14px; background: #fff; border-bottom: 1px solid var(--grey-300);
+        cursor: pointer; flex-shrink: 0;
+      }
+      .search-summary-bar .search-summary-icon {
+        width: 36px; height: 36px; border-radius: 50%; background: var(--grey-100);
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      }
+      .search-summary-bar .search-summary-icon svg { width: 18px; height: 18px; color: var(--text-secondary); }
+      .search-summary-bar .search-summary-text { flex: 1; min-width: 0; }
+      .search-summary-bar .search-summary-location {
+        font-size: 14px; font-weight: 500; color: var(--text-primary);
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+      .search-summary-bar .search-summary-dates {
+        font-size: 12px; color: var(--text-secondary);
+      }
+      .search-strip-expanded {
+        display: none; flex-direction: column; gap: 8px;
+        padding: 8px 12px 12px; background: #fff; border-bottom: 1px solid var(--grey-300);
+      }
+      .search-strip-expanded.open { display: flex; }
+      .search-strip-expanded .search-field { min-width: 0; width: 100%; }
+      .search-strip-expanded .search-date { min-width: 0; width: 100%; }
+
+      /* ===== LIST/MAP TAB TOGGLE ===== */
+      .mobile-list-map-tabs {
+        display: flex; background: #fff; border-bottom: 1px solid var(--grey-200);
+        flex-shrink: 0;
+      }
+      .mobile-list-map-tabs button {
+        flex: 1; padding: 10px; font-size: 14px; font-weight: 500;
+        background: none; border: none; border-bottom: 2px solid transparent;
+        color: var(--text-secondary); cursor: pointer; font-family: inherit;
+        transition: all 150ms; min-height: 44px;
+      }
+      .mobile-list-map-tabs button.active {
+        color: var(--primary-main); border-bottom-color: var(--primary-main);
+      }
+
+      /* ===== RESULTS COUNT BAR ===== */
+      .mobile-results-count {
+        display: flex; align-items: center; justify-content: center;
+        padding: 6px 12px; font-size: 13px; color: var(--success);
+        font-weight: 500; background: #fff; border-bottom: 1px solid var(--grey-200);
+        flex-shrink: 0;
+      }
+
+      /* ===== MAP VIEW (full-page) ===== */
+      .split-panel { flex-direction: column; position: relative; }
+      .split-panel.mobile-map-mode { height: calc(100vh - 48px); overflow: hidden; }
+      .split-panel.mobile-map-mode .list-panel { display: none; }
+      .split-panel.mobile-map-mode .map-panel {
+        display: block !important; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        height: 100% !important; z-index: 1;
+      }
+
+      /* ===== LIST VIEW ===== */
+      .split-panel.mobile-list-mode .map-panel { display: none !important; }
+      .split-panel.mobile-list-mode .list-panel { width: 100%; max-width: none; min-width: 0; border-right: none; }
+
+      /* ===== BOTTOM SHEET (card list over map) ===== */
+      .mobile-bottom-sheet {
+        display: none; position: fixed; bottom: 0; left: 0; right: 0;
+        background: #fff; z-index: 50; border-radius: 16px 16px 0 0;
+        box-shadow: 0 -4px 24px rgba(0,0,0,.15); max-height: 70vh;
+        transition: transform 300ms cubic-bezier(.32,.72,0,1);
+        flex-direction: column; touch-action: none;
+      }
+      .split-panel.mobile-map-mode .mobile-bottom-sheet { display: flex; }
+      .mobile-bottom-sheet.collapsed { max-height: 60px; overflow: hidden; }
+      .mobile-bottom-sheet.peek { max-height: 280px; }
+      .mobile-bottom-sheet.expanded { max-height: 70vh; }
+      .mobile-sheet-handle-bar {
+        display: flex; flex-direction: column; align-items: center;
+        padding: 8px 16px 4px; cursor: grab; flex-shrink: 0;
+      }
+      .mobile-sheet-handle-bar .handle {
+        width: 36px; height: 4px; background: var(--grey-300);
+        border-radius: 2px;
+      }
+      .mobile-sheet-handle-bar .sheet-title {
+        font-size: 13px; color: var(--text-secondary); font-weight: 500;
+        margin-top: 6px;
+      }
+      .mobile-sheet-cards {
+        flex: 1; overflow-y: auto; padding: 0 12px 16px;
+        -webkit-overflow-scrolling: touch;
+      }
+      .mobile-sheet-cards .cp-card { margin-bottom: 10px; }
+
+      /* ===== SELECTED CARD OVERLAY (shown when tapping map marker) ===== */
+      .mobile-selected-card-overlay {
+        display: none; position: fixed; bottom: 12px; left: 12px; right: 12px;
+        z-index: 60; background: #fff; border-radius: var(--radius-card);
+        box-shadow: 0 4px 20px rgba(0,0,0,.2); padding: 14px 16px;
+        transition: transform 250ms ease, opacity 250ms ease;
+      }
+      .mobile-selected-card-overlay.visible { display: block; }
+      .mobile-selected-card-overlay .overlay-card-top {
+        display: flex; gap: 12px; align-items: flex-start;
+      }
+      .mobile-selected-card-overlay .overlay-card-img {
+        width: 80px; height: 60px; background: var(--grey-200); border-radius: 6px;
+        flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+        overflow: hidden;
+      }
+      .mobile-selected-card-overlay .overlay-card-img svg { width: 24px; height: 24px; color: var(--text-disabled); }
+      .mobile-selected-card-overlay .overlay-card-info { flex: 1; min-width: 0; }
+      .mobile-selected-card-overlay .overlay-card-name {
+        font-size: 15px; font-weight: 500; color: var(--text-primary);
+        line-height: 1.3; margin-bottom: 2px;
+      }
+      .mobile-selected-card-overlay .overlay-card-rating {
+        display: flex; align-items: center; gap: 4px; margin-top: 4px;
+        font-size: 12px; color: var(--text-secondary);
+      }
+      .mobile-selected-card-overlay .overlay-card-rating .stars {
+        color: #F9A825; font-size: 13px; letter-spacing: 1px;
+      }
+      .mobile-selected-card-overlay .overlay-card-distance {
+        font-size: 13px; color: var(--text-secondary); margin-top: 4px;
+        display: flex; align-items: center; gap: 4px;
+      }
+      .mobile-selected-card-overlay .overlay-card-distance strong { color: var(--text-primary); font-weight: 500; }
+      .mobile-selected-card-overlay .overlay-buy-btn {
+        display: block; width: 100%; margin-top: 12px; padding: 12px 16px;
+        background: var(--success); color: #fff; border: none; border-radius: var(--radius-btn);
+        font-size: 15px; font-weight: 500; text-align: center; text-decoration: none;
+        font-family: inherit; cursor: pointer; min-height: 44px;
+      }
+      .mobile-selected-card-overlay .overlay-buy-btn:hover { background: #1B5E20; }
+      .mobile-selected-card-overlay .overlay-close {
+        position: absolute; top: 8px; right: 8px; background: none; border: none;
+        padding: 4px; cursor: pointer; color: var(--text-disabled); border-radius: 50%;
+      }
+      .mobile-selected-card-overlay .overlay-close:hover { background: var(--grey-100); }
+
+      /* ===== LIST MODE CARDS ===== */
+      .list-toolbar { padding: 6px 12px; }
+      .sort-tabs { flex-wrap: nowrap; overflow-x: auto; }
+      .sort-tab { padding: 6px 10px; font-size: 13px; flex-shrink: 0; }
+      .filter-toggle-btn { padding: 6px 10px; font-size: 12px; }
+      .filter-panel-bar { padding: 8px 12px; }
+      .demo-config-bar { padding: 6px 12px; font-size: 12px; }
+      .results-bar { padding: 6px 12px; font-size: 12px; }
+      .card-list { padding: 8px; gap: 8px; }
+      .cp-card { padding: 12px 14px; }
+      .cp-card-name { font-size: 14px; }
+      .cp-card-address { font-size: 12px; }
+      .cp-card-meta { gap: 6px; margin-top: 6px; }
+      .meta-chip { font-size: 11px; padding: 2px 8px; }
+      .cp-card-bottom { margin-top: 8px; }
+      .feat-tag { font-size: 10px; padding: 2px 6px; }
+      .cp-card-pricing { gap: 4px; margin-top: 8px; }
+      .price-pill { font-size: 10px; padding: 2px 8px; }
+      .cp-card-buy-row { margin-top: 10px; }
+      .buy-now-btn { font-size: 13px; padding: 8px 12px; min-height: 44px; }
+      .list-panel.map-disabled .card-list { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 380px) {
+      .cp-card-meta { flex-direction: column; align-items: flex-start; gap: 4px; }
+      .cp-card-pricing { flex-direction: column; }
+      .price-pill { width: fit-content; }
+    }
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-<!-- Skip Navigation -->
 <a href="#main-content" class="skip-link">Skip to main content</a>
 
 <!-- ===== HEADER ===== -->
@@ -462,23 +429,19 @@
     <button class="hamburger-btn" aria-label="Open navigation menu" onclick="openMobileNav()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
     </button>
-    <div class="logo">
-      <div class="logo-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" width="20" height="20"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor" opacity=".9"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
-      </div>
+    <div class="logo-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" width="20" height="20"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor" opacity=".9"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
     </div>
     <div class="header-divider"></div>
     <nav class="header-nav" aria-label="Main navigation">
-      <a href="#" onclick="return false;">
-        <span class="nav-text">My Applications</span>
-      </a>
-      <a href="#" class="active" onclick="return false;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-        <span class="nav-text">Car Parks</span>
-      </a>
+      <a href="#" class="active" onclick="return false;"><span class="nav-text">My Applications</span></a>
       <a href="#" onclick="return false;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
         <span class="nav-text">Vehicles</span>
+      </a>
+      <a href="#" onclick="return false;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+        <span class="nav-text">Documents</span>
       </a>
       <a href="#" onclick="return false;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
@@ -488,14 +451,14 @@
   </div>
   <div class="header-right">
     <div class="font-toggle" role="group" aria-label="Adjust text size">
-      <button onclick="setFontSize('normal')" class="active" aria-label="Normal text" id="font-normal">A</button>
-      <button onclick="setFontSize('large')" aria-label="Large text" id="font-large">A+</button>
-      <button onclick="setFontSize('xl')" aria-label="Extra large text" id="font-xl">A++</button>
+      <button onclick="setFontSize('normal')" class="active" id="font-normal">A</button>
+      <button onclick="setFontSize('large')" id="font-large">A+</button>
+      <button onclick="setFontSize('xl')" id="font-xl">A++</button>
     </div>
     <button class="header-bell" aria-label="Notifications">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
     </button>
-    <div class="header-avatar" aria-label="User account" style="background:rgba(255,255,255,.9); color:var(--text-primary); font-size:12px; letter-spacing:1.5px;">SN</div>
+    <div class="header-avatar" style="background:rgba(255,255,255,.9); color:var(--text-primary);">SN</div>
   </div>
 </header>
 
@@ -509,518 +472,819 @@
     <button class="drawer-close" onclick="closeMobileNav()" aria-label="Close menu">&times;</button>
   </div>
   <div class="drawer-links">
-    <a href="#" onclick="closeMobileNav(); return false;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      My Applications
-    </a>
-    <a href="#" class="active" onclick="closeMobileNav(); return false;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-      Car Parks
-    </a>
-    <a href="#" onclick="closeMobileNav(); return false;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-      Vehicles
-    </a>
-    <a href="#" onclick="closeMobileNav(); return false;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
-      Payment
-    </a>
+    <a href="#" class="active" onclick="closeMobileNav(); return false;">My Applications</a>
+    <a href="#" onclick="closeMobileNav(); return false;">Vehicles</a>
+    <a href="#" onclick="closeMobileNav(); return false;">Documents</a>
+    <a href="#" onclick="closeMobileNav(); return false;">Payment</a>
   </div>
 </div>
 
-<!-- ===== MAIN ===== -->
-<main id="main-content">
-  <div class="page-wrapper">
-
-    <!-- Page Heading -->
-    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0; flex-wrap:nowrap; gap:8px;">
-      <h1 class="page-heading" style="margin-bottom:0; flex:1; min-width:0;">Car Parks</h1>
-    </div>
-    <hr style="border:none; border-top:1px solid var(--grey-300); margin:16px 0 16px;">
-
-    <!-- Contract Toggle Demo (US 277543) -->
-    <div class="notice notice-warning" style="margin-bottom:16px;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-      <span style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-        <strong>Demo:</strong> Map Integration Toggle &mdash;
-        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-          <span>Off</span>
-          <div class="toggle-switch on" id="mapToggle" onclick="toggleMapIntegration()" role="switch" aria-checked="true" tabindex="0" aria-label="Map Integration toggle">
-            <div class="toggle-knob"></div>
-          </div>
-          <span>On</span>
-        </label>
-      </span>
-    </div>
-
-    <!-- Search & Filter Toolbar (US 209079, 209082) -->
-    <div class="discovery-toolbar">
-      <div class="search-box">
-        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        <input type="search" id="searchInput" placeholder="Search car parks by name or address…" aria-label="Search car parks" oninput="filterCarParks()">
+<!-- ===== SEARCH STRIP (like reference images) ===== -->
+<div class="search-strip">
+  <div class="search-field">
+    <label for="locationInput">Park at</label>
+    <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    <input type="text" id="locationInput" placeholder="Enter postcode, address, or place…" value="" oninput="handleSearchInput()" onkeydown="if(event.key==='Enter'){document.getElementById('autosuggestList').classList.remove('open'); filterCards(); pinSearchedAddress();}">
+    <!-- Auto-suggest -->
+    <div class="autosuggest" id="autosuggestList" role="listbox">
+      <div class="autosuggest-item" role="option" onclick="pickSuggestion('SW1A 1AA')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        SW1A 1AA <span class="suggest-type">Postcode</span>
       </div>
-      <div class="postcode-box" id="postcodeBox">
-        <input type="text" id="postcodeInput" placeholder="Enter postcode" aria-label="Postcode for distance" maxlength="8" oninput="calculateDistances()">
+      <div class="autosuggest-item" role="option" onclick="pickSuggestion('High Street, Town Centre')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        High Street, Town Centre <span class="suggest-type">Address</span>
       </div>
-      <div class="sort-box">
-        <select id="sortSelect" aria-label="Sort car parks" onchange="sortCarParks()">
-          <option value="name">Sort by Name</option>
-          <option value="distance">Sort by Distance</option>
-          <option value="capacity">Sort by Available Bays</option>
-        </select>
-      </div>
-      <div class="view-toggle" id="viewToggle">
-        <button class="active" id="listViewBtn" onclick="setView('list')" aria-label="List view">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
-          List
-        </button>
-        <button id="mapViewBtn" onclick="setView('map')" aria-label="Map view">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          Map
-        </button>
+      <div class="autosuggest-item" role="option" onclick="pickSuggestion('Birmingham City Centre')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Birmingham City Centre <span class="suggest-type">Town</span>
       </div>
     </div>
-
-    <!-- Results Info -->
-    <div class="results-info">
-      <span><span class="results-count" id="resultsCount">6</span> car parks found</span>
-    </div>
-
-    <!-- Map Container (US 209082, 277543) -->
-    <div class="map-container" id="mapContainer">
-      <div id="map"></div>
-    </div>
-    <div class="map-fallback" id="mapFallback">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-      <p>Map is currently unavailable. Please use the list view below.</p>
-    </div>
-
-    <!-- Car Park List (US 209076, 209079, 209080) -->
-    <div class="carpark-list" id="carparkList">
-
-      <!-- Car Park 1 -->
-      <a href="car-park-details.html?id=1" class="carpark-card" tabindex="0" role="article" aria-label="Central Multi-Storey Car Park" data-name="Central Multi-Storey Car Park" data-address="High Street, Town Centre, AB1 2CD" data-available="42" data-total="120" data-type="off-street" data-lat="51.505" data-lng="-0.09" data-price="45.00" style="text-decoration:none; color:inherit;">
-        <div class="carpark-info">
-          <div class="carpark-name">
-            Central Multi-Storey Car Park
-            <span class="type-badge off-street">Off-Street</span>
-          </div>
-          <div class="carpark-address">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            High Street, Town Centre, AB1 2CD
-          </div>
-          <div class="carpark-meta">
-            <div class="meta-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
-              <span>Bays:</span> <span class="meta-value">42 / 120</span>
-            </div>
-            <div class="meta-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-              <span>24/7 Access</span>
-            </div>
-          </div>
-          <div class="carpark-tags">
-            <span class="bay-tag">Standard</span>
-            <span class="bay-tag">Disabled</span>
-            <span class="bay-tag">Electric</span>
-          </div>
-          <div class="timing-info">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-            Non-enforceable: Sun 00:00 – 08:00
-          </div>
-        </div>
-        <div class="carpark-right">
-          <div class="availability-badge available">
-            <span class="dot"></span> Available
-          </div>
-          <div class="carpark-distance" id="dist-1">—</div>
-          <div class="carpark-price">
-            £45.00 <small>/ month</small>
-          </div>
-        </div>
-      </a>
-
-      <!-- Car Park 2 -->
-      <a href="car-park-details.html?id=2" class="carpark-card" tabindex="0" role="article" aria-label="Riverside Surface Car Park" data-name="Riverside Surface Car Park" data-address="River Lane, Waterside, AB3 4EF" data-available="8" data-total="60" data-type="off-street" data-lat="51.510" data-lng="-0.08" data-price="35.00" style="text-decoration:none; color:inherit;">
-        <div class="carpark-info">
-          <div class="carpark-name">
-            Riverside Surface Car Park
-            <span class="type-badge off-street">Off-Street</span>
-          </div>
-          <div class="carpark-address">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            River Lane, Waterside, AB3 4EF
-          </div>
-          <div class="carpark-meta">
-            <div class="meta-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
-              <span>Bays:</span> <span class="meta-value">8 / 60</span>
-            </div>
-            <div class="meta-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-              <span>Mon – Sat, 06:00 – 22:00</span>
-            </div>
-          </div>
-          <div class="carpark-tags">
-            <span class="bay-tag">Standard</span>
-            <span class="bay-tag">Disabled</span>
-          </div>
-          <div class="timing-info">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-            Non-enforceable: Daily 22:00 – 06:00
-          </div>
-        </div>
-        <div class="carpark-right">
-          <div class="availability-badge limited">
-            <span class="dot"></span> Limited
-          </div>
-          <div class="carpark-distance" id="dist-2">—</div>
-          <div class="carpark-price">
-            £35.00 <small>/ month</small>
-          </div>
-        </div>
-      </a>
-
-      <!-- Car Park 3 -->
-      <a href="car-park-details.html?id=3" class="carpark-card" tabindex="0" role="article" aria-label="Market Square On-Street Parking" data-name="Market Square On-Street Parking" data-address="Market Square, Old Town, AB5 6GH" data-available="15" data-total="30" data-type="on-street" data-lat="51.500" data-lng="-0.10" data-price="25.00" style="text-decoration:none; color:inherit;">
-        <div class="carpark-info">
-          <div class="carpark-name">
-            Market Square On-Street Parking
-            <span class="type-badge on-street">On-Street</span>
-          </div>
-          <div class="carpark-address">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            Market Square, Old Town, AB5 6GH
-          </div>
-          <div class="carpark-meta">
-            <div class="meta-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
-              <span>Bays:</span> <span class="meta-value">15 / 30</span>
-            </div>
-            <div class="meta-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-              <span>Mon – Fri, 08:00 – 18:00</span>
-            </div>
-          </div>
-          <div class="carpark-tags">
-            <span class="bay-tag">Standard</span>
-          </div>
-        </div>
-        <div class="carpark-right">
-          <div class="availability-badge available">
-            <span class="dot"></span> Available
-          </div>
-          <div class="carpark-distance" id="dist-3">—</div>
-          <div class="carpark-price">
-            £25.00 <small>/ month</small>
-          </div>
-        </div>
-      </a>
-
-      <!-- Car Park 4 -->
-      <a href="car-park-details.html?id=4" class="carpark-card" tabindex="0" role="article" aria-label="Station Road Car Park" data-name="Station Road Car Park" data-address="Station Road, Railway Quarter, AB7 8IJ" data-available="25" data-total="80" data-type="off-street" data-lat="51.515" data-lng="-0.07" data-price="40.00" style="text-decoration:none; color:inherit;">
-        <div class="carpark-info">
-          <div class="carpark-name">
-            Station Road Car Park
-            <span class="type-badge off-street">Off-Street</span>
-          </div>
-          <div class="carpark-address">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            Station Road, Railway Quarter, AB7 8IJ
-          </div>
-          <div class="carpark-meta">
-            <div class="meta-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
-              <span>Bays:</span> <span class="meta-value">25 / 80</span>
-            </div>
-            <div class="meta-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-              <span>24/7 Access</span>
-            </div>
-          </div>
-          <div class="carpark-tags">
-            <span class="bay-tag">Standard</span>
-            <span class="bay-tag">Electric</span>
-          </div>
-        </div>
-        <div class="carpark-right">
-          <div class="availability-badge available">
-            <span class="dot"></span> Available
-          </div>
-          <div class="carpark-distance" id="dist-4">—</div>
-          <div class="carpark-price">
-            £40.00 <small>/ month</small>
-          </div>
-        </div>
-      </a>
-
-      <!-- Car Park 5 -->
-      <a href="car-park-details.html?id=5" class="carpark-card" tabindex="0" role="article" aria-label="Park Lane Surface Lot" data-name="Park Lane Surface Lot" data-address="Park Lane, Green District, AB9 0KL" data-available="50" data-total="100" data-type="off-street" data-lat="51.508" data-lng="-0.12" data-price="30.00" style="text-decoration:none; color:inherit;">
-        <div class="carpark-info">
-          <div class="carpark-name">
-            Park Lane Surface Lot
-            <span class="type-badge off-street">Off-Street</span>
-          </div>
-          <div class="carpark-address">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            Park Lane, Green District, AB9 0KL
-          </div>
-          <div class="carpark-meta">
-            <div class="meta-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
-              <span>Bays:</span> <span class="meta-value">50 / 100</span>
-            </div>
-            <div class="meta-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-              <span>Mon – Sun, 07:00 – 21:00</span>
-            </div>
-          </div>
-          <div class="carpark-tags">
-            <span class="bay-tag">Standard</span>
-            <span class="bay-tag">Disabled</span>
-            <span class="bay-tag">Motorcycle</span>
-          </div>
-        </div>
-        <div class="carpark-right">
-          <div class="availability-badge available">
-            <span class="dot"></span> Available
-          </div>
-          <div class="carpark-distance" id="dist-5">—</div>
-          <div class="carpark-price">
-            £30.00 <small>/ month</small>
-          </div>
-        </div>
-      </a>
-
-      <!-- Car Park 6 -->
-      <a href="car-park-details.html?id=6" class="carpark-card" tabindex="0" role="article" aria-label="Church Street Bays" data-name="Church Street Bays" data-address="Church Street, Cathedral Ward, AB2 3MN" data-available="5" data-total="20" data-type="on-street" data-lat="51.502" data-lng="-0.11" data-price="20.00" style="text-decoration:none; color:inherit;">
-        <div class="carpark-info">
-          <div class="carpark-name">
-            Church Street Bays
-            <span class="type-badge on-street">On-Street</span>
-          </div>
-          <div class="carpark-address">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            Church Street, Cathedral Ward, AB2 3MN
-          </div>
-          <div class="carpark-meta">
-            <div class="meta-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
-              <span>Bays:</span> <span class="meta-value">5 / 20</span>
-            </div>
-            <div class="meta-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-              <span>Mon – Sat, 08:00 – 18:00</span>
-            </div>
-          </div>
-          <div class="carpark-tags">
-            <span class="bay-tag">Standard</span>
-          </div>
-          <div class="timing-info">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-            Non-enforceable: Sun all day
-          </div>
-        </div>
-        <div class="carpark-right">
-          <div class="availability-badge limited">
-            <span class="dot"></span> Limited
-          </div>
-          <div class="carpark-distance" id="dist-6">—</div>
-          <div class="carpark-price">
-            £20.00 <small>/ month</small>
-          </div>
-        </div>
-      </a>
-
-    </div><!-- /carpark-list -->
-
-    <!-- No Results Message -->
-    <div class="no-results hidden" id="noResults">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-      <h3>No car parks found</h3>
-      <p>Try adjusting your search or filters to find available car parks.</p>
-    </div>
-
   </div>
+  <div class="search-date">
+    <label for="startFrom">From</label>
+    <input type="date" id="startFrom" value="2026-05-05">
+  </div>
+  <div class="search-date">
+    <label for="duration">Until</label>
+    <select id="duration">
+      <option value="1week">1 Week</option>
+      <option value="1month">1 Month</option>
+      <option value="3months" selected>3 Months</option>
+      <option value="6months">6 Months</option>
+      <option value="12months">12 Months</option>
+    </select>
+  </div>
+</div>
+
+<!-- ===== MOBILE: SEARCH SUMMARY BAR (collapsible) ===== -->
+<div class="search-summary-bar" id="searchSummaryBar" onclick="toggleMobileSearch()">
+  <div class="search-summary-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+  </div>
+  <div class="search-summary-text">
+    <div class="search-summary-location" id="searchSummaryLocation">Enter location…</div>
+    <div class="search-summary-dates" id="searchSummaryDates">5th May at 08:00 - 5th May at 12:00</div>
+  </div>
+</div>
+<div class="search-strip-expanded" id="searchStripExpanded">
+  <div class="search-field">
+    <label for="mobileLocationInput">Park at</label>
+    <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    <input type="text" id="mobileLocationInput" placeholder="Enter postcode, address, or place…" oninput="syncMobileSearch()" onkeydown="if(event.key==='Enter'){closeMobileSearch(); filterCards(); pinSearchedAddress();}">
+  </div>
+  <div class="search-date">
+    <label for="mobileStartFrom">From</label>
+    <input type="date" id="mobileStartFrom" value="2026-05-05">
+  </div>
+  <div class="search-date">
+    <label for="mobileDuration">Until</label>
+    <select id="mobileDuration">
+      <option value="1week">1 Week</option>
+      <option value="1month">1 Month</option>
+      <option value="3months" selected>3 Months</option>
+      <option value="6months">6 Months</option>
+      <option value="12months">12 Months</option>
+    </select>
+  </div>
+</div>
+
+<!-- ===== MOBILE: LIST/MAP TABS ===== -->
+<div class="mobile-list-map-tabs" id="mobileListMapTabs">
+  <button class="active" id="mobileTabList" onclick="switchMobileView('list')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="vertical-align:-3px; margin-right:4px;"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+    List
+  </button>
+  <button id="mobileTabMap" onclick="switchMobileView('map')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="vertical-align:-3px; margin-right:4px;"><polygon points="1,6 1,22 8,18 16,22 23,18 23,2 16,6 8,2"/></svg>
+    Map
+  </button>
+</div>
+
+<!-- ===== MOBILE: RESULTS COUNT ===== -->
+<div class="mobile-results-count" id="mobileResultsCount">
+  <span id="mobileResultsText">7 parking spaces available</span>
+</div>
+
+<!-- ===== MAIN: SPLIT PANEL ===== -->
+<main id="main-content" class="split-panel">
+
+  <!-- LEFT: LIST PANEL -->
+  <div class="list-panel">
+
+    <!-- Sort tabs + Filter toggle -->
+    <div class="list-toolbar">
+      <div class="sort-tabs" role="tablist">
+        <button class="sort-tab active" role="tab" onclick="sortBy('recommended',this)">Recommended</button>
+        <button class="sort-tab" role="tab" onclick="sortBy('cheapest',this)">Cheapest</button>
+        <button class="sort-tab" role="tab" onclick="sortBy('closest',this)">Closest</button>
+      </div>
+      <button class="filter-toggle-btn" onclick="toggleFilters()" aria-expanded="false" aria-controls="filterBar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/></svg>
+        Filters
+        <span class="filter-count" id="filterCount">0</span>
+      </button>
+    </div>
+
+    <!-- Filter bar (collapsible) -->
+    <div class="filter-panel-bar" id="filterBar">
+      <label><input type="checkbox" value="ev" class="f-feat" onchange="applyFilters()"> EV Charging</label>
+      <label><input type="checkbox" value="disabled" class="f-feat" onchange="applyFilters()"> Disabled</label>
+      <label><input type="checkbox" value="24h" class="f-feat" onchange="applyFilters()"> 24/7</label>
+      <label><input type="checkbox" value="covered" class="f-feat" onchange="applyFilters()"> Covered</label>
+      <button class="filter-clear" onclick="clearFilters()">Clear</button>
+    </div>
+
+    <!-- Demo config: Admin-controlled map toggle -->
+    <div class="demo-config-bar">
+      <span class="demo-badge">Demo</span>
+      <label>
+        <input type="checkbox" id="mapEnabledToggle" checked onchange="toggleMapEnabled(this.checked)">
+        Map Enabled (Admin Config)
+      </label>
+    </div>
+
+    <!-- Results count -->
+    <div class="results-bar" aria-live="polite">
+      <span>Filter by</span>
+      <span><strong id="resultsCount">7</strong> results</span>
+    </div>
+
+    <!-- Car park cards -->
+    <div class="card-list" id="cardList">
+
+      <!-- Card 1 -->
+      <div class="cp-card" id="card-0" data-name="Central Multi-Storey Car Park" data-address="High Street, Town Centre, AB1 2CD" data-price="12" data-distance="0.3" data-walk="6" data-features="ev,disabled,24h,covered" data-type="off-street" data-lat="51.505" data-lng="-0.09" onclick="selectCard(0)" onmouseenter="hoverCard(0)" onmouseleave="unhoverCard(0)">
+        <div class="cp-card-top">
+          <div class="cp-card-info">
+            <span class="cp-card-name">Central Multi-Storey Car Park</span>
+            <div class="cp-card-address">High Street, Town Centre, AB1 2CD</div>
+          </div>
+        </div>
+        <div class="cp-card-meta">
+          <span class="meta-chip">0.3 mi</span>
+          <span class="meta-chip">6 min walk</span>
+          <span class="meta-chip type-chip off-street">Off-Street</span>
+        </div>
+        <div class="cp-card-bottom">
+          <div class="cp-card-features">
+            <span class="feat-tag ev">EV Charging</span>
+            <span class="feat-tag dis">Disabled</span>
+            <span class="feat-tag h24">24/7</span>
+            <span class="feat-tag cov">Covered</span>
+          </div>
+        </div>
+        <div class="cp-card-pricing">
+          <span class="price-pill"><strong>£12</strong><span class="dur">6 mon</span></span>
+          <span class="price-pill"><strong>£35</strong><span class="dur">8 mon</span></span>
+          <span class="price-pill"><strong>£85</strong><span class="dur">1 yr</span></span>
+          <span class="price-pill"><strong>£280</strong><span class="dur">3 yr</span></span>
+        </div>
+        <div class="cp-card-buy-row">
+          <a href="car-park-purchase-v2.html?id=0&name=Central+Multi-Storey+Car+Park&price=12&address=High+Street,+Town+Centre,+AB1+2CD&type=off-street" class="buy-now-btn" onclick="event.stopPropagation();">BUY FROM £12</a>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="cp-card" id="card-1" data-name="Riverside Surface Car Park" data-address="River Lane, Waterside, AB3 4EF" data-price="10" data-distance="0.8" data-walk="12" data-features="disabled" data-type="off-street" data-lat="51.510" data-lng="-0.08" onclick="selectCard(1)" onmouseenter="hoverCard(1)" onmouseleave="unhoverCard(1)">
+        <div class="cp-card-top">
+          <div class="cp-card-info">
+            <span class="cp-card-name">Riverside Surface Car Park</span>
+            <div class="cp-card-address">River Lane, Waterside, AB3 4EF</div>
+          </div>
+        </div>
+        <div class="cp-card-meta">
+          <span class="meta-chip">0.8 mi</span>
+          <span class="meta-chip">12 min walk</span>
+          <span class="meta-chip type-chip off-street">Off-Street</span>
+        </div>
+        <div class="cp-card-bottom">
+          <div class="cp-card-features">
+            <span class="feat-tag dis">Disabled</span>
+          </div>
+        </div>
+        <div class="cp-card-pricing">
+          <span class="price-pill"><strong>£10</strong><span class="dur">6 mon</span></span>
+          <span class="price-pill"><strong>£28</strong><span class="dur">8 mon</span></span>
+          <span class="price-pill"><strong>£70</strong><span class="dur">1 yr</span></span>
+          <span class="price-pill"><strong>£240</strong><span class="dur">3 yr</span></span>
+        </div>
+        <div class="cp-card-buy-row">
+          <a href="car-park-purchase-v2.html?id=1&name=Riverside+Surface+Car+Park&price=10&address=River+Lane,+Waterside,+AB3+4EF&type=off-street" class="buy-now-btn" onclick="event.stopPropagation();">BUY FROM £10</a>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="cp-card" id="card-2" data-name="Market Square On-Street Parking" data-address="Market Square, Old Town, AB5 6GH" data-price="8" data-distance="1.2" data-walk="18" data-features="" data-type="on-street" data-lat="51.500" data-lng="-0.10" onclick="selectCard(2)" onmouseenter="hoverCard(2)" onmouseleave="unhoverCard(2)">
+        <div class="cp-card-top">
+          <div class="cp-card-info">
+            <span class="cp-card-name">Market Square On-Street Parking</span>
+            <div class="cp-card-address">Market Square, Old Town, AB5 6GH</div>
+          </div>
+        </div>
+        <div class="cp-card-meta">
+          <span class="meta-chip">1.2 mi</span>
+          <span class="meta-chip">18 min walk</span>
+          <span class="meta-chip type-chip on-street">On-Street</span>
+        </div>
+        <div class="cp-card-bottom">
+          <div class="cp-card-features"></div>
+        </div>
+        <div class="cp-card-pricing">
+          <span class="price-pill"><strong>£8</strong><span class="dur">6 mon</span></span>
+          <span class="price-pill"><strong>£25</strong><span class="dur">8 mon</span></span>
+          <span class="price-pill"><strong>£65</strong><span class="dur">1 yr</span></span>
+          <span class="price-pill"><strong>£220</strong><span class="dur">3 yr</span></span>
+        </div>
+        <div class="cp-card-buy-row">
+          <a href="car-park-purchase-v2.html?id=2&name=Market+Square+On-Street+Parking&price=8&address=Market+Square,+Old+Town,+AB5+6GH&type=on-street" class="buy-now-btn" onclick="event.stopPropagation();">BUY FROM £8</a>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="cp-card" id="card-3" data-name="Station Road Car Park" data-address="Station Road, Railway Quarter, AB7 8IJ" data-price="11" data-distance="1.5" data-walk="22" data-features="ev,24h" data-type="off-street" data-lat="51.515" data-lng="-0.07" onclick="selectCard(3)" onmouseenter="hoverCard(3)" onmouseleave="unhoverCard(3)">
+        <div class="cp-card-top">
+          <div class="cp-card-info">
+            <span class="cp-card-name">Station Road Car Park</span>
+            <div class="cp-card-address">Station Road, Railway Quarter, AB7 8IJ</div>
+          </div>
+        </div>
+        <div class="cp-card-meta">
+          <span class="meta-chip">1.5 mi</span>
+          <span class="meta-chip">22 min walk</span>
+          <span class="meta-chip type-chip off-street">Off-Street</span>
+        </div>
+        <div class="cp-card-bottom">
+          <div class="cp-card-features">
+            <span class="feat-tag ev">EV Charging</span>
+            <span class="feat-tag h24">24/7</span>
+          </div>
+        </div>
+        <div class="cp-card-pricing">
+          <span class="price-pill"><strong>£11</strong><span class="dur">6 mon</span></span>
+          <span class="price-pill"><strong>£32</strong><span class="dur">8 mon</span></span>
+          <span class="price-pill"><strong>£80</strong><span class="dur">1 yr</span></span>
+          <span class="price-pill"><strong>£260</strong><span class="dur">3 yr</span></span>
+        </div>
+        <div class="cp-card-buy-row">
+          <a href="car-park-purchase-v2.html?id=3&name=Station+Road+Car+Park&price=11&address=Station+Road,+Railway+Quarter,+AB7+8IJ&type=off-street" class="buy-now-btn" onclick="event.stopPropagation();">BUY FROM £11</a>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="cp-card" id="card-4" data-name="Park Lane Surface Lot" data-address="Park Lane, Green District, AB9 0KL" data-price="9" data-distance="2.1" data-walk="30" data-features="disabled" data-type="off-street" data-lat="51.508" data-lng="-0.12" onclick="selectCard(4)" onmouseenter="hoverCard(4)" onmouseleave="unhoverCard(4)">
+        <div class="cp-card-top">
+          <div class="cp-card-info">
+            <span class="cp-card-name">Park Lane Surface Lot</span>
+            <div class="cp-card-address">Park Lane, Green District, AB9 0KL</div>
+          </div>
+        </div>
+        <div class="cp-card-meta">
+          <span class="meta-chip">2.1 mi</span>
+          <span class="meta-chip">30 min walk</span>
+          <span class="meta-chip type-chip off-street">Off-Street</span>
+        </div>
+        <div class="cp-card-bottom">
+          <div class="cp-card-features">
+            <span class="feat-tag dis">Disabled</span>
+          </div>
+        </div>
+        <div class="cp-card-pricing">
+          <span class="price-pill"><strong>£9</strong><span class="dur">6 mon</span></span>
+          <span class="price-pill"><strong>£26</strong><span class="dur">8 mon</span></span>
+          <span class="price-pill"><strong>£68</strong><span class="dur">1 yr</span></span>
+          <span class="price-pill"><strong>£230</strong><span class="dur">3 yr</span></span>
+        </div>
+        <div class="cp-card-buy-row">
+          <a href="car-park-purchase-v2.html?id=4&name=Park+Lane+Surface+Lot&price=9&address=Park+Lane,+Green+District,+AB9+0KL&type=off-street" class="buy-now-btn" onclick="event.stopPropagation();">BUY FROM £9</a>
+        </div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="cp-card" id="card-5" data-name="Church Street Bays" data-address="Church Street, Cathedral Ward, AB2 3MN" data-price="7" data-distance="2.8" data-walk="40" data-features="" data-type="on-street" data-lat="51.502" data-lng="-0.11" onclick="selectCard(5)" onmouseenter="hoverCard(5)" onmouseleave="unhoverCard(5)">
+        <div class="cp-card-top">
+          <div class="cp-card-info">
+            <span class="cp-card-name">Church Street Bays</span>
+            <div class="cp-card-address">Church Street, Cathedral Ward, AB2 3MN</div>
+          </div>
+        </div>
+        <div class="cp-card-meta">
+          <span class="meta-chip">2.8 mi</span>
+          <span class="meta-chip">40 min walk</span>
+          <span class="meta-chip type-chip on-street">On-Street</span>
+        </div>
+        <div class="cp-card-bottom">
+          <div class="cp-card-features"></div>
+        </div>
+        <div class="cp-card-pricing">
+          <span class="price-pill"><strong>£7</strong><span class="dur">6 mon</span></span>
+          <span class="price-pill"><strong>£20</strong><span class="dur">8 mon</span></span>
+          <span class="price-pill"><strong>£55</strong><span class="dur">1 yr</span></span>
+          <span class="price-pill"><strong>£190</strong><span class="dur">3 yr</span></span>
+        </div>
+        <div class="cp-card-buy-row">
+          <a href="car-park-purchase-v2.html?id=5&name=Church+Street+Bays&price=7&address=Church+Street,+Cathedral+Ward,+AB2+3MN&type=on-street" class="buy-now-btn" onclick="event.stopPropagation();">BUY FROM £7</a>
+        </div>
+      </div>
+
+      <!-- Card 7 -->
+      <div class="cp-card" id="card-6" data-name="Victoria Road Multi-Storey" data-address="Victoria Road, East Quarter, AB4 5PQ" data-price="14" data-distance="3.2" data-walk="48" data-features="ev,covered" data-type="off-street" data-lat="51.507" data-lng="-0.06" onclick="selectCard(6)" onmouseenter="hoverCard(6)" onmouseleave="unhoverCard(6)">
+        <div class="cp-card-top">
+          <div class="cp-card-info">
+            <span class="cp-card-name">Victoria Road Multi-Storey</span>
+            <div class="cp-card-address">Victoria Road, East Quarter, AB4 5PQ</div>
+          </div>
+        </div>
+        <div class="cp-card-meta">
+          <span class="meta-chip">3.2 mi</span>
+          <span class="meta-chip">48 min walk</span>
+          <span class="meta-chip type-chip off-street">Off-Street</span>
+        </div>
+        <div class="cp-card-bottom">
+          <div class="cp-card-features">
+            <span class="feat-tag ev">EV Charging</span>
+            <span class="feat-tag cov">Covered</span>
+          </div>
+        </div>
+        <div class="cp-card-pricing">
+          <span class="price-pill"><strong>£14</strong><span class="dur">6 mon</span></span>
+          <span class="price-pill"><strong>£40</strong><span class="dur">8 mon</span></span>
+          <span class="price-pill"><strong>£95</strong><span class="dur">1 yr</span></span>
+          <span class="price-pill"><strong>£320</strong><span class="dur">3 yr</span></span>
+        </div>
+        <div class="cp-card-buy-row">
+          <a href="car-park-purchase-v2.html?id=6&name=Victoria+Road+Multi-Storey&price=14&address=Victoria+Road,+East+Quarter,+AB4+5PQ&type=off-street" class="buy-now-btn" onclick="event.stopPropagation();">BUY FROM £14</a>
+        </div>
+      </div>
+
+      <!-- No results -->
+      <div class="no-results hidden" id="noResults">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <h3>No car parks found</h3>
+        <p>Try a different location or adjust your filters.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: MAP PANEL -->
+  <div class="map-panel" id="mapPanel">
+    <div id="map"></div>
+  </div>
+
 </main>
+
+<!-- ===== MOBILE: BOTTOM SHEET (map mode card list) ===== -->
+<div class="mobile-bottom-sheet peek" id="mobileBottomSheet">
+  <div class="mobile-sheet-handle-bar" id="sheetHandle">
+    <div class="handle"></div>
+    <div class="sheet-title" id="sheetTitle">7 parking spaces available</div>
+  </div>
+  <div class="mobile-sheet-cards" id="mobileSheetCards">
+    <!-- Cards cloned here by JS -->
+  </div>
+</div>
+
+<!-- ===== MOBILE: SELECTED CARD OVERLAY (shown on map marker tap) ===== -->
+<div class="mobile-selected-card-overlay" id="mobileSelectedOverlay">
+  <button class="overlay-close" onclick="closeMobileOverlay()" aria-label="Close">&times;</button>
+  <div class="overlay-card-top">
+    <div class="overlay-card-img">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+    </div>
+    <div class="overlay-card-info">
+      <div class="overlay-card-name" id="overlayCardName">—</div>
+      <div class="overlay-card-rating">
+        <span class="stars">★★★★★</span>
+        <span id="overlayCardRating">(5)</span>
+        <span style="width:14px;height:14px;background:var(--success);border-radius:50%;display:inline-block;margin-left:2px;"></span>
+      </div>
+      <div class="overlay-card-distance">
+        <strong id="overlayCardDistance">—</strong> to destination
+      </div>
+    </div>
+  </div>
+  <a href="#" class="overlay-buy-btn" id="overlayBuyBtn">Reserve for £—</a>
+</div>
 
 <!-- ===== FOOTER ===== -->
 <footer class="site-footer" role="contentinfo">
-  <p>&copy; 2026 Customer Portal &mdash; Car Parks Discovery &bull;
-    <a href="#">Privacy Policy</a> &bull; <a href="#">Terms</a> &bull; <a href="#">Accessibility</a>
-  </p>
+  <p>&copy; 2026 Customer Portal &bull; <a href="#">Privacy</a> &bull; <a href="#">Terms</a> &bull; <a href="#">Accessibility</a></p>
 </footer>
 
-<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script>
   /* ===== STATE ===== */
-  let currentView = 'list';
-  let mapEnabled = true;
   let mapInstance = null;
   let mapMarkers = [];
+  let searchedMarker = null;
+  let selectedCard = -1;
+  let activeFeats = [];
+  let mapVisible = true;
 
   /* ===== FONT SIZE ===== */
-  function setFontSize(size) {
-    document.body.classList.remove('font-large', 'font-xl');
-    if (size === 'large') document.body.classList.add('font-large');
-    if (size === 'xl') document.body.classList.add('font-xl');
-    document.querySelectorAll('.font-toggle button').forEach(b => b.classList.remove('active'));
-    document.getElementById('font-' + size)?.classList.add('active');
+  function setFontSize(s) {
+    document.body.classList.remove('font-large','font-xl');
+    if (s==='large') document.body.classList.add('font-large');
+    if (s==='xl') document.body.classList.add('font-xl');
+    document.querySelectorAll('.font-toggle button').forEach(b=>b.classList.remove('active'));
+    document.getElementById('font-'+s)?.classList.add('active');
   }
 
   /* ===== MOBILE NAV ===== */
-  function openMobileNav() {
-    document.getElementById('mobile-nav-overlay').classList.add('open');
-    document.getElementById('mobile-nav-drawer').classList.add('open');
+  function openMobileNav(){ document.getElementById('mobile-nav-overlay').classList.add('open'); document.getElementById('mobile-nav-drawer').classList.add('open'); }
+  function closeMobileNav(){ document.getElementById('mobile-nav-overlay').classList.remove('open'); document.getElementById('mobile-nav-drawer').classList.remove('open'); }
+
+  /* ===== SEARCH ===== */
+  function handleSearchInput(){
+    const v = document.getElementById('locationInput').value;
+    const sg = document.getElementById('autosuggestList');
+    if(v.length>=3) sg.classList.add('open'); else sg.classList.remove('open');
+    if(v.length<3) filterCards();
   }
-  function closeMobileNav() {
-    document.getElementById('mobile-nav-overlay').classList.remove('open');
-    document.getElementById('mobile-nav-drawer').classList.remove('open');
+  function pickSuggestion(val){
+    document.getElementById('locationInput').value = val;
+    document.getElementById('autosuggestList').classList.remove('open');
+    filterCards();
+    pinSearchedAddress();
+  }
+  document.addEventListener('click', e => {
+    if(!e.target.closest('.search-field')) document.getElementById('autosuggestList').classList.remove('open');
+  });
+
+  /* ===== SORT ===== */
+  function sortBy(mode, btn){
+    document.querySelectorAll('.sort-tab').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active');
+    const list = document.getElementById('cardList');
+    const cards = Array.from(list.querySelectorAll('.cp-card'));
+    cards.sort((a,b)=>{
+      if(mode==='cheapest') return parseFloat(a.dataset.price)-parseFloat(b.dataset.price);
+      if(mode==='closest') return parseFloat(a.dataset.distance)-parseFloat(b.dataset.distance);
+      return 0; // recommended = original order
+    });
+    const noRes = document.getElementById('noResults');
+    cards.forEach(c=>list.appendChild(c));
+    list.appendChild(noRes);
   }
 
-  /* ===== MAP INTEGRATION TOGGLE (US 277543) ===== */
-  function toggleMapIntegration() {
-    const toggle = document.getElementById('mapToggle');
-    mapEnabled = !mapEnabled;
-    toggle.classList.toggle('on', mapEnabled);
-    toggle.setAttribute('aria-checked', mapEnabled);
+  /* ===== FILTERS ===== */
+  function toggleFilters(){
+    const bar = document.getElementById('filterBar');
+    const open = bar.classList.contains('open');
+    bar.classList.toggle('open');
+    document.querySelector('.filter-toggle-btn').setAttribute('aria-expanded', !open);
+  }
+  function applyFilters(){
+    activeFeats = Array.from(document.querySelectorAll('.f-feat:checked')).map(c=>c.value);
+    const total = activeFeats.length;
+    const badge = document.getElementById('filterCount');
+    badge.textContent = total;
+    badge.classList.toggle('visible', total>0);
+    filterCards();
+  }
+  function clearFilters(){
+    document.querySelectorAll('.f-feat').forEach(c=>c.checked=false);
+    activeFeats=[];
+    document.getElementById('filterCount').classList.remove('visible');
+    filterCards();
+  }
 
-    const viewToggle = document.getElementById('viewToggle');
-    const postcodeBox = document.getElementById('postcodeBox');
-    const sortSelect = document.getElementById('sortSelect');
-    const distanceOpt = sortSelect.querySelector('option[value="distance"]');
+  /* ===== FILTER + SEARCH COMBINED ===== */
+  function filterCards(){
+    const q = document.getElementById('locationInput').value.toLowerCase();
+    const cards = document.querySelectorAll('.cp-card');
+    let count = 0;
+    cards.forEach(c=>{
+      const name = (c.dataset.name||'').toLowerCase();
+      const addr = (c.dataset.address||'').toLowerCase();
+      const feats = (c.dataset.features||'').split(',').filter(Boolean);
+      let show = true;
+      if(q.length>=2 && !name.includes(q) && !addr.includes(q)) show=false;
+      if(show && activeFeats.length>0 && !activeFeats.every(f=>feats.includes(f))) show=false;
+      c.style.display = show?'':'none';
+      if(show) count++;
+    });
+    document.getElementById('resultsCount').textContent = count;
+    document.getElementById('noResults').classList.toggle('hidden', count>0);
+    refreshMapMarkers();
+    populateMobileSheetCards();
+  }
 
-    if (!mapEnabled) {
-      // Hide map UI, distance sorting
-      viewToggle.style.display = 'none';
-      postcodeBox.style.display = 'none';
-      distanceOpt.disabled = true;
-      if (sortSelect.value === 'distance') { sortSelect.value = 'name'; sortCarParks(); }
-      setView('list');
-    } else {
-      viewToggle.style.display = 'flex';
-      postcodeBox.style.display = 'block';
-      distanceOpt.disabled = false;
+  /* ===== CARD SELECT + HOVER ===== */
+  function clearSelectedMarker(){
+    document.querySelectorAll('.price-marker').forEach(m=>m.classList.remove('selected'));
+  }
+  function markSelectedOnMap(idx){
+    clearSelectedMarker();
+    if(mapMarkers[idx]){
+      const el = mapMarkers[idx].getElement();
+      if(el) el.querySelector('.price-marker')?.classList.add('selected');
+    }
+  }
+  function selectCard(idx){
+    document.querySelectorAll('.cp-card').forEach(c=>{c.classList.remove('selected'); c.classList.remove('map-highlighted');});
+    const card = document.getElementById('card-'+idx);
+    if(!card) return;
+    card.classList.add('selected');
+    card.classList.add('map-highlighted');
+    selectedCard = idx;
+    // Highlight marker on map
+    markSelectedOnMap(idx);
+    // Pan map to this marker
+    if(mapVisible && mapMarkers[idx]){
+      const ll = mapMarkers[idx].getLatLng();
+      mapInstance?.setView(ll, 15);
+      mapMarkers[idx].openPopup();
+    }
+  }
+  function highlightCardFromMap(idx){
+    document.querySelectorAll('.cp-card').forEach(c=>{c.classList.remove('selected'); c.classList.remove('map-highlighted');});
+    const card = document.getElementById('card-'+idx);
+    if(!card) return;
+    card.classList.add('selected');
+    card.classList.add('map-highlighted');
+    selectedCard = idx;
+    // Highlight marker on map
+    markSelectedOnMap(idx);
+    // Scroll the whole page so the card is visible
+    const headerH = document.querySelector('.site-header')?.offsetHeight || 56;
+    const cardRect = card.getBoundingClientRect();
+    const scrollTarget = window.scrollY + cardRect.top - headerH - 20;
+    window.scrollTo({top: scrollTarget, behavior:'smooth'});
+  }
+  function hoverCard(idx){
+    if(mapMarkers[idx]){
+      const el = mapMarkers[idx].getElement();
+      if(el) el.querySelector('.price-marker')?.classList.add('highlighted');
+    }
+  }
+  function unhoverCard(idx){
+    if(mapMarkers[idx]){
+      const el = mapMarkers[idx].getElement();
+      if(el) el.querySelector('.price-marker')?.classList.remove('highlighted');
     }
   }
 
-  /* ===== VIEW TOGGLE ===== */
-  function setView(view) {
-    currentView = view;
-    const listBtn = document.getElementById('listViewBtn');
-    const mapBtn = document.getElementById('mapViewBtn');
-    const listEl = document.getElementById('carparkList');
-    const mapEl = document.getElementById('mapContainer');
-
-    listBtn.classList.toggle('active', view === 'list');
-    mapBtn.classList.toggle('active', view === 'map');
-
-    if (view === 'map') {
-      mapEl.classList.add('visible');
-      listEl.style.display = 'none';
-      initMap();
-    } else {
-      mapEl.classList.remove('visible');
-      listEl.style.display = 'grid';
-    }
-  }
-
-  /* ===== MAP INIT (Leaflet) ===== */
-  function initMap() {
-    if (mapInstance) { mapInstance.invalidateSize(); return; }
+  /* ===== MAP ===== */
+  function initMap(){
+    if(mapInstance) return;
     try {
       mapInstance = L.map('map').setView([51.505, -0.09], 13);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; OpenStreetMap contributors'
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+        maxZoom:19, attribution:'&copy; OpenStreetMap contributors'
       }).addTo(mapInstance);
-      addMapMarkers();
-    } catch (e) {
-      // Fallback if map fails (US 277543 - FR-11)
-      document.getElementById('mapContainer').classList.remove('visible');
-      document.getElementById('mapFallback').classList.add('visible');
-      setView('list');
-    }
+      refreshMapMarkers();
+    } catch(e){}
   }
 
-  function addMapMarkers() {
-    if (!mapInstance) return;
-    mapMarkers.forEach(m => mapInstance.removeLayer(m));
+  function refreshMapMarkers(){
+    if(!mapInstance) return;
+    mapMarkers.forEach(m=>mapInstance.removeLayer(m));
     mapMarkers = [];
-    document.querySelectorAll('.carpark-card').forEach(card => {
+    const cards = document.querySelectorAll('.cp-card');
+    cards.forEach((card,idx)=>{
+      if(card.style.display==='none') return;
       const lat = parseFloat(card.dataset.lat);
       const lng = parseFloat(card.dataset.lng);
-      if (!isNaN(lat) && !isNaN(lng)) {
-        const name = card.dataset.name;
-        const avail = card.dataset.available;
-        const price = card.dataset.price;
-        const marker = L.marker([lat, lng]).addTo(mapInstance);
-        marker.bindPopup(`
-          <strong>${name}</strong><br>
-          Available bays: ${avail}<br>
-          From £${price}/month<br>
-          <a href="${card.href}" style="color:var(--primary-main);">View Details →</a>
-        `);
-        mapMarkers.push(marker);
-      }
-    });
-  }
-
-  /* ===== SEARCH & FILTER (US 209079) ===== */
-  function filterCarParks() {
-    const query = document.getElementById('searchInput').value.toLowerCase();
-    const cards = document.querySelectorAll('.carpark-card');
-    let visibleCount = 0;
-    cards.forEach(card => {
-      const name = (card.dataset.name || '').toLowerCase();
-      const address = (card.dataset.address || '').toLowerCase();
-      const match = name.includes(query) || address.includes(query);
-      card.style.display = match ? '' : 'none';
-      if (match) visibleCount++;
-    });
-    document.getElementById('resultsCount').textContent = visibleCount;
-    document.getElementById('noResults').classList.toggle('hidden', visibleCount > 0);
-    if (mapInstance) addMapMarkers();
-  }
-
-  /* ===== SORT (US 209082) ===== */
-  function sortCarParks() {
-    const list = document.getElementById('carparkList');
-    const cards = Array.from(list.querySelectorAll('.carpark-card'));
-    const sortBy = document.getElementById('sortSelect').value;
-    cards.sort((a, b) => {
-      if (sortBy === 'name') return (a.dataset.name || '').localeCompare(b.dataset.name || '');
-      if (sortBy === 'capacity') return parseInt(b.dataset.available || 0) - parseInt(a.dataset.available || 0);
-      if (sortBy === 'distance') {
-        const dA = parseFloat(a.querySelector('[id^="dist-"]')?.textContent) || 9999;
-        const dB = parseFloat(b.querySelector('[id^="dist-"]')?.textContent) || 9999;
-        return dA - dB;
-      }
-      return 0;
-    });
-    cards.forEach(c => list.appendChild(c));
-  }
-
-  /* ===== DISTANCE CALCULATION (US 209082) ===== */
-  function calculateDistances() {
-    const postcode = document.getElementById('postcodeInput').value.trim();
-    const cards = document.querySelectorAll('.carpark-card');
-    if (postcode.length < 3) {
-      cards.forEach((c, i) => {
-        const el = document.getElementById('dist-' + (i + 1));
-        if (el) el.textContent = '—';
+      if(isNaN(lat)||isNaN(lng)) return;
+      const price = card.dataset.price;
+      const name = card.dataset.name;
+      const markerClass = 'price-marker';
+      const icon = L.divIcon({
+        className: '',
+        html: '<div class="'+markerClass+'">£'+parseInt(price)+'</div>',
+        iconSize: [60,28],
+        iconAnchor: [30,14]
       });
-      return;
-    }
-    // Simulated distances for prototype
-    const distances = [0.3, 0.8, 1.2, 1.5, 2.1, 2.8];
-    cards.forEach((c, i) => {
-      const el = document.getElementById('dist-' + (i + 1));
-      if (el) el.textContent = distances[i] + ' miles';
+      const marker = L.marker([lat,lng],{icon:icon}).addTo(mapInstance);
+      const buyLink = '<a href="'+card.querySelector('.buy-now-btn')?.href+'" style="color:var(--primary-main);font-weight:500;">Buy Now</a>';
+      marker.bindPopup(
+        '<strong>'+name+'</strong><br>'+
+        'From £'+parseFloat(price).toFixed(0)+'<br>'+
+        buyLink
+      );
+      marker.on('click',()=>highlightCardFromMap(idx));
+      mapMarkers[idx] = marker;
     });
   }
+
+  /* ===== MAP ENABLE/DISABLE (Admin Config Demo) ===== */
+  function toggleMapEnabled(enabled){
+    const panel = document.getElementById('mapPanel');
+    const listPanel = document.querySelector('.list-panel');
+    mapVisible = enabled;
+    if(enabled){
+      panel.style.display = '';
+      panel.classList.remove('map-hidden');
+      listPanel.classList.remove('map-disabled');
+      if(mapInstance) mapInstance.invalidateSize();
+      else initMap();
+    } else {
+      panel.style.display = 'none';
+      panel.classList.add('map-hidden');
+      listPanel.classList.add('map-disabled');
+    }
+  }
+
+  /* ===== PIN SEARCHED ADDRESS ===== */
+  function pinSearchedAddress(){
+    if(!mapInstance) return;
+    // Remove previous searched marker
+    if(searchedMarker){ mapInstance.removeLayer(searchedMarker); searchedMarker = null; }
+    const q = document.getElementById('locationInput').value.trim();
+    if(!q) return;
+    // Simulated geocode: place pin near the center of visible cards
+    const cards = document.querySelectorAll('.cp-card');
+    let sumLat=0, sumLng=0, cnt=0;
+    cards.forEach(c=>{
+      if(c.style.display==='none') return;
+      const lat = parseFloat(c.dataset.lat);
+      const lng = parseFloat(c.dataset.lng);
+      if(!isNaN(lat) && !isNaN(lng)){ sumLat+=lat; sumLng+=lng; cnt++; }
+    });
+    if(cnt===0) return;
+    const cLat = sumLat/cnt + 0.002; // offset slightly so it's not exactly on a marker
+    const cLng = sumLng/cnt + 0.002;
+    const icon = L.divIcon({
+      className: '',
+      html: '<div class="searched-dot"></div>',
+      iconSize: [20,20],
+      iconAnchor: [10,10]
+    });
+    searchedMarker = L.marker([cLat, cLng], {icon: icon, zIndexOffset: 1000}).addTo(mapInstance);
+    searchedMarker.bindPopup('<strong>Searched location</strong><br>'+q).openPopup();
+    mapInstance.setView([cLat, cLng], 13);
+  }
+
+  /* ===== MOBILE: COLLAPSIBLE SEARCH ===== */
+  function toggleMobileSearch() {
+    const expanded = document.getElementById('searchStripExpanded');
+    expanded.classList.toggle('open');
+    // Sync values
+    document.getElementById('mobileLocationInput').value = document.getElementById('locationInput').value;
+  }
+  function closeMobileSearch() {
+    document.getElementById('searchStripExpanded').classList.remove('open');
+    updateSearchSummary();
+  }
+  function syncMobileSearch() {
+    document.getElementById('locationInput').value = document.getElementById('mobileLocationInput').value;
+    handleSearchInput();
+  }
+  function updateSearchSummary() {
+    const loc = document.getElementById('locationInput').value || 'Enter location…';
+    document.getElementById('searchSummaryLocation').textContent = loc;
+    const from = document.getElementById('startFrom').value;
+    const dur = document.getElementById('duration').selectedOptions[0]?.textContent || '';
+    document.getElementById('searchSummaryDates').textContent = from + ' — ' + dur;
+  }
+
+  /* ===== MOBILE: LIST/MAP VIEW SWITCHING ===== */
+  let mobileView = 'list';
+  function isMobile() { return window.innerWidth <= 640; }
+
+  function switchMobileView(mode) {
+    mobileView = mode;
+    const splitPanel = document.querySelector('.split-panel');
+    const tabList = document.getElementById('mobileTabList');
+    const tabMap = document.getElementById('mobileTabMap');
+    const sheet = document.getElementById('mobileBottomSheet');
+    const overlay = document.getElementById('mobileSelectedOverlay');
+
+    tabList.classList.toggle('active', mode === 'list');
+    tabMap.classList.toggle('active', mode === 'map');
+
+    if (mode === 'map') {
+      splitPanel.classList.add('mobile-map-mode');
+      splitPanel.classList.remove('mobile-list-mode');
+      // Show bottom sheet in peek mode
+      sheet.className = 'mobile-bottom-sheet peek';
+      // Ensure map renders
+      const mapPanel = document.getElementById('mapPanel');
+      mapPanel.style.display = '';
+      mapPanel.classList.remove('map-hidden');
+      setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); else initMap(); }, 100);
+    } else {
+      splitPanel.classList.remove('mobile-map-mode');
+      splitPanel.classList.add('mobile-list-mode');
+      sheet.className = 'mobile-bottom-sheet';
+      overlay.classList.remove('visible');
+    }
+  }
+
+  /* ===== MOBILE: BOTTOM SHEET DRAG ===== */
+  (function() {
+    let startY = 0, sheetState = 'peek'; // collapsed, peek, expanded
+    const states = ['collapsed', 'peek', 'expanded'];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const handle = document.getElementById('sheetHandle');
+      if (!handle) return;
+
+      handle.addEventListener('touchstart', (e) => {
+        startY = e.touches[0].clientY;
+      }, { passive: true });
+
+      handle.addEventListener('touchend', (e) => {
+        const endY = e.changedTouches[0].clientY;
+        const diff = startY - endY;
+        const sheet = document.getElementById('mobileBottomSheet');
+
+        if (diff > 40) {
+          // Swiped up
+          if (sheetState === 'collapsed') sheetState = 'peek';
+          else if (sheetState === 'peek') sheetState = 'expanded';
+        } else if (diff < -40) {
+          // Swiped down
+          if (sheetState === 'expanded') sheetState = 'peek';
+          else if (sheetState === 'peek') sheetState = 'collapsed';
+        }
+        sheet.className = 'mobile-bottom-sheet ' + sheetState;
+      }, { passive: true });
+    });
+  })();
+
+  /* ===== MOBILE: POPULATE BOTTOM SHEET CARDS ===== */
+  function populateMobileSheetCards() {
+    const container = document.getElementById('mobileSheetCards');
+    if (!container) return;
+    container.innerHTML = '';
+    const cards = document.querySelectorAll('#cardList .cp-card');
+    cards.forEach((card, idx) => {
+      if (card.style.display === 'none') return;
+      const clone = card.cloneNode(true);
+      clone.id = 'sheet-card-' + idx;
+      clone.onclick = () => { selectCard(idx); showMobileOverlay(idx); };
+      clone.removeAttribute('onmouseenter');
+      clone.removeAttribute('onmouseleave');
+      container.appendChild(clone);
+    });
+    const count = container.children.length;
+    document.getElementById('sheetTitle').textContent = count + ' parking spaces available';
+    document.getElementById('mobileResultsText').textContent = count + ' parking spaces available';
+  }
+
+  /* ===== MOBILE: SELECTED CARD OVERLAY ===== */
+  function showMobileOverlay(idx) {
+    if (!isMobile() || mobileView !== 'map') return;
+    const card = document.getElementById('card-' + idx);
+    if (!card) return;
+
+    const overlay = document.getElementById('mobileSelectedOverlay');
+    document.getElementById('overlayCardName').textContent = card.dataset.name;
+    document.getElementById('overlayCardDistance').textContent = card.dataset.distance + ' miles';
+    const buyBtn = document.getElementById('overlayBuyBtn');
+    buyBtn.textContent = 'Reserve for £' + parseInt(card.dataset.price);
+    const cardBuyLink = card.querySelector('.buy-now-btn');
+    buyBtn.href = cardBuyLink ? cardBuyLink.href : '#';
+    overlay.classList.add('visible');
+
+    // Hide bottom sheet when overlay is shown
+    document.getElementById('mobileBottomSheet').className = 'mobile-bottom-sheet collapsed';
+  }
+  function closeMobileOverlay() {
+    document.getElementById('mobileSelectedOverlay').classList.remove('visible');
+    document.getElementById('mobileBottomSheet').className = 'mobile-bottom-sheet peek';
+  }
+
+  /* ===== OVERRIDE: highlightCardFromMap for mobile ===== */
+  const _origHighlightCardFromMap = highlightCardFromMap;
+  highlightCardFromMap = function(idx) {
+    if (isMobile() && mobileView === 'map') {
+      // On mobile map: show overlay instead of scrolling
+      document.querySelectorAll('.cp-card').forEach(c => { c.classList.remove('selected','map-highlighted'); });
+      const card = document.getElementById('card-' + idx);
+      if (card) { card.classList.add('selected','map-highlighted'); }
+      selectedCard = idx;
+      markSelectedOnMap(idx);
+      showMobileOverlay(idx);
+    } else {
+      _origHighlightCardFromMap(idx);
+    }
+  };
+
+  /* ===== MOBILE: UPDATE ON RESIZE ===== */
+  window.addEventListener('resize', () => {
+    if (!isMobile()) {
+      // Reset to desktop layout
+      const splitPanel = document.querySelector('.split-panel');
+      splitPanel.classList.remove('mobile-map-mode', 'mobile-list-mode');
+      document.getElementById('mobileSelectedOverlay').classList.remove('visible');
+    }
+  });
+
+  /* ===== INIT ===== */
+  window.addEventListener('DOMContentLoaded', ()=>{
+    initMap();
+    updateSearchSummary();
+    populateMobileSheetCards();
+    // Set initial card heights to fill viewport
+    const listPanel = document.querySelector('.list-panel');
+    const headerH = document.querySelector('.site-header').offsetHeight;
+    const searchH = document.querySelector('.search-strip').offsetHeight;
+    const footerH = document.querySelector('.site-footer').offsetHeight;
+    // The split panel fills remaining height via flex
+  });
 </script>
 </body>
 </html>

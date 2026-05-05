@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Car Park Permit — Purchase</title>
+  <title>New Parking Permit — Purchase</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
@@ -41,157 +41,70 @@
       --radius-nav: 8px;
       --font-size-base: 16px;
     }
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
-    body {
-      font-size: var(--font-size-base);
-      font-family: 'Roboto', Helvetica, Arial, sans-serif;
-      color: var(--text-primary); background: var(--bg-page);
-      line-height: 1.5; letter-spacing: 0.15px; min-height: 100vh;
-    }
+    body { font-size: var(--font-size-base); font-family: 'Roboto', Helvetica, Arial, sans-serif; color: var(--text-primary); background: var(--bg-page); line-height: 1.5; letter-spacing: 0.15px; min-height: 100vh; }
     body.font-large { zoom: 1.15; }
     body.font-xl    { zoom: 1.3; }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; }
-    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; } }
 
-    .skip-link {
-      position: absolute; left: -999px; top: 0;
-      background: var(--primary-main); color: #fff; padding: 8px 16px;
-      z-index: 1000; border-radius: 0 0 var(--radius-input) 0; font-size: 14px;
-    }
+    .skip-link { position: absolute; left: -999px; top: 0; background: var(--primary-main); color: #fff; padding: 8px 16px; z-index: 1000; border-radius: 0 0 var(--radius-input) 0; font-size: 14px; }
     .skip-link:focus { left: 0; }
 
     /* ===== HEADER ===== */
-    .site-header {
-      background: var(--primary-800); border-bottom: 4px solid var(--primary-main);
-      padding: 0 40px; display: flex; align-items: center; justify-content: space-between;
-      height: 56px; position: sticky; top: 0; z-index: 100;
-    }
+    .site-header { background: var(--primary-800); border-bottom: 4px solid var(--primary-main); padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 100; }
     .header-left { display: flex; align-items: center; gap: 24px; }
-    .site-header .logo { display: flex; align-items: center; gap: 12px; }
-    .site-header .logo-icon {
-      width: 36px; height: 36px; background: var(--yellow-500);
-      border-radius: 4px; display: flex; align-items: center; justify-content: center;
-      font-weight: 500; font-size: 14px; color: var(--primary-800);
-    }
+    .site-header .logo-icon { width: 36px; height: 36px; background: var(--yellow-500); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 500; font-size: 14px; color: var(--primary-800); }
     .header-divider { width: 1px; height: 24px; background: rgba(255,255,255,.3); }
-    .header-nav { display: flex; align-items: center; gap: 0; }
-    .header-nav a {
-      text-decoration: none; color: #fff; font-size: 14px;
-      font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px;
-      padding: 16px 20px; display: flex; align-items: center; gap: 8px;
-      transition: background 150ms ease; line-height: 24px;
-    }
+    .header-nav { display: flex; align-items: center; }
+    .header-nav a { text-decoration: none; color: #fff; font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px; padding: 16px 20px; display: flex; align-items: center; gap: 8px; transition: background 150ms ease; line-height: 24px; }
     .header-nav a:hover { background: rgba(255,255,255,.08); }
     .header-nav a.active { color: var(--yellow-500); }
     .header-nav a svg { width: 20px; height: 20px; }
     .header-right { display: flex; align-items: center; gap: 16px; }
-    .header-bell {
-      background: none; border: none; color: #fff; cursor: pointer;
-      padding: 8px; border-radius: var(--radius-nav); transition: background 150ms;
-    }
-    .header-bell:hover { background: rgba(255,255,255,.1); }
+    .header-bell { background: none; border: none; color: #fff; cursor: pointer; padding: 8px; border-radius: var(--radius-nav); }
     .header-bell svg { width: 24px; height: 24px; }
-    .header-avatar {
-      width: 32px; height: 32px; border-radius: 50%;
-      background: var(--avatar-bg); color: #fff;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 500; letter-spacing: 0.16px;
-    }
-    .font-toggle {
-      display: flex; gap: 2px; align-items: center;
-      border: 1px solid rgba(255,255,255,.4); border-radius: var(--radius-input);
-      padding: 2px; background: rgba(255,255,255,.08);
-    }
-    .font-toggle button {
-      background: none; border: none; padding: 3px 8px; cursor: pointer;
-      font-weight: 500; border-radius: 6px; color: rgba(255,255,255,.6);
-      font-size: 12px; transition: all 150ms; font-family: inherit;
-    }
+    .header-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; letter-spacing: 1.5px; }
+    .font-toggle { display: flex; gap: 2px; align-items: center; border: 1px solid rgba(255,255,255,.4); border-radius: var(--radius-input); padding: 2px; background: rgba(255,255,255,.08); }
+    .font-toggle button { background: none; border: none; padding: 3px 8px; cursor: pointer; font-weight: 500; border-radius: 6px; color: rgba(255,255,255,.6); font-size: 12px; transition: all 150ms; font-family: inherit; }
     .font-toggle button.active { background: rgba(255,255,255,.2); color: #fff; }
-    .hamburger-btn {
-      display: none; background: none; border: none; color: #fff;
-      cursor: pointer; padding: 8px; border-radius: var(--radius-nav);
-      transition: background 150ms; flex-shrink: 0;
-    }
-    .hamburger-btn:hover { background: rgba(255,255,255,.1); }
+    .hamburger-btn { display: none; background: none; border: none; color: #fff; cursor: pointer; padding: 8px; border-radius: var(--radius-nav); flex-shrink: 0; }
     .hamburger-btn svg { width: 24px; height: 24px; }
 
     /* ===== LAYOUT ===== */
     .page-wrapper { margin: 0 180px; padding: 24px 0 100px; }
     .page-layout { display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; }
-    .page-heading {
-      font-size: 24px; font-weight: 400; line-height: 1.33;
-      color: var(--text-primary); margin-bottom: 24px;
-    }
+    .page-heading { font-size: 24px; font-weight: 400; line-height: 1.33; color: var(--text-primary); margin-bottom: 24px; }
 
     /* ===== BREADCRUMB ===== */
-    .breadcrumb {
-      display: flex; align-items: center; gap: 8px;
-      font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; letter-spacing: 0.17px;
-    }
+    .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; letter-spacing: 0.17px; }
     .breadcrumb a { color: var(--primary-main); text-decoration: none; }
     .breadcrumb a:hover { text-decoration: underline; }
     .breadcrumb svg { width: 16px; height: 16px; }
 
     /* ===== STEPPER ===== */
     .stepper { display: flex; align-items: flex-start; margin-bottom: 24px; padding: 0 0 8px; }
-    .step-item {
-      display: flex; flex-direction: column; align-items: center; gap: 8px;
-      min-width: 80px; position: relative;
-    }
-    .step-item .step-num {
-      width: 24px; height: 24px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 400; letter-spacing: 0.4px;
-      background: var(--grey-400); color: #fff;
-      transition: background 200ms ease; flex-shrink: 0; line-height: 1.66;
-    }
-    .step-item .step-label {
-      font-size: 14px; color: var(--text-secondary);
-      line-height: 1.43; letter-spacing: 0.17px; text-align: center; white-space: nowrap;
-    }
+    .step-item { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 80px; position: relative; }
+    .step-item .step-num { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 400; letter-spacing: 0.4px; background: var(--grey-400); color: #fff; transition: background 200ms ease; flex-shrink: 0; line-height: 1.66; }
+    .step-item .step-label { font-size: 14px; color: var(--text-secondary); line-height: 1.43; letter-spacing: 0.17px; text-align: center; white-space: nowrap; }
     .step-item.active .step-num { background: var(--primary-main); color: #fff; }
     .step-item.active .step-label { color: var(--primary-main); font-weight: 500; letter-spacing: 0.1px; }
     .step-item.completed .step-num { background: var(--primary-main); color: #fff; }
     .step-item.completed .step-num::after { content: '\2713'; font-size: 14px; font-weight: 500; }
     .step-item.completed .step-num span { display: none; }
     .step-item.completed .step-label { color: var(--text-primary); font-weight: 500; letter-spacing: 0.1px; }
-    .step-connector {
-      flex: 1; height: 1px; background: var(--grey-300);
-      margin: 12px 8px 0; min-width: 24px;
-    }
+    .step-connector { flex: 1; height: 1px; background: var(--grey-300); margin: 12px 8px 0; min-width: 24px; }
     .step-connector.completed { background: var(--primary-main); }
 
     /* ===== CARDS ===== */
-    .card {
-      background: #fff; border: 1px solid var(--grey-300);
-      border-radius: var(--radius-card); padding: 24px; margin-bottom: 20px;
-    }
-    .card h2 {
-      font-size: 20px; font-weight: 500; line-height: 1.6;
-      letter-spacing: 0.15px; margin-bottom: 4px; color: var(--text-primary);
-    }
-    .card .subtitle {
-      color: var(--text-secondary); font-size: 14px;
-      line-height: 1.43; letter-spacing: 0.17px; margin-bottom: 20px;
-    }
+    .card { background: #fff; border: 1px solid var(--grey-300); border-radius: var(--radius-card); padding: 24px; margin-bottom: 20px; }
+    .card h2 { font-size: 20px; font-weight: 500; line-height: 1.6; letter-spacing: 0.15px; margin-bottom: 4px; color: var(--text-primary); }
+    .card .subtitle { color: var(--text-secondary); font-size: 14px; line-height: 1.43; letter-spacing: 0.17px; margin-bottom: 20px; }
 
     /* ===== BUTTONS ===== */
-    .btn {
-      padding: 8px 22px; border-radius: var(--radius-btn); font-size: 14px;
-      font-weight: 500; cursor: pointer; border: none;
-      text-transform: uppercase; letter-spacing: 0.4px; line-height: 24px;
-      transition: background 150ms ease; display: inline-flex; align-items: center; gap: 8px;
-      font-family: 'Roboto', Helvetica, Arial, sans-serif;
-    }
+    .btn { padding: 8px 22px; border-radius: var(--radius-btn); font-size: 14px; font-weight: 500; cursor: pointer; border: none; text-transform: uppercase; letter-spacing: 0.4px; line-height: 24px; transition: background 150ms ease; display: inline-flex; align-items: center; gap: 8px; font-family: 'Roboto', Helvetica, Arial, sans-serif; }
     .btn:focus-visible { outline: 2px solid var(--primary-main); outline-offset: 2px; }
-    .btn-primary {
-      background: var(--primary-main); color: #fff;
-      font-size: 15px; line-height: 26px; letter-spacing: 0.46px; padding: 10px 24px;
-    }
+    .btn-primary { background: var(--primary-main); color: #fff; font-size: 15px; line-height: 26px; letter-spacing: 0.46px; padding: 10px 24px; }
     .btn-primary:hover { background: var(--primary-dark); }
     .btn-primary:disabled { background: var(--grey-400); cursor: not-allowed; }
     .btn-secondary { background: transparent; color: var(--primary-main); border: 1px solid var(--primary-main); }
@@ -201,198 +114,173 @@
 
     /* ===== FORMS ===== */
     .form-group { margin-bottom: 20px; }
-    .form-group label {
-      display: block; font-size: 14px; font-weight: 400;
-      line-height: 1.43; letter-spacing: 0.17px; margin-bottom: 6px; color: var(--text-primary);
-    }
-    .form-group .hint {
-      font-size: 12px; color: var(--text-disabled);
-      line-height: 1.66; letter-spacing: 0.4px; margin-bottom: 6px;
-    }
-    input[type="text"], input[type="email"], input[type="tel"], input[type="date"], select, textarea {
-      width: 100%; padding: 10px 14px;
-      border: 1px solid var(--grey-400); border-radius: var(--radius-input);
-      font-size: 16px; line-height: 24px; letter-spacing: 0.15px;
-      color: var(--text-primary); background: #fff;
-      font-family: 'Roboto', Helvetica, Arial, sans-serif;
-      transition: border-color 150ms ease, box-shadow 150ms ease;
-    }
-    select {
-      padding-right: 36px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='2' fill='none'/%3E%3C/svg%3E");
-      background-repeat: no-repeat; background-position: right 14px center;
-      -webkit-appearance: none; -moz-appearance: none; appearance: none;
-    }
+    .form-group label { display: block; font-size: 14px; font-weight: 400; line-height: 1.43; letter-spacing: 0.17px; margin-bottom: 6px; color: var(--text-primary); }
+    .form-group .hint { font-size: 12px; color: var(--text-disabled); line-height: 1.66; letter-spacing: 0.4px; margin-bottom: 6px; }
+    input[type="text"], input[type="email"], input[type="tel"], input[type="date"], select, textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--grey-400); border-radius: var(--radius-input); font-size: 16px; line-height: 24px; letter-spacing: 0.15px; color: var(--text-primary); background: #fff; font-family: 'Roboto', Helvetica, Arial, sans-serif; transition: border-color 150ms ease, box-shadow 150ms ease; }
+    select { padding-right: 36px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='2' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; -webkit-appearance: none; -moz-appearance: none; appearance: none; }
     input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary-main); box-shadow: 0 0 0 1px var(--primary-main); }
-    input.error, select.error { border-color: var(--error) !important; box-shadow: 0 0 0 1px var(--error) !important; }
-    .error-msg { color: var(--error); font-size: 12px; line-height: 1.66; letter-spacing: 0.4px; margin-top: 4px; display: none; }
-    .error-msg.visible { display: block; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    textarea { resize: vertical; min-height: 80px; }
-
-    /* ===== VEHICLE CHIPS ===== */
-    .vehicle-chips {
-      display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 12px;
-      border: 1px solid var(--neutral-100); border-radius: var(--radius-input);
-      min-height: 44px; align-items: center;
-    }
-    .vehicle-chip {
-      display: inline-flex; align-items: center; gap: 4px;
-      background: var(--primary-25); color: var(--primary-main);
-      border-radius: var(--radius-chip); padding: 2px 10px 2px 12px;
-      font-size: 13px; line-height: 18px; letter-spacing: 0.16px;
-    }
-    .vehicle-chip .chip-close {
-      background: none; border: none; color: var(--primary-main);
-      cursor: pointer; font-size: 14px; padding: 2px; border-radius: 50%;
-    }
 
     /* ===== NOTICES ===== */
-    .notice {
-      display: flex; gap: 12px; padding: 12px 16px;
-      border-radius: var(--radius-input); font-size: 14px;
-      line-height: 1.43; letter-spacing: 0.17px; margin-bottom: 16px;
-    }
+    .notice { display: flex; gap: 12px; padding: 12px 16px; border-radius: var(--radius-input); font-size: 14px; line-height: 1.43; letter-spacing: 0.17px; margin-bottom: 16px; }
     .notice-info { background: #E3F2FD; color: var(--info); }
     .notice-warning { background: #FFF3E0; color: var(--warning); }
     .notice-error { background: #FDECEA; color: var(--error); }
+    .notice-success { background: #E8F5E9; color: var(--success); }
     .notice svg { width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px; }
     .notice span { color: var(--text-primary); }
 
     /* ===== NAV BUTTONS ===== */
-    .nav-buttons {
-      display: flex; justify-content: space-between; margin-top: 24px;
-      padding-top: 20px; border-top: 1px solid var(--grey-200); flex-wrap: wrap; gap: 12px;
-    }
+    .nav-buttons { display: flex; justify-content: space-between; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--grey-200); flex-wrap: wrap; gap: 12px; }
     .nav-buttons-right { display: flex; gap: 12px; flex-wrap: wrap; }
 
     /* ===== SIDEBAR ===== */
     .summary-sidebar { position: sticky; top: 80px; }
-    .summary-card {
-      background: #fff; border: 1px solid var(--primary-25);
-      border-radius: var(--radius-card); padding: 0;
-      box-shadow: 0px 1px 21.4px 0px rgba(81,85,110,0.12); overflow: hidden;
-    }
-    .summary-card h3 {
-      font-size: 20px; font-weight: 500; line-height: 1.6;
-      letter-spacing: 0.15px; margin: 0; padding: 12px 16px;
-      color: var(--text-primary); border-bottom: 1px solid var(--grey-400);
-    }
+    .summary-card { background: #fff; border: 1px solid var(--primary-25); border-radius: var(--radius-card); padding: 0; box-shadow: 0px 1px 21.4px 0px rgba(81,85,110,0.12); overflow: hidden; }
+    .summary-card h3 { font-size: 20px; font-weight: 500; line-height: 1.6; letter-spacing: 0.15px; margin: 0; padding: 12px 16px; color: var(--text-primary); border-bottom: 1px solid var(--grey-400); }
     .summary-body { padding: 16px; }
-    .summary-row {
-      display: flex; justify-content: space-between;
-      padding: 6px 0; font-size: 14px; line-height: 1.43; letter-spacing: 0.17px;
-    }
+    .summary-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; line-height: 1.43; letter-spacing: 0.17px; }
     .summary-row .s-label { color: var(--text-secondary); }
     .summary-row .s-value { font-weight: 500; color: var(--text-primary); text-align: right; max-width: 55%; }
     .summary-divider { height: 1px; background: var(--grey-200); margin: 8px 0; }
-    .summary-total {
-      display: flex; justify-content: space-between;
-      padding: 12px 0 0; font-size: 16px; font-weight: 500;
-    }
+    .summary-total { display: flex; justify-content: space-between; padding: 12px 0 0; font-size: 16px; font-weight: 500; }
     .summary-total .s-value { color: var(--primary-main); font-size: 20px; }
 
     /* ===== REVIEW SECTIONS ===== */
-    .review-section {
-      border: 1px solid var(--grey-300); border-radius: var(--radius-card);
-      margin-bottom: 16px; overflow: hidden;
-    }
-    .review-section-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 16px; background: var(--grey-50);
-      border-bottom: 1px solid var(--grey-200);
-    }
+    .review-section { border: 1px solid var(--grey-300); border-radius: var(--radius-card); margin-bottom: 16px; overflow: hidden; }
+    .review-section-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--grey-50); border-bottom: 1px solid var(--grey-200); }
     .review-section-header h3 { font-size: 14px; font-weight: 500; letter-spacing: 0.1px; }
-    .review-section-header .edit-link {
-      color: var(--primary-main); font-size: 13px; cursor: pointer;
-      text-transform: uppercase; letter-spacing: 0.46px; font-weight: 500;
-      background: none; border: none; font-family: inherit;
-    }
+    .review-section-header .edit-link { color: var(--primary-main); font-size: 13px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.46px; font-weight: 500; background: none; border: none; font-family: inherit; }
     .review-section-body { padding: 16px; }
-    .review-row {
-      display: flex; justify-content: space-between;
-      padding: 4px 0; font-size: 14px; line-height: 1.43;
-    }
+    .review-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 14px; line-height: 1.43; }
     .review-row .label { color: var(--text-secondary); }
     .review-row .value { font-weight: 500; text-align: right; max-width: 55%; }
 
     /* ===== PAYMENT OPTIONS ===== */
     .payment-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-    .payment-option {
-      border: 1px solid var(--grey-300); border-radius: var(--radius-card);
-      padding: 16px 20px; cursor: pointer;
-      transition: border-color 200ms ease, background 200ms ease;
-      background: #fff; display: flex; align-items: center; gap: 14px; position: relative;
-    }
+    .payment-option { border: 1px solid var(--grey-300); border-radius: var(--radius-card); padding: 16px 20px; cursor: pointer; transition: border-color 200ms ease, background 200ms ease; background: #fff; display: flex; align-items: center; gap: 14px; position: relative; }
     .payment-option:hover { border-color: var(--primary-200); }
     .payment-option.selected { border-color: var(--primary-main); background: var(--primary-25); }
-    .payment-option .pay-icon {
-      width: 40px; height: 40px; border-radius: 50%; background: var(--grey-100);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; flex-shrink: 0; color: var(--text-secondary);
-    }
+    .payment-option .pay-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--grey-100); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; color: var(--text-secondary); }
     .payment-option.selected .pay-icon { background: var(--primary-25); color: var(--primary-main); }
     .payment-option .pay-info { flex: 1; }
     .payment-option .pay-label { font-size: 14px; font-weight: 500; letter-spacing: 0.15px; color: var(--text-primary); display: block; }
     .payment-option .pay-desc { font-size: 12px; color: var(--text-secondary); letter-spacing: 0.4px; margin-top: 2px; display: block; }
-    .payment-option .pay-check {
-      position: absolute; top: 12px; right: 12px;
-      width: 22px; height: 22px; border-radius: 50%;
-      border: 2px solid var(--grey-400); display: flex;
-      align-items: center; justify-content: center; transition: all 150ms;
-    }
+    .payment-option .pay-check { position: absolute; top: 12px; right: 12px; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--grey-400); display: flex; align-items: center; justify-content: center; transition: all 150ms; }
     .payment-option.selected .pay-check { border-color: var(--primary-main); background: var(--primary-main); color: #fff; }
     .payment-option.selected .pay-check::after { content: '\2713'; font-size: 12px; font-weight: 700; }
 
+    /* ===== MORE PAYMENT OPTIONS ===== */
+    .more-payment-list { margin-top: 0; border: 1px solid var(--grey-300); border-radius: var(--radius-card); overflow: hidden; }
+    .more-payment-list h4 { font-size: 14px; font-weight: 500; padding: 12px 16px; margin: 0; background: var(--grey-50); border-bottom: 1px solid var(--grey-300); cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+    .more-payment-list h4::after { content: '\25BC'; font-size: 10px; color: var(--text-secondary); transition: transform 200ms; }
+    .more-payment-list.open h4::after { transform: rotate(180deg); }
+    .more-payment-list #more-payment-items { display: none; }
+    .more-payment-list.open #more-payment-items { display: block; }
+    .more-pay-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--grey-200); cursor: pointer; transition: background 150ms; }
+    .more-pay-item:last-child { border-bottom: none; }
+    .more-pay-item:hover { background: var(--grey-50); }
+    .more-pay-item.selected { background: var(--primary-25); }
+    .more-pay-item .pay-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--grey-100); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .more-pay-item.selected .pay-icon { background: var(--primary-25); color: var(--primary-main); }
+    .more-pay-item .pay-label { font-size: 14px; font-weight: 500; color: var(--text-primary); flex: 1; }
+    .more-pay-item .pay-check { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--grey-400); display: flex; align-items: center; justify-content: center; }
+    .more-pay-item.selected .pay-check { border-color: var(--primary-main); background: var(--primary-main); color: #fff; }
+    .more-pay-item.selected .pay-check::after { content: '\2713'; font-size: 11px; font-weight: 700; }
+
+    /* ===== INSTRUCTION ALERT ===== */
+    .instruction-alert { display: flex; align-items: flex-start; gap: 12px; padding: 16px 20px; background: #E3F2FD; border: 1px solid #90CAF9; border-radius: var(--radius-card); margin-bottom: 20px; }
+    .instruction-alert-icon { flex-shrink: 0; color: #1565C0; margin-top: 2px; }
+    .instruction-alert-content { flex: 1; }
+    .instruction-alert-title { background: none; border: none; padding: 0; font-size: 15px; font-weight: 500; color: #1565C0; cursor: pointer; text-align: left; letter-spacing: 0.15px; }
+    .instruction-alert-body { overflow: hidden; max-height: 500px; transition: max-height 300ms ease; font-size: 13px; line-height: 1.6; color: var(--text-primary); margin-top: 8px; }
+    .instruction-alert-body.collapsed { max-height: 0; margin-top: 0; }
+    .instruction-docs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; padding: 12px; background: rgba(255,255,255,.6); border-radius: var(--radius-input); }
+    .instruction-docs-grid p { margin: 0; font-size: 13px; line-height: 1.5; }
+    .instruction-alert-toggle { background: none; border: none; cursor: pointer; color: #1565C0; padding: 4px; flex-shrink: 0; margin-top: 2px; transition: transform 200ms; }
+    .instruction-alert-toggle.flipped { transform: rotate(180deg); }
+
     /* ===== PRICING BREAKDOWN ===== */
-    .price-card {
-      background: var(--grey-50); border: 1px solid var(--grey-300);
-      border-radius: var(--radius-card); padding: 20px 24px;
-    }
-    .price-line {
-      display: flex; justify-content: space-between;
-      padding: 6px 0; font-size: 14px; line-height: 1.43; letter-spacing: 0.17px;
-    }
+    .price-card { background: var(--grey-50); border: 1px solid var(--grey-300); border-radius: var(--radius-card); padding: 20px 24px; }
+    .price-line { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; line-height: 1.43; letter-spacing: 0.17px; }
     .price-line .p-label { color: var(--text-secondary); }
     .price-line .p-value { font-weight: 500; text-align: right; }
-    .price-line.total {
-      font-size: 16px; font-weight: 500;
-      border-top: 1px solid var(--grey-300); padding-top: 12px; margin-top: 4px;
-    }
+    .price-line.total { font-size: 16px; font-weight: 500; border-top: 1px solid var(--grey-300); padding-top: 12px; margin-top: 4px; }
     .price-line.total .p-label { font-weight: 500; }
+
+    /* ===== CAR PARK CARD (Step 1) ===== */
+    .cp-location-card { border: 1px solid var(--grey-300); border-radius: var(--radius-card); padding: 20px 24px; display: flex; gap: 20px; align-items: flex-start; margin-bottom: 16px; }
+    .cp-loc-info { flex: 1; }
+    .cp-loc-info h3 { font-size: 18px; font-weight: 500; color: var(--primary-main); margin-bottom: 4px; }
+    .cp-loc-info .loc-address { font-size: 14px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+    .cp-loc-info .loc-address svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .cp-loc-meta { display: flex; gap: 16px; flex-wrap: wrap; }
+    .cp-loc-meta .loc-meta-item { font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
+    .cp-loc-meta .loc-meta-item svg { width: 14px; height: 14px; }
+    .cp-loc-meta .loc-meta-item strong { color: var(--text-primary); }
+    .cp-loc-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; border-radius: var(--radius-chip); font-size: 13px; font-weight: 500; }
+    .cp-loc-badge.available { background: #E8F5E9; color: var(--success); }
+    .cp-loc-badge.limited { background: #FFF3E0; color: var(--warning); }
 
     /* ===== CONFIRMATION ===== */
     .confirmation-box { text-align: center; padding: 40px 24px; }
-    .confirmation-box .check-icon {
-      width: 64px; height: 64px; background: rgba(46,125,50,.1);
-      border-radius: 50%; display: flex; align-items: center;
-      justify-content: center; margin: 0 auto 20px;
-    }
+    .confirmation-box .check-icon { width: 64px; height: 64px; background: rgba(46,125,50,.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
     .confirmation-box .check-icon svg { width: 32px; height: 32px; color: var(--success); }
     .confirmation-box h2 { font-size: 24px; font-weight: 400; margin-bottom: 8px; }
-    .confirmation-box .ref-number {
-      background: var(--primary-25); display: inline-block;
-      padding: 8px 20px; border-radius: var(--radius-input);
-      font-weight: 500; font-size: 16px; margin: 12px 0;
-      letter-spacing: 1px; color: var(--primary-main);
-    }
+    .confirmation-box .ref-number { background: var(--primary-25); display: inline-block; padding: 8px 20px; border-radius: var(--radius-input); font-weight: 500; font-size: 16px; margin: 12px 0; letter-spacing: 1px; color: var(--primary-main); }
+    .next-steps { text-align: left; max-width: 500px; margin: 24px auto 0; background: var(--grey-50); border: 1px solid var(--grey-200); border-radius: var(--radius-card); padding: 20px 24px; }
+    .next-steps h3 { font-size: 16px; font-weight: 500; margin-bottom: 12px; }
+    .next-steps ul { list-style: none; padding: 0; }
+    .next-steps li { padding: 6px 0; font-size: 14px; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 8px; }
+    .next-steps li svg { width: 18px; height: 18px; color: var(--success); flex-shrink: 0; margin-top: 2px; }
+    .payment-failure { text-align: center; padding: 40px 24px; display: none; }
+    .payment-failure .fail-icon { width: 64px; height: 64px; background: rgba(211,47,47,.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+    .payment-failure .fail-icon svg { width: 32px; height: 32px; color: var(--error); }
+    .payment-failure h2 { font-size: 24px; font-weight: 400; margin-bottom: 8px; color: var(--error); }
 
     /* ===== STICKY NAV BAR ===== */
-    .sticky-nav-bar {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: #fff; border-top: 1px solid var(--grey-300);
-      padding: 12px 180px; display: flex; align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 -2px 8px rgba(0,0,0,.08); z-index: 90; flex-wrap: wrap; gap: 12px;
-    }
+    .sticky-nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid var(--grey-300); padding: 12px 180px; display: none; align-items: center; justify-content: space-between; box-shadow: 0 -2px 8px rgba(0,0,0,.08); z-index: 90; flex-wrap: wrap; gap: 12px; }
+    .sticky-nav-bar.visible { display: flex; }
     .sticky-nav-bar .nav-left { display: flex; gap: 12px; align-items: center; }
     .sticky-nav-bar .nav-right { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 
+    /* ===== KEBAB MENU ===== */
+    .btn-icon { background: none; border: 1px solid var(--grey-300); border-radius: var(--radius-btn); padding: 8px 10px; cursor: pointer; display: none; align-items: center; justify-content: center; }
+    .kebab-dropdown { position: absolute; bottom: 56px; left: 12px; background: #fff; border: 1px solid var(--grey-300); border-radius: var(--radius-input); box-shadow: var(--shadow-card); display: none; min-width: 160px; z-index: 91; }
+    .kebab-dropdown.open { display: block; }
+    .kebab-dropdown-item { display: block; width: 100%; text-align: left; padding: 12px 16px; border: none; background: none; cursor: pointer; font-size: 14px; font-family: inherit; color: var(--text-primary); }
+    .kebab-dropdown-item:hover { background: var(--grey-50); }
+    .cancel-text-btn { }
+
+    /* ===== PRICING DURATION TABLE ===== */
+    .pricing-duration-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .pricing-duration-table th { text-align: left; padding: 10px 14px; font-weight: 500; font-size: 13px; color: var(--text-secondary); letter-spacing: 0.4px; border-bottom: 2px solid var(--grey-300); background: var(--grey-50); }
+    .pricing-duration-table td { padding: 12px 14px; border-bottom: 1px solid var(--grey-200); cursor: pointer; }
+    .pricing-duration-table tr:hover td { background: var(--grey-50); }
+    .pricing-duration-table tr.selected-duration td { background: var(--primary-25); border-color: var(--primary-main); }
+    .pricing-duration-table input[type="radio"] { accent-color: var(--primary-main); width: 16px; height: 16px; margin-right: 8px; vertical-align: middle; }
+    .pricing-duration-table label { cursor: pointer; font-weight: 500; }
+
+    /* ===== DISCOUNT SECTION ===== */
+    .discount-section { margin-top: 24px; padding: 20px 0; }
+    .discount-section h3 { font-size: 16px; font-weight: 500; letter-spacing: 0.15px; margin-bottom: 16px; }
+    .discount-toggle-row { display: flex; align-items: flex-start; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--grey-200); }
+    .discount-toggle-row:last-child { border-bottom: none; }
+    .discount-toggle-info { flex: 1; }
+    .toggle-title { display: block; font-size: 14px; font-weight: 500; color: var(--text-primary); margin-bottom: 2px; }
+    .toggle-desc { display: block; font-size: 13px; color: var(--text-secondary); }
+
+    /* ===== TOGGLE SWITCH (MUI-style) ===== */
+    .toggle-switch { position: relative; display: inline-block; width: 42px; height: 24px; flex-shrink: 0; margin-top: 2px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-switch .slider { position: absolute; cursor: pointer; inset: 0; background: var(--grey-400); border-radius: 24px; transition: .2s; }
+    .toggle-switch .slider::before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: .2s; }
+    .toggle-switch input:checked + .slider { background: var(--primary-main); }
+    .toggle-switch input:checked + .slider::before { transform: translateX(18px); }
+    .toggle-switch input:focus-visible + .slider { outline: 2px solid var(--primary-main); outline-offset: 2px; }
+
     /* ===== FOOTER ===== */
-    .site-footer {
-      background: var(--primary-800); border-top: 4px solid var(--primary-main);
-      padding: 24px; text-align: center;
-    }
+    .site-footer { background: var(--primary-800); border-top: 4px solid var(--primary-main); padding: 24px; text-align: center; }
     .site-footer p { font-size: 14px; line-height: 24px; letter-spacing: 0.07px; color: #fff; }
     .site-footer a { color: #fff; text-decoration: none; }
     .site-footer a:hover { text-decoration: underline; }
@@ -400,26 +288,12 @@
     /* ===== MOBILE NAV ===== */
     .mobile-nav-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 300; display: none; }
     .mobile-nav-overlay.open { display: block; }
-    .mobile-nav-drawer {
-      position: fixed; top: 0; left: -280px; width: 260px; height: 100vh;
-      background: var(--primary-800); z-index: 301; transition: left 250ms ease;
-      display: flex; flex-direction: column; overflow-y: auto; box-shadow: 4px 0 24px rgba(0,0,0,.2);
-    }
+    .mobile-nav-drawer { position: fixed; top: 0; left: -280px; width: 260px; height: 100vh; background: var(--primary-800); z-index: 301; transition: left 250ms ease; display: flex; flex-direction: column; overflow-y: auto; box-shadow: 4px 0 24px rgba(0,0,0,.2); }
     .mobile-nav-drawer.open { left: 0; }
-    .mobile-nav-drawer .drawer-header {
-      padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,.15);
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .mobile-nav-drawer .drawer-close {
-      background: none; border: none; color: #fff; font-size: 22px;
-      cursor: pointer; padding: 4px 8px; border-radius: var(--radius-input);
-    }
+    .mobile-nav-drawer .drawer-header { padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,.15); display: flex; justify-content: space-between; align-items: center; }
+    .mobile-nav-drawer .drawer-close { background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; padding: 4px 8px; border-radius: var(--radius-input); }
     .mobile-nav-drawer .drawer-links { padding: 12px 0; }
-    .mobile-nav-drawer .drawer-links a {
-      display: flex; align-items: center; gap: 12px;
-      padding: 14px 20px; color: #fff; text-decoration: none;
-      font-size: 15px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px; transition: background 150ms;
-    }
+    .mobile-nav-drawer .drawer-links a { display: flex; align-items: center; gap: 12px; padding: 14px 20px; color: #fff; text-decoration: none; font-size: 15px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px; transition: background 150ms; }
     .mobile-nav-drawer .drawer-links a:hover { background: rgba(255,255,255,.08); }
     .mobile-nav-drawer .drawer-links a.active { color: var(--yellow-500); }
 
@@ -427,9 +301,13 @@
     @media (max-width: 900px) {
       .page-wrapper { margin: 0 24px; }
       .page-layout { grid-template-columns: 1fr; }
+      .summary-sidebar { display: block; position: static; margin-bottom: 16px; order: 99; }
       .sticky-nav-bar { padding: 12px 24px; }
     }
+
+    /* ===== RESPONSIVE — MOBILE (max-width: 640px) ===== */
     @media (max-width: 640px) {
+      /* Header */
       .site-header { padding: 0; height: auto; min-height: 48px; }
       .header-left { gap: 8px; flex: 1; min-width: 0; }
       .header-divider { display: none; }
@@ -437,14 +315,169 @@
       .hamburger-btn { display: flex; align-items: center; justify-content: center; }
       .header-right { gap: 0; }
       .font-toggle { display: none; }
-      .page-wrapper { margin: 0; padding: 8px 16px 120px; }
-      .page-heading { font-size: 14px; }
-      .card { padding: 16px; }
-      .form-row { grid-template-columns: 1fr; gap: 0; }
-      .payment-options { grid-template-columns: 1fr; }
-      .sticky-nav-bar { padding: 12px 16px; }
+      .header-bell { padding: 8px; }
+      .header-avatar { width: 32px; height: 32px; font-size: 12px; }
+
+      /* Page layout */
+      .page-wrapper { margin: 0; padding: 8px 16px 88px; }
+      .page-layout { gap: 16px; }
+
+      /* Page heading */
+      .page-heading { font-size: 14px; font-weight: 400; line-height: 1.43; letter-spacing: 0.17px; }
+
+      /* Breadcrumb */
+      .breadcrumb { font-size: 12px; gap: 4px; margin-bottom: 10px; flex-wrap: wrap; }
+
+      /* Stepper */
       .stepper { gap: 0; margin-bottom: 0; padding: 8px 0 0; }
+      .step-item { min-width: 0; flex: 0 0 auto; }
       .step-item .step-label { display: none; }
+      .step-item .step-num { width: 24px; height: 24px; font-size: 12px; }
+      .step-connector { flex: 1; margin: 12px 4px 0; min-width: 16px; height: 2px; }
+
+      /* Summary sidebar — always visible at bottom */
+      .summary-sidebar { display: block !important; position: static !important; margin-bottom: 16px; order: 99; }
+      .summary-card { padding: 16px; }
+      .summary-card h3 { font-size: 20px; font-weight: 500; margin-bottom: 12px; }
+      .summary-row { font-size: 14px; }
+      .summary-total { font-size: 16px; }
+      .summary-total .s-value { font-size: 20px; }
+
+      /* Cards */
+      .card { padding: 16px; margin-bottom: 16px; }
+      .card h2 { font-size: 18px; font-weight: 500; }
+      .card .subtitle { font-size: 14px; margin-bottom: 16px; }
+
+      /* Forms */
+      .form-group { margin-bottom: 16px; }
+      .form-group label { font-size: 14px; }
+      .form-group .hint { font-size: 12px; }
+      .form-row { grid-template-columns: 1fr; gap: 0; }
+      input[type="text"], input[type="email"], input[type="tel"], input[type="date"], select, textarea {
+        font-size: 16px; padding: 8px 12px; border-radius: 8px;
+      }
+
+      /* Car park location card */
+      .cp-location-card { flex-direction: column; gap: 12px; padding: 14px 16px; }
+      .cp-loc-info h3 { font-size: 16px; }
+      .cp-loc-info .loc-address { font-size: 13px; }
+      .cp-loc-meta { gap: 10px; }
+
+      /* Instruction alert */
+      .instruction-alert { padding: 12px 14px; gap: 10px; }
+      .instruction-alert-title { font-size: 14px; }
+      .instruction-alert-body { font-size: 12px; }
+      .instruction-docs-grid { grid-template-columns: 1fr; gap: 12px; padding: 10px; }
+      .instruction-docs-grid p { font-size: 12px; }
+
+      /* Pricing table */
+      .pricing-duration-table th { font-size: 11px; padding: 8px 10px; }
+      .pricing-duration-table td { padding: 10px; font-size: 13px; }
+      .pricing-duration-table label { font-size: 13px; }
+
+      /* Discount section */
+      .discount-section h3 { font-size: 14px; }
+      .discount-toggle-row { gap: 10px; padding: 10px 0; }
+      .toggle-title { font-size: 13px; }
+      .toggle-desc { font-size: 12px; }
+
+      /* Pricing card */
+      .price-card { padding: 16px; }
+      .price-line { font-size: 14px; }
+      .price-line.total { font-size: 16px; }
+
+      /* Payment options — single column */
+      .payment-options { grid-template-columns: 1fr; gap: 10px; }
+      .payment-option { padding: 12px 16px; }
+      .payment-option .pay-icon { width: 36px; height: 36px; font-size: 16px; }
+      .payment-option .pay-label { font-size: 14px; }
+      .payment-option .pay-desc { font-size: 12px; }
+
+      /* Notices */
+      .notice { padding: 6px 16px; font-size: 14px; gap: 12px; }
+      .notice svg { width: 22px; height: 22px; }
+
+      /* Sticky nav bar */
+      .sticky-nav-bar { padding: 12px 16px; min-height: 72px; height: auto; }
+      .sticky-nav-bar .btn { padding: 8px 16px; font-size: 14px; min-height: 44px; }
+      .kebab-menu-btn { display: inline-flex !important; }
+      .cancel-text-btn { display: none !important; }
+
+      /* Review sections */
+      .review-section-body { padding: 12px; }
+      .review-section-header { padding: 10px 12px; }
+      .review-section-header h3 { font-size: 13px; }
+      .review-row { font-size: 14px; flex-direction: column; gap: 2px; }
+      .review-row .value { text-align: left; max-width: 100%; }
+
+      /* Confirmation */
+      .confirmation-box { padding: 24px 16px; }
+      .confirmation-box h2 { font-size: 20px; }
+      .confirmation-box .ref-number { font-size: 14px; padding: 6px 16px; }
+      .next-steps { padding: 14px 16px; }
+      .next-steps h3 { font-size: 14px; }
+      .next-steps li { font-size: 13px; }
+
+      /* Payment failure */
+      .payment-failure h2 { font-size: 20px; }
+
+      /* T&C modal */
+      #tc-modal > div:nth-child(2) { width: 95%; max-height: 85vh; }
+
+      /* Footer */
+      .site-footer { padding: 24px 16px; }
+      .site-footer p { font-size: 14px; }
+    }
+
+    /* ===== RESPONSIVE — SMALL MOBILE (max-width: 400px) ===== */
+    @media (max-width: 400px) {
+      .site-header { padding: 0; height: auto; min-height: 48px; }
+      .header-left { gap: 8px; flex: 1; min-width: 0; }
+      .site-header .logo-icon { width: 32px; height: 32px; font-size: 12px; }
+      .header-right { gap: 0; }
+
+      .page-wrapper { margin: 0; padding: 8px 16px 88px; }
+      .page-layout { gap: 16px; }
+      .page-heading { font-size: 14px; font-weight: 400; line-height: 1.43; letter-spacing: 0.17px; }
+
+      .stepper { gap: 0; margin-bottom: 0; padding: 8px 0 16px; align-items: center; }
+      .step-item { min-width: 0; flex: 0 0 auto; gap: 0; }
+      .step-item .step-label { display: none; }
+      .step-item .step-num { width: 24px; height: 24px; font-size: 12px; }
+      .step-connector { flex: 1; margin: 4px 4px 0; min-width: 16px; height: 2px; }
+
+      .card h2 { font-size: 18px; font-weight: 500; }
+      .card .subtitle { font-size: 14px; margin-bottom: 16px; }
+      .card { padding: 16px; margin-bottom: 16px; }
+
+      .form-group label { font-size: 14px; margin-bottom: 6px; }
+      .form-group .hint { font-size: 12px; }
+      .form-row { grid-template-columns: 1fr !important; gap: 0 !important; }
+      input[type="text"], input[type="email"], input[type="tel"], input[type="date"], select, textarea {
+        font-size: 16px; padding: 8px 12px; border-radius: 8px;
+      }
+
+      .btn { font-size: 14px; padding: 8px 16px; min-width: 100px; border-radius: 8px; }
+      .sticky-nav-bar { padding: 12px 16px; min-height: 72px; height: auto; }
+      .sticky-nav-bar .btn { padding: 8px 16px; font-size: 14px; min-width: auto; }
+      .kebab-menu-btn { display: inline-flex !important; }
+      .cancel-text-btn { display: none !important; }
+
+      .pricing-duration-table th:nth-child(3), .pricing-duration-table td:nth-child(3) { display: none; }
+
+      .price-card { padding: 16px; }
+      .price-line { font-size: 14px; }
+      .price-line.total { font-size: 16px; }
+
+      .payment-option { padding: 12px 16px; }
+      .payment-option .pay-icon { width: 36px; height: 36px; }
+      .payment-option .pay-label { font-size: 14px; }
+      .payment-option .pay-desc { font-size: 12px; }
+
+      .summary-card { padding: 16px; border-radius: 8px; }
+      .summary-card h3 { font-size: 20px; font-weight: 500; margin-bottom: 12px; }
+      .summary-row { font-size: 14px; }
+      .summary-total .s-value { font-size: 20px; }
     }
     .hidden { display: none !important; }
   </style>
@@ -459,21 +492,19 @@
     <button class="hamburger-btn" aria-label="Open navigation menu" onclick="openMobileNav()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
     </button>
-    <div class="logo">
-      <div class="logo-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" width="20" height="20"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor" opacity=".9"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
-      </div>
+    <div class="logo-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" width="20" height="20"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor" opacity=".9"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
     </div>
     <div class="header-divider"></div>
     <nav class="header-nav" aria-label="Main navigation">
-      <a href="#" onclick="return false;"><span class="nav-text">My Applications</span></a>
-      <a href="car-park-discovery.html" class="active">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-        <span class="nav-text">Car Parks</span>
-      </a>
+      <a href="#" class="active" onclick="return false;"><span class="nav-text">My Applications</span></a>
       <a href="#" onclick="return false;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
         <span class="nav-text">Vehicles</span>
+      </a>
+      <a href="#" onclick="return false;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+        <span class="nav-text">Documents</span>
       </a>
       <a href="#" onclick="return false;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
@@ -490,7 +521,7 @@
     <button class="header-bell" aria-label="Notifications">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
     </button>
-    <div class="header-avatar" aria-label="User account" style="background:rgba(255,255,255,.9); color:var(--text-primary); font-size:12px; letter-spacing:1.5px;">SN</div>
+    <div class="header-avatar" style="background:rgba(255,255,255,.9); color:var(--text-primary);">SN</div>
   </div>
 </header>
 
@@ -504,9 +535,9 @@
     <button class="drawer-close" onclick="closeMobileNav()" aria-label="Close menu">&times;</button>
   </div>
   <div class="drawer-links">
-    <a href="#" onclick="closeMobileNav(); return false;">My Applications</a>
-    <a href="car-park-discovery.html" class="active" onclick="closeMobileNav();">Car Parks</a>
+    <a href="#" class="active" onclick="closeMobileNav(); return false;">My Applications</a>
     <a href="#" onclick="closeMobileNav(); return false;">Vehicles</a>
+    <a href="#" onclick="closeMobileNav(); return false;">Documents</a>
     <a href="#" onclick="closeMobileNav(); return false;">Payment</a>
   </div>
 </div>
@@ -517,49 +548,67 @@
 
     <!-- Breadcrumb -->
     <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href="car-park-discovery.html">Car Parks</a>
+      <a href="car-park-discovery-v2.html">Car Parks</a>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,18 15,12 9,6"/></svg>
-      <a href="car-park-details.html?id=1">Central Multi-Storey</a>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,18 15,12 9,6"/></svg>
-      <span>Purchase Permit</span>
+      <span id="breadcrumbName">Purchase Permit</span>
     </nav>
 
     <!-- Page Heading -->
-    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0; flex-wrap:nowrap; gap:8px;">
-      <h1 class="page-heading" style="margin-bottom:0; flex:1; min-width:0;">Purchase Car Park Permit</h1>
-    </div>
-    <hr style="border:none; border-top:1px solid var(--grey-300); margin:16px 0 16px;">
+    <h1 class="page-heading">New Parking Permit</h1>
 
-    <!-- Availability Notice (US 209080, 209081 - Scenario 4) -->
-    <div class="notice notice-info" id="availNotice">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-      <span><strong>Central Multi-Storey Car Park</strong> — 42 bays available. Availability is validated before purchase completion.</span>
-    </div>
-
-    <!-- Unavailability Error (hidden by default) -->
-    <div class="notice notice-error hidden" id="unavailNotice">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
-      <span>This car park is now <strong>full</strong>. Please select a different car park. <a href="car-park-discovery.html" style="color:var(--primary-main);">Back to Car Parks</a></span>
+    <!-- Duplicate prevention notice (hidden by default) -->
+    <div class="notice notice-warning hidden" id="duplicateNotice">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+      <span>You already have an active permit for this car park (CP-2026-003211). Purchasing again may result in a duplicate charge.</span>
     </div>
 
     <div class="page-layout">
       <div class="wizard-main">
 
-        <!-- Stepper -->
+        <!-- Instruction Alert Banner (visible on ALL steps) -->
+        <div class="instruction-alert" id="instruction-alert">
+          <div class="instruction-alert-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          </div>
+          <div class="instruction-alert-content">
+            <button class="instruction-alert-title" onclick="toggleInstructionAlert()" aria-expanded="true">
+              Instruction for Permit Purchase
+            </button>
+            <div class="instruction-alert-body" id="instruction-alert-body">
+              <p style="margin-bottom:8px;">You must submit an application before purchasing a car park permit. Make sure your details are accurate and have the following documents ready.</p>
+              <p style="margin-bottom:8px;"><strong>Important:</strong> Apply at least <strong>3 working days</strong> before your desired permit start date.</p>
+              <div class="instruction-docs-grid">
+                <div>
+                  <p><strong>Proof of residency</strong> (any one)</p>
+                  <p>Bank Statement, Utility Bill (last 3 months), Driving Licence, or Signed Tenancy Agreement</p>
+                </div>
+                <div>
+                  <p><strong>Proof of vehicle ownership</strong> (any one)</p>
+                  <p>V5C, Motor Insurance, Lease/Hire Agreement, or Recent Bill of Sale</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="instruction-alert-toggle" onclick="toggleInstructionAlert()" aria-label="Toggle instruction details">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" id="instruction-chevron"><polyline points="18 15 12 9 6 15"/></svg>
+          </button>
+        </div>
+
+        <!-- Stepper: Car Park → Vehicle → Pricing → Checkout -->
         <nav class="stepper" aria-label="Purchase progress">
-          <div class="step-item completed" id="step-ind-1">
+          <div class="step-item active" id="step-ind-1">
             <span class="step-num"><span>1</span></span>
             <span class="step-label">Car Park</span>
           </div>
-          <div class="step-connector completed" id="conn-1"></div>
-          <div class="step-item active" id="step-ind-2">
+          <div class="step-connector" id="conn-1"></div>
+          <div class="step-item" id="step-ind-2">
             <span class="step-num"><span>2</span></span>
-            <span class="step-label">Permit Details</span>
+            <span class="step-label">Vehicle</span>
           </div>
           <div class="step-connector" id="conn-2"></div>
           <div class="step-item" id="step-ind-3">
             <span class="step-num"><span>3</span></span>
-            <span class="step-label">Vehicle</span>
+            <span class="step-label">Pricing</span>
           </div>
           <div class="step-connector" id="conn-3"></div>
           <div class="step-item" id="step-ind-4">
@@ -568,205 +617,191 @@
           </div>
         </nav>
 
-        <!-- ============ STEP 2: PERMIT DETAILS (US 209081) ============ -->
-        <div id="step-2" class="wizard-step">
+        <!-- ============ STEP 1: CAR PARK LOCATION ============ -->
+        <div id="step-1" class="wizard-step">
           <div class="card">
-            <h2>Permit Configuration</h2>
-            <p class="subtitle">Configure your car park permit for Central Multi-Storey Car Park.</p>
+            <h2>Car Park Location</h2>
+            <p class="subtitle">Your selected car park from the discovery page.</p>
 
-            <div class="form-group">
-              <label for="permitDuration">Permit Duration *</label>
-              <select id="permitDuration" onchange="updatePricing()">
-                <option value="">Select duration…</option>
-                <option value="1week">1 Week — £15.00</option>
-                <option value="1month">1 Month — £45.00</option>
-                <option value="3months" selected>3 Months — £120.00</option>
-                <option value="6months">6 Months — £210.00</option>
-                <option value="12months">12 Months — £380.00</option>
-              </select>
+            <div class="cp-location-card">
+              <div class="cp-loc-info">
+                <h3 id="cpName">Central Multi-Storey Car Park</h3>
+                <div class="loc-address">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <span id="cpAddress">High Street, Town Centre, AB1 2CD</span>
+                </div>
+                <div class="cp-loc-meta">
+                  <div class="loc-meta-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    Type: <strong id="cpType">Off-Street</strong>
+                  </div>
+                </div>
+              </div>
             </div>
+
+            <div class="notice notice-info">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+              <span>Permit purchase is subject to availability. If your selected car park is no longer available, you will be notified before payment.</span>
+            </div>
+
+            <p style="font-size:14px; color:var(--text-secondary);">Not the right car park? <a href="car-park-discovery-v2.html" style="color:var(--primary-main); font-weight:500;">Go back to discovery</a> to choose another.</p>
+          </div>
+        </div>
+
+        <!-- ============ STEP 2: PRICING ============ -->
+        <div id="step-2" class="wizard-step hidden">
+          <div class="card">
+            <h2>Permit Pricing</h2>
+            <p class="subtitle">Select your permit duration and review pricing.</p>
 
             <div class="form-group">
               <label for="startDate">Start Date *</label>
               <input type="date" id="startDate" value="2026-05-05">
             </div>
 
-            <div class="form-group">
-              <label for="bayType">Bay Type *</label>
-              <select id="bayType">
-                <option value="standard" selected>Standard</option>
-                <option value="disabled">Disabled</option>
-                <option value="electric">Electric Vehicle</option>
-              </select>
+            <!-- Pricing Duration Table -->
+            <h3 style="font-size:16px; font-weight:500; letter-spacing:0.15px; margin-top:20px; margin-bottom:12px;">Pricing Section</h3>
+            <div style="overflow-x:auto;">
+              <table class="pricing-duration-table" id="pricing-duration-table">
+                <thead>
+                  <tr>
+                    <th>Duration</th>
+                    <th>Permit Price</th>
+                    <th>Diesel Surcharge</th>
+                    <th>Sub Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr onclick="selectDuration('1week')" id="dur-1week">
+                    <td><label><input type="radio" name="duration" value="1week"> 1 Week</label></td>
+                    <td>£12.50</td>
+                    <td>£2.50</td>
+                    <td>£15.00</td>
+                  </tr>
+                  <tr onclick="selectDuration('1month')" id="dur-1month">
+                    <td><label><input type="radio" name="duration" value="1month"> 1 Month</label></td>
+                    <td>£37.50</td>
+                    <td>£7.50</td>
+                    <td>£45.00</td>
+                  </tr>
+                  <tr class="selected-duration" onclick="selectDuration('3months')" id="dur-3months">
+                    <td><label><input type="radio" name="duration" value="3months" checked> 3 Months</label></td>
+                    <td>£100.00</td>
+                    <td>£20.00</td>
+                    <td>£120.00</td>
+                  </tr>
+                  <tr onclick="selectDuration('6months')" id="dur-6months">
+                    <td><label><input type="radio" name="duration" value="6months"> 6 Months</label></td>
+                    <td>£175.00</td>
+                    <td>£35.00</td>
+                    <td>£210.00</td>
+                  </tr>
+                  <tr onclick="selectDuration('12months')" id="dur-12months">
+                    <td><label><input type="radio" name="duration" value="12months"> 12 Months</label></td>
+                    <td>£316.67</td>
+                    <td>£63.33</td>
+                    <td>£380.00</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
 
-            <!-- Pricing Breakdown (US 209081 - Scenario 3) -->
-            <div class="price-card" style="margin-top:20px;">
-              <div class="price-line">
-                <span class="p-label">Base Price (3 Months)</span>
-                <span class="p-value" id="basePrice">£120.00</span>
+            <!-- Discount Section -->
+            <div class="discount-section">
+              <h3>Discount</h3>
+              <div class="discount-toggle-row">
+                <label class="toggle-switch">
+                  <input type="checkbox" id="blue-badge-toggle" onchange="updatePricing()" />
+                  <span class="slider"></span>
+                </label>
+                <div class="discount-toggle-info">
+                  <span class="toggle-title">Are you a Blue Badge holder?</span>
+                  <span class="toggle-desc">Blue Badge holders receive a 25% discount on permit price.</span>
+                </div>
               </div>
-              <div class="price-line">
-                <span class="p-label">Bay Type Surcharge</span>
-                <span class="p-value" id="surcharge">£0.00</span>
-              </div>
-              <div class="price-line total">
-                <span class="p-label">Total</span>
-                <span class="p-value" id="totalPrice" style="color:var(--primary-main);">£120.00</span>
+              <div class="discount-toggle-row">
+                <label class="toggle-switch">
+                  <input type="checkbox" id="state-pension-toggle" onchange="updatePricing()" />
+                  <span class="slider"></span>
+                </label>
+                <div class="discount-toggle-info">
+                  <span class="toggle-title">Do you receive a state pension?</span>
+                  <span class="toggle-desc">State pension recipients receive a 15% discount on permit price.</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="nav-buttons">
-            <a href="car-park-details.html?id=1" class="btn btn-text" style="text-decoration:none;">← BACK</a>
-            <div class="nav-buttons-right">
-              <button class="btn btn-primary" onclick="goToStep(3)">NEXT: VEHICLE DETAILS</button>
+            <div style="height:1px; background:var(--grey-200); margin:20px 0;"></div>
+
+            <!-- Price Summary -->
+            <div class="price-card" id="price-summary" style="margin-top:16px;">
+              <div class="price-line"><span class="p-label">Subtotal:</span><span class="p-value" id="ps-subtotal">£100.00</span></div>
+              <div class="price-line" id="ps-discount-row" style="display:none;"><span class="p-label">Discount:</span><span class="p-value" id="ps-discount" style="color:var(--success);">-£0.00</span></div>
+              <div class="price-line"><span class="p-label">Diesel Surcharge:</span><span class="p-value" id="ps-admin">£20.00</span></div>
+              <div class="price-line"><span class="p-label">VAT (20%):</span><span class="p-value" id="ps-vat">£0.00</span></div>
+              <div class="price-line total"><span class="p-label">Total:</span><span class="p-value" id="ps-total" style="color:var(--primary-main);">£120.00</span></div>
             </div>
+            <p style="font-size:12px; color:var(--text-disabled); margin-top:8px; letter-spacing:0.4px;">All prices are inclusive of VAT at the standard rate (20%).</p>
           </div>
         </div>
 
-        <!-- ============ STEP 3: VEHICLE DETAILS ============ -->
+        <!-- ============ STEP 3: CHECKOUT ============ -->
         <div id="step-3" class="wizard-step hidden">
           <div class="card">
-            <h2>Vehicle Details</h2>
-            <p class="subtitle">Enter your vehicle registration to associate with this permit.</p>
+            <h2>Checkout</h2>
+            <p class="subtitle">Select a payment method and complete your purchase.</p>
 
-            <div class="form-group">
-              <label for="vrn">Vehicle Registration Number (VRN) *</label>
-              <input type="text" id="vrn" placeholder="e.g. AB12 CDE" style="text-transform:uppercase; max-width:200px;">
-            </div>
-
-            <div class="form-group">
-              <label for="vehicleMake">Vehicle Make</label>
-              <input type="text" id="vehicleMake" placeholder="e.g. Ford">
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="vehicleModel">Vehicle Model</label>
-                <input type="text" id="vehicleModel" placeholder="e.g. Focus">
+            <div>
+              <h3 style="font-size:16px; font-weight:500; margin-bottom:12px;">Payment Method</h3>
+              <!-- Primary payment methods (2x2 grid) -->
+              <div class="payment-options" id="payment-options-container"></div>
+              <!-- More payment options (expandable) -->
+              <div class="more-payment-list" id="more-payment-list">
+                <h4>More Payment Option</h4>
+                <div id="more-payment-items"></div>
               </div>
+              <!-- Card fields (shown only when Credit/Debit Card selected) -->
+              <div id="card-fields">
+                <div class="form-group"><label for="card-name">Name on card</label><input type="text" id="card-name" placeholder="J. Smith" /></div>
+                <div class="form-group"><label for="card-number">Card number</label><input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19" /></div>
+                <div class="form-row">
+                  <div class="form-group"><label for="card-expiry">Expiry date</label><input type="text" id="card-expiry" placeholder="MM/YY" maxlength="5" /></div>
+                  <div class="form-group"><label for="card-cvv">Security code (CVV)</label><input type="text" id="card-cvv" placeholder="123" maxlength="4" /></div>
+                </div>
+              </div>
+
               <div class="form-group">
-                <label for="vehicleColour">Vehicle Colour</label>
-                <input type="text" id="vehicleColour" placeholder="e.g. Blue">
+                <label for="email-confirm">Email for confirmation</label>
+                <p class="hint" style="font-size:12px; color:var(--text-disabled); margin-bottom:6px;">We'll send your confirmation and reference number to this address.</p>
+                <input type="email" id="email-confirm" placeholder="your.email@example.com" />
+              </div>
+
+              <!-- Terms & Conditions -->
+              <div style="margin-top:16px; padding:16px; background:var(--grey-50); border-radius:var(--radius-input); border:1px solid var(--grey-300);">
+                <p style="font-size:14px; line-height:1.43;">By clicking <strong>Save and Continue</strong>, you agree to our <a href="#" onclick="openTCModal(); return false;" style="color:var(--primary-main); font-weight:500;">Terms and Conditions</a> for car park permit purchase.</p>
               </div>
             </div>
 
-            <div class="form-group">
-              <label for="fuelType">Fuel Type</label>
-              <select id="fuelType">
-                <option value="petrol">Petrol</option>
-                <option value="diesel">Diesel</option>
-                <option value="electric">Electric</option>
-                <option value="hybrid">Hybrid</option>
-              </select>
-              <p class="hint">Diesel vehicles may incur an additional surcharge.</p>
-            </div>
-          </div>
-
-          <div class="nav-buttons">
-            <button class="btn btn-text" onclick="goToStep(2)">← BACK</button>
-            <div class="nav-buttons-right">
-              <button class="btn btn-primary" onclick="goToStep(4)">NEXT: REVIEW & PAY</button>
-            </div>
           </div>
         </div>
 
-        <!-- ============ STEP 4: CHECKOUT ============ -->
-        <div id="step-4" class="wizard-step hidden">
-          <div class="card">
-            <h2>Review & Confirm</h2>
-            <p class="subtitle">Please review your permit details before proceeding to payment.</p>
-
-            <!-- Car Park Review -->
-            <div class="review-section">
-              <div class="review-section-header">
-                <h3>Car Park</h3>
-                <button class="edit-link" onclick="goToStep(2)">EDIT</button>
-              </div>
-              <div class="review-section-body">
-                <div class="review-row"><span class="label">Name</span><span class="value">Central Multi-Storey Car Park</span></div>
-                <div class="review-row"><span class="label">Address</span><span class="value">High Street, Town Centre, AB1 2CD</span></div>
-                <div class="review-row"><span class="label">Type</span><span class="value">Off-Street</span></div>
-              </div>
+        <!-- T&C Modal -->
+        <div id="tc-modal" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:200; display:flex; align-items:center; justify-content:center;" onclick="closeTCModal(event)">
+          <div style="background:#fff; border-radius:var(--radius-card); max-width:600px; width:90%; max-height:80vh; overflow-y:auto; box-shadow:0 8px 32px rgba(0,0,0,.2);" onclick="event.stopPropagation()">
+            <div style="padding:20px 24px; border-bottom:1px solid var(--grey-300); display:flex; justify-content:space-between; align-items:center;">
+              <h3 style="font-size:18px; font-weight:500;">Terms and Conditions</h3>
+              <button onclick="closeTCModal()" style="background:none; border:none; font-size:20px; cursor:pointer; padding:4px 8px; color:var(--text-secondary);">&times;</button>
             </div>
-
-            <!-- Permit Review -->
-            <div class="review-section">
-              <div class="review-section-header">
-                <h3>Permit Details</h3>
-                <button class="edit-link" onclick="goToStep(2)">EDIT</button>
-              </div>
-              <div class="review-section-body">
-                <div class="review-row"><span class="label">Duration</span><span class="value" id="reviewDuration">3 Months</span></div>
-                <div class="review-row"><span class="label">Start Date</span><span class="value" id="reviewStart">05/05/2026</span></div>
-                <div class="review-row"><span class="label">Bay Type</span><span class="value" id="reviewBay">Standard</span></div>
-              </div>
+            <div style="padding:24px; font-size:14px; line-height:1.6; color:var(--text-primary);">
+              <p><strong>1. Permit Terms</strong><br>By purchasing this parking permit, you agree to abide by the terms set forth by the local authority for the use of designated parking bays.</p>
+              <p style="margin-top:12px;"><strong>2. Payment</strong><br>All fees are non-refundable once the permit has been activated. Cancellation before activation may be eligible for a partial refund subject to council policy.</p>
+              <p style="margin-top:12px;"><strong>3. Duration</strong><br>The permit is valid only for the duration selected in your application. Any extension must be applied for separately.</p>
+              <p style="margin-top:12px;"><strong>4. Compliance</strong><br>You must display or register the permit as required. Failure to comply may result in enforcement action.</p>
+              <p style="margin-top:12px;"><strong>5. Liability</strong><br>The council is not liable for any loss or damage to vehicles while parked in the designated area.</p>
             </div>
-
-            <!-- Vehicle Review -->
-            <div class="review-section">
-              <div class="review-section-header">
-                <h3>Vehicle</h3>
-                <button class="edit-link" onclick="goToStep(3)">EDIT</button>
-              </div>
-              <div class="review-section-body">
-                <div class="review-row"><span class="label">VRN</span><span class="value" id="reviewVRN">AB12 CDE</span></div>
-                <div class="review-row"><span class="label">Make / Model</span><span class="value" id="reviewVehicle">Ford Focus</span></div>
-                <div class="review-row"><span class="label">Fuel Type</span><span class="value" id="reviewFuel">Petrol</span></div>
-              </div>
-            </div>
-
-            <!-- Payment -->
-            <h2 style="margin-top:24px;">Payment Method</h2>
-            <div class="payment-options" style="margin-top:16px;">
-              <div class="payment-option selected" onclick="selectPayment(this)">
-                <div class="pay-icon">💳</div>
-                <div class="pay-info">
-                  <span class="pay-label">Card Payment</span>
-                  <span class="pay-desc">Debit or credit card</span>
-                </div>
-                <div class="pay-check"></div>
-              </div>
-              <div class="payment-option" onclick="selectPayment(this)">
-                <div class="pay-icon">🏦</div>
-                <div class="pay-info">
-                  <span class="pay-label">Direct Debit</span>
-                  <span class="pay-desc">Set up recurring payments</span>
-                </div>
-                <div class="pay-check"></div>
-              </div>
-            </div>
-
-            <!-- Pricing Summary -->
-            <div class="price-card">
-              <div class="price-line">
-                <span class="p-label">Permit (3 Months)</span>
-                <span class="p-value">£120.00</span>
-              </div>
-              <div class="price-line">
-                <span class="p-label">Surcharges</span>
-                <span class="p-value">£0.00</span>
-              </div>
-              <div class="price-line total">
-                <span class="p-label">Total Due</span>
-                <span class="p-value" style="color:var(--primary-main); font-size:20px;">£120.00</span>
-              </div>
-            </div>
-
-            <!-- Terms -->
-            <div style="margin-top:20px;">
-              <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer; font-size:14px;">
-                <input type="checkbox" id="termsCheck" style="accent-color:var(--primary-main); width:18px; height:18px; margin-top:2px;">
-                <span>I agree to the <a href="#" style="color:var(--primary-main);">terms and conditions</a> for car park permit purchase.</span>
-              </label>
-            </div>
-          </div>
-
-          <div class="nav-buttons">
-            <button class="btn btn-text" onclick="goToStep(3)">← BACK</button>
-            <div class="nav-buttons-right">
-              <button class="btn btn-primary" onclick="submitPurchase()">CONFIRM & PAY £120.00</button>
+            <div style="padding:16px 24px; border-top:1px solid var(--grey-300); display:flex; gap:12px; justify-content:flex-end;">
+              <button class="btn btn-secondary" onclick="closeTCModal()">Cancel</button>
+              <button class="btn btn-primary" onclick="closeTCModal()">I Understand</button>
             </div>
           </div>
         </div>
@@ -781,23 +816,81 @@
               <h2>Permit Purchased Successfully!</h2>
               <p style="color:var(--text-secondary); font-size:16px; margin-top:8px;">Your car park permit has been issued.</p>
               <div class="ref-number">CP-2026-004587</div>
+
+              <div class="notice notice-success" style="margin-top:20px; text-align:left;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <span>A confirmation email has been sent to <strong>s.newman@email.com</strong> with your permit details and receipt.</span>
+              </div>
+
               <div style="margin-top:24px;">
                 <div class="review-section" style="text-align:left; max-width:400px; margin:0 auto;">
                   <div class="review-section-header"><h3>Permit Details</h3></div>
                   <div class="review-section-body">
-                    <div class="review-row"><span class="label">Car Park</span><span class="value">Central Multi-Storey</span></div>
-                    <div class="review-row"><span class="label">Duration</span><span class="value">3 Months</span></div>
-                    <div class="review-row"><span class="label">Start</span><span class="value">05/05/2026</span></div>
-                    <div class="review-row"><span class="label">End</span><span class="value">05/08/2026</span></div>
-                    <div class="review-row"><span class="label">VRN</span><span class="value">AB12 CDE</span></div>
-                    <div class="review-row"><span class="label">Amount Paid</span><span class="value" style="color:var(--primary-main);">£120.00</span></div>
+                    <div class="review-row"><span class="label">Car Park</span><span class="value" id="confCP">Central Multi-Storey</span></div>
+                    <div class="review-row"><span class="label">Duration</span><span class="value" id="confDuration">3 Months</span></div>
+                    <div class="review-row"><span class="label">Start</span><span class="value" id="confStart">05/05/2026</span></div>
+                    <div class="review-row"><span class="label">End</span><span class="value" id="confEnd">05/08/2026</span></div>
+                    <div class="review-row"><span class="label">Amount Paid</span><span class="value" id="confAmount" style="color:var(--primary-main);">£120.00 <small style="color:var(--text-disabled); font-weight:400;">inc. VAT</small></span></div>
                   </div>
                 </div>
               </div>
-              <div style="margin-top:24px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
-                <a href="car-park-discovery.html" class="btn btn-primary" style="text-decoration:none;">BROWSE MORE CAR PARKS</a>
-                <button class="btn btn-secondary" onclick="window.print()">DOWNLOAD RECEIPT</button>
+
+              <div class="next-steps">
+                <h3>What happens next?</h3>
+                <ul>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>
+                    Your permit is now active and linked to your vehicle registration.
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>
+                    Enforcement officers can verify your permit via ANPR cameras.
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>
+                    You can manage, renew, or cancel your permit from "My Permits".
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>
+                    A renewal reminder will be sent before your permit expires.
+                  </li>
+                </ul>
               </div>
+
+              <div style="margin-top:24px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                <a href="#" class="btn btn-primary" style="text-decoration:none;" onclick="alert('Navigate to My Permits page'); return false;">VIEW MY PERMITS</a>
+                <a href="car-park-discovery-v2.html" class="btn btn-secondary" style="text-decoration:none;">BROWSE MORE CAR PARKS</a>
+                <button class="btn btn-secondary" onclick="window.print()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  DOWNLOAD RECEIPT
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ PAYMENT FAILURE STATE ============ -->
+        <div id="step-fail" class="wizard-step hidden">
+          <div class="card">
+            <div class="payment-failure" style="display:block;">
+              <div class="fail-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+              </div>
+              <h2>Payment Failed</h2>
+              <p style="color:var(--text-secondary); font-size:16px; margin-top:8px;">Your payment could not be processed. You have not been charged.</p>
+              <p style="color:var(--text-secondary); font-size:14px; margin-top:12px;">Error: Card declined by issuing bank. Please check your card details or try a different payment method.</p>
+
+              <div style="margin-top:24px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="goToStep(4)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+                  TRY AGAIN
+                </button>
+                <button class="btn btn-secondary" onclick="goToStep(4)">CHOOSE DIFFERENT PAYMENT METHOD</button>
+              </div>
+              <p style="margin-top:16px; font-size:13px; color:var(--text-disabled);">
+                If the problem persists, please contact support at
+                <a href="tel:+441234567890" style="color:var(--primary-main);">01234 567 890</a>
+              </p>
             </div>
           </div>
         </div>
@@ -811,15 +904,15 @@
           <div class="summary-body">
             <div class="summary-row">
               <span class="s-label">Car Park</span>
-              <span class="s-value">Central Multi-Storey</span>
+              <span class="s-value" id="sideCP">Central Multi-Storey</span>
             </div>
             <div class="summary-row">
               <span class="s-label">Type</span>
-              <span class="s-value">Off-Street</span>
+              <span class="s-value" id="sideType">Off-Street</span>
             </div>
             <div class="summary-row">
               <span class="s-label">Address</span>
-              <span class="s-value">High Street, AB1 2CD</span>
+              <span class="s-value" id="sideAddr">High Street, AB1 2CD</span>
             </div>
             <div class="summary-divider"></div>
             <div class="summary-row">
@@ -831,18 +924,32 @@
               <span class="s-value" id="sideStart">05/05/2026</span>
             </div>
             <div class="summary-row">
-              <span class="s-label">Bay Type</span>
-              <span class="s-value" id="sideBay">Standard</span>
-            </div>
-            <div class="summary-row">
-              <span class="s-label">Vehicle</span>
-              <span class="s-value" id="sideVRN">—</span>
+              <span class="s-label">Discount</span>
+              <span class="s-value" id="sideDiscount">None</span>
             </div>
             <div class="summary-divider"></div>
             <div class="summary-total">
               <span class="s-label">Total</span>
               <span class="s-value" id="sideTotal">£120.00</span>
             </div>
+            <div style="font-size:11px; color:var(--text-disabled); text-align:right; margin-top:2px;">inc. VAT</div>
+          </div>
+        </div>
+
+        <!-- Demo controls -->
+        <div class="card" style="margin-top:16px;">
+          <h2 style="font-size:14px; color:var(--text-disabled);">Demo Controls</h2>
+          <div style="margin-top:8px;">
+            <label style="font-size:12px; cursor:pointer; display:flex; align-items:center; gap:6px; color:var(--text-disabled);">
+              <input type="checkbox" id="demoFailToggle">
+              Simulate payment failure on next submit
+            </label>
+          </div>
+          <div style="margin-top:8px;">
+            <label style="font-size:12px; cursor:pointer; display:flex; align-items:center; gap:6px; color:var(--text-disabled);">
+              <input type="checkbox" id="demoDuplicateToggle" onchange="toggleDuplicateNotice()">
+              Show duplicate permit warning
+            </label>
           </div>
         </div>
       </aside>
@@ -851,116 +958,365 @@
   </div>
 </main>
 
-<!-- Sticky Nav Bar -->
-<div class="sticky-nav-bar" id="stickyNav">
+<!-- Sticky bottom nav (dispensation/suspension pattern) -->
+<div class="sticky-nav-bar visible" id="stickyNav">
   <div class="nav-left">
-    <button class="btn btn-text" onclick="cancelPurchase()">CANCEL</button>
+    <button class="btn btn-icon kebab-menu-btn" id="kebab-menu-btn" onclick="toggleKebabMenu()" aria-label="More options">
+      <svg width="4" height="20" viewBox="0 0 4 20" fill="none"><circle cx="2" cy="2" r="2" fill="#5F6368"/><circle cx="2" cy="10" r="2" fill="#5F6368"/><circle cx="2" cy="18" r="2" fill="#5F6368"/></svg>
+    </button>
+    <div class="kebab-dropdown" id="kebab-dropdown">
+      <button class="kebab-dropdown-item" onclick="cancelPurchase(); toggleKebabMenu();">Cancel</button>
+    </div>
+    <button class="btn btn-secondary" id="sticky-back-btn" onclick="stickyBack()" style="display:none;">Back</button>
+    <button class="btn btn-text cancel-text-btn" onclick="cancelPurchase()">Cancel</button>
   </div>
   <div class="nav-right">
-    <span style="font-size:14px; color:var(--text-secondary);" id="stickyPrice">Total: <strong style="color:var(--primary-main); font-size:18px;">£120.00</strong></span>
+    <button class="btn btn-primary" id="sticky-next-btn" onclick="stickyNext()">Save and Continue</button>
   </div>
 </div>
 
 <!-- ===== FOOTER ===== -->
 <footer class="site-footer" role="contentinfo">
-  <p>&copy; 2026 Customer Portal &mdash; Car Park Permit Purchase &bull;
+  <p>&copy; 2026 Customer Portal &mdash; New Parking Permit &bull;
     <a href="#">Privacy Policy</a> &bull; <a href="#">Terms</a> &bull; <a href="#">Accessibility</a>
   </p>
 </footer>
 
 <script>
   /* ===== FONT SIZE ===== */
-  function setFontSize(size) {
-    document.body.classList.remove('font-large', 'font-xl');
-    if (size === 'large') document.body.classList.add('font-large');
-    if (size === 'xl') document.body.classList.add('font-xl');
-    document.querySelectorAll('.font-toggle button').forEach(b => b.classList.remove('active'));
-    document.getElementById('font-' + size)?.classList.add('active');
+  function setFontSize(s) {
+    document.body.classList.remove('font-large','font-xl');
+    if(s==='large') document.body.classList.add('font-large');
+    if(s==='xl') document.body.classList.add('font-xl');
+    document.querySelectorAll('.font-toggle button').forEach(b=>b.classList.remove('active'));
+    document.getElementById('font-'+s)?.classList.add('active');
   }
 
   /* ===== MOBILE NAV ===== */
-  function openMobileNav() {
-    document.getElementById('mobile-nav-overlay').classList.add('open');
-    document.getElementById('mobile-nav-drawer').classList.add('open');
+  function openMobileNav(){ document.getElementById('mobile-nav-overlay').classList.add('open'); document.getElementById('mobile-nav-drawer').classList.add('open'); }
+  function closeMobileNav(){ document.getElementById('mobile-nav-overlay').classList.remove('open'); document.getElementById('mobile-nav-drawer').classList.remove('open'); }
+
+  /* ===== KEBAB MENU ===== */
+  function toggleKebabMenu() {
+    document.getElementById('kebab-dropdown').classList.toggle('open');
   }
-  function closeMobileNav() {
-    document.getElementById('mobile-nav-overlay').classList.remove('open');
-    document.getElementById('mobile-nav-drawer').classList.remove('open');
+  document.addEventListener('click', e => {
+    if(!e.target.closest('.kebab-menu-btn') && !e.target.closest('.kebab-dropdown')) {
+      document.getElementById('kebab-dropdown')?.classList.remove('open');
+    }
+  });
+
+  /* ===== PARSE URL PARAMS (from discovery page) ===== */
+  function getParams() {
+    const p = new URLSearchParams(window.location.search);
+    return {
+      name: p.get('name') || 'Central Multi-Storey Car Park',
+      address: p.get('address') || 'High Street, Town Centre, AB1 2CD',
+      price: p.get('price') || '45',
+      type: p.get('type') || 'off-street'
+    };
+  }
+  function initFromParams() {
+    const cp = getParams();
+    document.getElementById('cpName').textContent = cp.name;
+    document.getElementById('cpAddress').textContent = cp.address;
+    document.getElementById('cpType').textContent = cp.type.replace('-',' ').replace(/\b\w/g,c=>c.toUpperCase());
+    document.getElementById('breadcrumbName').textContent = cp.name + ' — Purchase Permit';
+    // Update sidebar
+    const shortName = cp.name.length > 22 ? cp.name.substring(0,22)+'…' : cp.name;
+    document.getElementById('sideCP').textContent = shortName;
+    document.getElementById('sideType').textContent = cp.type.replace('-',' ').replace(/\b\w/g,c=>c.toUpperCase());
+    document.getElementById('sideAddr').textContent = cp.address.length > 28 ? cp.address.substring(0,28)+'…' : cp.address;
+    document.getElementById('confCP').textContent = shortName;
   }
 
   /* ===== STEP NAVIGATION ===== */
-  let currentStep = 2;
-  function goToStep(n) {
-    // Hide all steps
-    document.querySelectorAll('.wizard-step').forEach(s => s.classList.add('hidden'));
-    document.getElementById('step-' + n)?.classList.remove('hidden');
+  let currentStep = 1;
+  const TOTAL_STEPS = 4;
+  // Vehicle step (step 2) is in the stepper but SKIPPED in the flow.
+  // Flow: 1 (Car Park) → 3 (Pricing) → 4 (Checkout)
+  const SKIP_STEPS = [2]; // steps to skip in forward/back navigation
 
-    // Update stepper indicators
-    for (let i = 1; i <= 4; i++) {
+  function getNextStep(from) {
+    let n = from + 1;
+    while (SKIP_STEPS.includes(n) && n <= TOTAL_STEPS) n++;
+    return n;
+  }
+  function getPrevStep(from) {
+    let n = from - 1;
+    while (SKIP_STEPS.includes(n) && n >= 1) n--;
+    return n;
+  }
+
+  function goToStep(n) {
+    document.querySelectorAll('.wizard-step').forEach(s => s.classList.add('hidden'));
+    // Map step-ind numbers: steps 1,3,4 have content in step-1, step-2 (pricing), step-3 (checkout)
+    // But now we use step-1, step-3, step-3 for content IDs.
+    // Actually content divs: step-1 = Car Park, step-2 = Pricing (was step-2), step-3 = Checkout (was step-3)
+    // We need to map stepper step n to content div:
+    // Stepper step 1 → content step-1
+    // Stepper step 3 → content step-2 (Pricing)
+    // Stepper step 4 → content step-3 (Checkout)
+    const stepContentMap = { 1: 'step-1', 3: 'step-2', 4: 'step-3', 5: 'step-5', 'fail': 'step-fail' };
+    const contentId = stepContentMap[n] || ('step-' + n);
+    document.getElementById(contentId)?.classList.remove('hidden');
+
+    for (let i = 1; i <= TOTAL_STEPS; i++) {
       const ind = document.getElementById('step-ind-' + i);
-      const conn = document.getElementById('conn-' + (i - 1));
+      const conn = document.getElementById('conn-' + i);
       if (!ind) continue;
       ind.classList.remove('active', 'completed');
       if (i < n) { ind.classList.add('completed'); if (conn) conn.classList.add('completed'); }
       else if (i === n) ind.classList.add('active');
       else { if (conn) conn.classList.remove('completed'); }
     }
-
-    // Update sidebar
+    // Mark skipped step 2 as completed when we're past it
     if (n >= 3) {
-      document.getElementById('sideVRN').textContent =
-        document.getElementById('vrn')?.value?.toUpperCase() || '—';
+      document.getElementById('step-ind-2')?.classList.add('completed');
+      const conn1 = document.getElementById('conn-1');
+      if (conn1) conn1.classList.add('completed');
+      const conn2 = document.getElementById('conn-2');
+      if (conn2) conn2.classList.add('completed');
+    }
+    // Show/hide sticky nav bar
+    const stickyNav = document.getElementById('stickyNav');
+    if (n === 5 || n === 'fail') {
+      stickyNav.classList.remove('visible');
+    } else {
+      stickyNav.classList.add('visible');
+    }
+    // Update sticky Back btn visibility
+    const backBtn = document.getElementById('sticky-back-btn');
+    if (n > 1 && n <= TOTAL_STEPS) {
+      backBtn.style.display = '';
+    } else {
+      backBtn.style.display = 'none';
+    }
+    // Update sticky Next btn text
+    const nextBtn = document.getElementById('sticky-next-btn');
+    if (n === TOTAL_STEPS) {
+      nextBtn.textContent = 'Confirm & Pay';
+    } else {
+      nextBtn.textContent = 'Save and Continue';
     }
     currentStep = n;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  /* ===== PRICING (US 209081 - Scenario 3) ===== */
+  /* ===== STICKY NAV ACTIONS ===== */
+  function stickyNext() {
+    if (currentStep < TOTAL_STEPS) {
+      goToStep(getNextStep(currentStep));
+    } else if (currentStep === TOTAL_STEPS) {
+      submitPurchase();
+    }
+  }
+  function stickyBack() {
+    if (currentStep > 1) {
+      goToStep(getPrevStep(currentStep));
+    }
+  }
+
+  /* ===== PRICING ===== */
   const prices = {
-    '1week': { label: '1 Week', base: 15 },
-    '1month': { label: '1 Month', base: 45 },
-    '3months': { label: '3 Months', base: 120 },
-    '6months': { label: '6 Months', base: 210 },
-    '12months': { label: '12 Months', base: 380 },
+    '1week': { label: '1 Week', subtotal: 12.50, dieselSurcharge: 2.50, total: 15 },
+    '1month': { label: '1 Month', subtotal: 37.50, dieselSurcharge: 7.50, total: 45 },
+    '3months': { label: '3 Months', subtotal: 100, dieselSurcharge: 20, total: 120 },
+    '6months': { label: '6 Months', subtotal: 175, dieselSurcharge: 35, total: 210 },
+    '12months': { label: '12 Months', subtotal: 316.67, dieselSurcharge: 63.33, total: 380 },
   };
+  let selectedDuration = '3months';
+
+  function selectDuration(key) {
+    selectedDuration = key;
+    // Update radio
+    document.querySelectorAll('.pricing-duration-table input[type="radio"]').forEach(r => r.checked = (r.value === key));
+    // Highlight row
+    document.querySelectorAll('.pricing-duration-table tbody tr').forEach(r => r.classList.remove('selected-duration'));
+    document.getElementById('dur-'+key)?.classList.add('selected-duration');
+    updatePricing();
+  }
 
   function updatePricing() {
-    const sel = document.getElementById('permitDuration').value;
-    const info = prices[sel];
+    const info = prices[selectedDuration];
     if (!info) return;
-    const base = info.base;
-    document.getElementById('basePrice').textContent = '£' + base.toFixed(2);
-    document.getElementById('totalPrice').textContent = '£' + base.toFixed(2);
-    document.getElementById('sideTotal').textContent = '£' + base.toFixed(2);
+    // Discounts
+    const blueBadge = document.getElementById('blue-badge-toggle')?.checked || false;
+    const statePension = document.getElementById('state-pension-toggle')?.checked || false;
+    let discountPct = 0;
+    let discountLabel = [];
+    if (blueBadge) { discountPct += 25; discountLabel.push('Blue Badge 25%'); }
+    if (statePension) { discountPct += 15; discountLabel.push('State Pension 15%'); }
+    const discountAmt = info.subtotal * (discountPct / 100);
+    const subtotalAfterDiscount = info.subtotal - discountAmt;
+    const vat = subtotalAfterDiscount * 0.2;
+    const total = subtotalAfterDiscount + info.dieselSurcharge + vat;
+
+    // Update price summary
+    document.getElementById('ps-subtotal').textContent = '£' + info.subtotal.toFixed(2);
+    const discountRow = document.getElementById('ps-discount-row');
+    if (discountPct > 0) {
+      discountRow.style.display = '';
+      document.getElementById('ps-discount').textContent = '-£' + discountAmt.toFixed(2);
+    } else {
+      discountRow.style.display = 'none';
+    }
+    document.getElementById('ps-admin').textContent = '£' + info.dieselSurcharge.toFixed(2);
+    document.getElementById('ps-vat').textContent = '£' + vat.toFixed(2);
+    document.getElementById('ps-total').textContent = '£' + total.toFixed(2);
+
+    // Update sidebar
+    document.getElementById('sideTotal').textContent = '£' + total.toFixed(2);
     document.getElementById('sideDuration').textContent = info.label;
-    document.getElementById('stickyPrice').innerHTML =
-      'Total: <strong style="color:var(--primary-main); font-size:18px;">£' + base.toFixed(2) + '</strong>';
+    document.getElementById('sideDiscount').textContent = discountLabel.length > 0 ? discountLabel.join(', ') : 'None';
+
+    // Update confirmation amounts
+    if (document.getElementById('confAmount')) {
+      document.getElementById('confAmount').innerHTML = '£' + total.toFixed(2) + ' <small style="color:var(--text-disabled); font-weight:400;">inc. VAT</small>';
+    }
+    if (document.getElementById('confDuration')) {
+      document.getElementById('confDuration').textContent = info.label;
+    }
   }
 
-  /* ===== PAYMENT SELECTION ===== */
-  function selectPayment(el) {
+  /* ===== PAYMENT (suspension pattern) ===== */
+  const paymentConfig = {
+    paymentMethods: [
+      { id: 'card', icon: '💳', label: 'Credit / Debit Card', desc: 'Visa, Mastercard, Amex' },
+      { id: 'directdebit', icon: '🏦', label: 'Direct Debit', desc: 'Set up recurring payments' },
+      { id: 'applepay', icon: '', label: 'Apple Pay', desc: 'Pay with Apple Pay' },
+      { id: 'googlepay', icon: '🅖', label: 'Google Pay', desc: 'Pay with Google Pay' }
+    ],
+    morePaymentMethods: [
+      { id: 'paypal', icon: '🅿', label: 'PayPal' },
+      { id: 'banktransfer', icon: '🏛', label: 'Bank Transfer' },
+      { id: 'klarna', icon: '🅺', label: 'Klarna - Pay Later' }
+    ]
+  };
+
+  function renderPaymentMethods() {
+    const container = document.getElementById('payment-options-container');
+    const moreItems = document.getElementById('more-payment-items');
+    if (!container) return;
+    // Primary methods (2x2 grid)
+    container.innerHTML = paymentConfig.paymentMethods.map((m, i) =>
+      `<div class="payment-option${i === 0 ? ' selected' : ''}" onclick="selectPayment(this, '${m.id}')">
+        <div class="pay-icon">${m.icon}</div>
+        <div class="pay-info">
+          <span class="pay-label">${m.label}</span>
+          <span class="pay-desc">${m.desc}</span>
+        </div>
+        <div class="pay-check"></div>
+      </div>`
+    ).join('');
+    // More payment methods
+    if (moreItems) {
+      moreItems.innerHTML = paymentConfig.morePaymentMethods.map(m =>
+        `<div class="more-pay-item" onclick="selectMorePayment(this, '${m.id}')">
+          <div class="pay-icon">${m.icon}</div>
+          <span class="pay-label">${m.label}</span>
+          <div class="pay-check"></div>
+        </div>`
+      ).join('');
+    }
+    // Toggle more panel
+    const moreList = document.getElementById('more-payment-list');
+    const h4 = moreList?.querySelector('h4');
+    if (h4) {
+      h4.onclick = () => moreList.classList.toggle('open');
+    }
+  }
+
+  function selectPayment(el, method) {
     document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+    document.querySelectorAll('.more-pay-item').forEach(o => o.classList.remove('selected'));
     el.classList.add('selected');
+    // Show card fields only for card payment
+    const cardFields = document.getElementById('card-fields');
+    if (cardFields) {
+      cardFields.style.display = (method === 'card') ? '' : 'none';
+    }
+    // Close more panel
+    document.getElementById('more-payment-list')?.classList.remove('open');
   }
 
-  /* ===== SUBMIT PURCHASE (US 209081) ===== */
+  function selectMorePayment(el, method) {
+    document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+    document.querySelectorAll('.more-pay-item').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    // Hide card fields for non-card methods
+    const cardFields = document.getElementById('card-fields');
+    if (cardFields) cardFields.style.display = 'none';
+  }
+
+  /* ===== INSTRUCTION ALERT ===== */
+  function toggleInstructionAlert() {
+    const body = document.getElementById('instruction-alert-body');
+    const chevron = document.querySelector('.instruction-alert-toggle');
+    body?.classList.toggle('collapsed');
+    chevron?.classList.toggle('flipped');
+  }
+
+  /* ===== T&C MODAL ===== */
+  function openTCModal() {
+    document.getElementById('tc-modal').classList.remove('hidden');
+    document.getElementById('tc-modal').style.display = 'flex';
+  }
+  function closeTCModal(e) {
+    if (e && e.target !== e.currentTarget) return;
+    document.getElementById('tc-modal').classList.add('hidden');
+    document.getElementById('tc-modal').style.display = 'none';
+  }
+
+  /* ===== SUBMIT ===== */
   function submitPurchase() {
-    const termsChecked = document.getElementById('termsCheck')?.checked;
-    if (!termsChecked) {
-      alert('Please agree to the terms and conditions before proceeding.');
+    const demoFail = document.getElementById('demoFailToggle')?.checked;
+    if (demoFail) {
+      document.querySelectorAll('.wizard-step').forEach(s => s.classList.add('hidden'));
+      document.getElementById('step-fail').classList.remove('hidden');
+      document.getElementById('stickyNav').classList.remove('visible');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    // Simulate availability recheck (US 209080 - Scenario 2)
-    // In real app, this would call backend API
+    // Populate confirmation
+    const info = prices[selectedDuration];
+    if (info) {
+      document.getElementById('confDuration').textContent = info.label;
+    }
+    const startVal = document.getElementById('startDate')?.value;
+    if (startVal) {
+      const d = new Date(startVal);
+      document.getElementById('confStart').textContent = d.toLocaleDateString('en-GB');
+      // End date
+      const end = new Date(d);
+      if (selectedDuration === '1week') end.setDate(end.getDate() + 7);
+      else if (selectedDuration === '1month') end.setMonth(end.getMonth() + 1);
+      else if (selectedDuration === '3months') end.setMonth(end.getMonth() + 3);
+      else if (selectedDuration === '6months') end.setMonth(end.getMonth() + 6);
+      else if (selectedDuration === '12months') end.setFullYear(end.getFullYear() + 1);
+      document.getElementById('confEnd').textContent = end.toLocaleDateString('en-GB');
+    }
+    const email = document.getElementById('email-confirm')?.value || 's.newman@email.com';
     goToStep(5);
-    document.getElementById('stickyNav').style.display = 'none';
   }
 
   function cancelPurchase() {
     if (confirm('Are you sure you want to cancel this purchase?')) {
-      window.location.href = 'car-park-discovery.html';
+      window.location.href = 'car-park-discovery-v2.html';
     }
   }
+
+  function toggleDuplicateNotice() {
+    const show = document.getElementById('demoDuplicateToggle').checked;
+    document.getElementById('duplicateNotice').classList.toggle('hidden', !show);
+  }
+
+  /* ===== INIT ===== */
+  window.addEventListener('DOMContentLoaded', () => {
+    initFromParams();
+    updatePricing();
+    renderPaymentMethods();
+  });
 </script>
 </body>
 </html>
