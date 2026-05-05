@@ -2240,8 +2240,12 @@ customer-portal-prototype<!DOCTYPE html>
                   <span id="bay-selection-rule-hint" style="font-size:12px; color:var(--text-secondary); font-style:italic;"></span>
                 </div>
 
-                <!-- Map Selection Info / Instruction (moved to top of map panel) -->
-                <div class="error-msg" id="map-bay-error">Please select a bay from the map</div>
+                <!-- Map Selection Error Banner -->
+                <div class="notice" id="map-bay-error" style="display:none; background:#FFEBEE; border:1px solid var(--error); border-left:4px solid var(--error); color:var(--error);">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0; width:20px; height:20px;"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                  <span id="map-bay-error-text" style="color:var(--text-primary); flex:1;">Please select a bay from the map</span>
+                  <button onclick="clearMapError()" style="background:none; border:none; cursor:pointer; color:var(--text-secondary); font-size:18px; padding:0 4px; line-height:1;" aria-label="Dismiss">&times;</button>
+                </div>
 
                 <!-- Selected Bays from Map (auto-populated from map click) -->
                 <div class="map-selected-bays" id="map-selected-bays">
@@ -2660,7 +2664,6 @@ function populateTimeOptions () {
 
 function setMinDate () {
   var today = new Date();
-  today.setDate(today.getDate() + 7);
   document.getElementById('start-date').setAttribute('min', today.toISOString().split('T')[0]);
 }
 
@@ -3484,6 +3487,12 @@ function calculateEndDate () {
   document.querySelectorAll('[id^="bay-row-"]').forEach(function (row) {
     updateBayRowPrice(row.id);
   });
+
+  // Re-validate selected map bays against new date range
+  revalidateMapBaysForDateChange();
+
+  // Update greyed-out streets based on new date range
+  greyOutFullyBookedStreets();
 }
 
 function scrollToFirstError () {
@@ -4330,7 +4339,7 @@ var mapConfig = {
     ],
     'High Street': [
       { bayType: 'PB', totalSpaces: 8, bookedSpaces: 3 },
-      { bayType: 'PO', totalSpaces: 5, bookedSpaces: 5 },
+      { bayType: 'PO', totalSpaces: 5, bookedSpaces: 0 },
       { bayType: 'EV', totalSpaces: 3, bookedSpaces: 1 },
     ],
     'Victoria Avenue': [
@@ -4343,12 +4352,21 @@ var mapConfig = {
     ],
   },
 
-  // Simulated existing suspensions for overlap validation
-  existingSuspensions: [
-    { street: 'High Street', bayType: 'PO', startDate: '2026-04-10', endDate: '2026-04-15', spaces: 5, status: 'Active' },
-    { street: 'Baker Street', bayType: 'LW', startDate: '2026-04-08', endDate: '2026-04-12', spaces: 2, status: 'Submitted' },
-    { street: 'Abbey Hill', bayType: 'PB', startDate: '2026-04-05', endDate: '2026-04-20', spaces: 4, status: 'Active' },
-  ],
+  // Simulated existing suspensions for overlap validation (dynamic dates relative to today)
+  // High Street: single bay (PO) suspended — demonstrates single bay validation
+  // Baker Street: ALL bays suspended — demonstrates fully-booked street (greyed out on map)
+  existingSuspensions: (function () {
+    var today = new Date();
+    function fmt (d) { return d.toISOString().split('T')[0]; }
+    function addDays (d, n) { var r = new Date(d); r.setDate(r.getDate() + n); return r; }
+    return [
+      { street: 'High Street', bayType: 'PO', startDate: fmt(addDays(today, -5)), endDate: fmt(addDays(today, 2)), spaces: 5, status: 'Active' },
+      { street: 'Baker Street', bayType: 'PB', startDate: fmt(addDays(today, -2)), endDate: fmt(addDays(today, 5)), spaces: 4, status: 'Active' },
+      { street: 'Baker Street', bayType: 'RB', startDate: fmt(addDays(today, -2)), endDate: fmt(addDays(today, 5)), spaces: 6, status: 'Active' },
+      { street: 'Baker Street', bayType: 'LW', startDate: fmt(addDays(today, -2)), endDate: fmt(addDays(today, 5)), spaces: 3, status: 'Active' },
+      { street: 'Baker Street', bayType: 'DB', startDate: fmt(addDays(today, -2)), endDate: fmt(addDays(today, 5)), spaces: 2, status: 'Active' },
+    ];
+  })(),
 };
 
 /* === Selection Mode (map only) === */
@@ -4421,6 +4439,14 @@ function closeMapPopup () {
 /* === Toggle bay from popup checkbox === */
 function togglePopupBay (checkbox, streetName, bayType, totalSpaces, availableSpaces) {
   if (checkbox.checked) {
+    // Validate: bay already suspended for chosen date/time range
+    var overlapResult = checkOverlappingSuspension(streetName, bayType);
+    if (overlapResult.fullyRestricted) {
+      showMapError('Selected Bay is already suspended for the chosen date and time range');
+      checkbox.checked = false;
+      return;
+    }
+
     // Validate multiple bay type restriction
     if (!mapConfig.allowMultipleBayTypes) {
       var existingTypesOnStreet = mapConfig.selectedBays.filter(function (b) { return b.street === streetName; });
@@ -4432,7 +4458,7 @@ function togglePopupBay (checkbox, streetName, bayType, totalSpaces, availableSp
     }
 
     if (availableSpaces <= 0) {
-      showMapError('No bay spaces available for ' + bayTypeNames[bayType] + ' on ' + streetName);
+      showMapError('Selected Bay is already suspended for the chosen date and time range');
       checkbox.checked = false;
       return;
     }
@@ -4543,13 +4569,14 @@ function checkOverlappingSuspension (street, bayType) {
 /* === Error display for map === */
 function showMapError (msg) {
   var errorEl = document.getElementById('map-bay-error');
-  errorEl.textContent = msg;
-  errorEl.classList.add('visible');
+  var textEl = document.getElementById('map-bay-error-text');
+  textEl.textContent = msg;
+  errorEl.style.display = 'flex';
   errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function clearMapError () {
-  document.getElementById('map-bay-error').classList.remove('visible');
+  document.getElementById('map-bay-error').style.display = 'none';
 }
 
 /* === Render selected bays list === */
@@ -4658,6 +4685,46 @@ function updateMapBaySpaces (index, inputEl) {
   }
 }
 
+/* === Re-validate map bays when date/time changes === */
+function revalidateMapBaysForDateChange () {
+  if (mapConfig.selectedBays.length === 0) return;
+
+  var conflicting = [];
+  mapConfig.selectedBays.forEach(function (bay) {
+    var overlapResult = checkOverlappingSuspension(bay.street, bay.bayType);
+    if (overlapResult.fullyRestricted) {
+      conflicting.push(bay);
+    } else if (bay.baySpaces > overlapResult.remainingSpaces) {
+      bay.baySpaces = overlapResult.remainingSpaces;
+      bay.availableSpaces = overlapResult.remainingSpaces;
+    }
+  });
+
+  if (conflicting.length > 0) {
+    conflicting.forEach(function (bay) {
+      updateLeafletMarkerStyle(bay.street, bay.bayType, false);
+    });
+    mapConfig.selectedBays = mapConfig.selectedBays.filter(function (b) {
+      return !conflicting.some(function (c) { return c.street === b.street && c.bayType === b.bayType; });
+    });
+
+    var names = conflicting.map(function (b) { return (bayTypeNames[b.bayType] || b.bayType) + ' on ' + b.street; });
+    showMapError('Selected Bay is already suspended for the chosen date and time range: ' + names.join(', '));
+
+    if (mapConfig.selectedBays.length === 0) {
+      mapConfig.selectedStreet = null;
+      Object.keys(leafletStreetLayers).forEach(function (key) {
+        leafletStreetLayers[key].setStyle({ color: '#D32F2F', weight: 6 });
+      });
+      var prompt = document.getElementById('map-select-prompt');
+      prompt.querySelector('.info-text').innerHTML = '<strong>Hover</strong> over a red-highlighted street to see available bay types. <strong>Click</strong> a street to select bays for your suspension.';
+    }
+
+    renderMapSelectedBays();
+    syncMapBaysToAppState();
+  }
+}
+
 /* === Remove bay from map selection === */
 function removeMapBay (index) {
   var bay = mapConfig.selectedBays[index];
@@ -4665,6 +4732,18 @@ function removeMapBay (index) {
     updateLeafletMarkerStyle(bay.street, bay.bayType, false);
   }
   mapConfig.selectedBays.splice(index, 1);
+
+  // Reset street highlight when all bays are removed (allows selecting another street)
+  if (mapConfig.selectedBays.length === 0) {
+    mapConfig.selectedStreet = null;
+    Object.keys(leafletStreetLayers).forEach(function (key) {
+      leafletStreetLayers[key].setStyle({ color: '#D32F2F', weight: 6 });
+    });
+    var prompt = document.getElementById('map-select-prompt');
+    prompt.querySelector('.info-text').innerHTML = '<strong>Hover</strong> over a red-highlighted street to see available bay types. <strong>Click</strong> a street to select bays for your suspension.';
+    clearMapError();
+  }
+
   renderMapSelectedBays();
   syncMapBaysToAppState();
 }
@@ -4791,8 +4870,36 @@ function initLeafletMap () {
     // Bay markers removed — selection happens via street click popup
   });
 
+  // Grey out fully-booked streets on initial load
+  greyOutFullyBookedStreets();
+
   // Setup map address search
   setupMapAddressSearch();
+}
+
+/* === Grey out streets where ALL bays are fully suspended for the selected date range === */
+function greyOutFullyBookedStreets () {
+  Object.keys(mapConfig.troTmoData).forEach(function (streetName) {
+    var troData = mapConfig.troTmoData[streetName];
+    var allFullyBooked = troData.every(function (bay) {
+      var overlapResult = checkOverlappingSuspension(streetName, bay.bayType);
+      var available = bay.totalSpaces - bay.bookedSpaces;
+      available = Math.min(available, overlapResult.remainingSpaces);
+      return available <= 0;
+    });
+
+    var polyline = leafletStreetLayers[streetName];
+    if (!polyline) return;
+
+    // Don't override selected street style
+    if (mapConfig.selectedStreet === streetName) return;
+
+    if (allFullyBooked) {
+      polyline.setStyle({ color: '#BDBDBD', weight: 4, opacity: 0.5, dashArray: '8 4' });
+    } else {
+      polyline.setStyle({ color: '#D32F2F', weight: 6, opacity: 0.85, dashArray: null });
+    }
+  });
 }
 
 /* === Map Address Search — zoom to street on selection === */
@@ -4935,6 +5042,27 @@ function openStreetPopupLeaflet (e, streetName) {
 
   if (popup.classList.contains('visible') && _activePopupStreet === streetName) {
     closeMapPopup(); return;
+  }
+
+  // Restrict selection to one street at a time — only allow if no bays are selected or same street
+  if (mapConfig.selectedBays.length > 0 && mapConfig.selectedBays[0].street !== streetName) {
+    showMapError('Please remove all bays from \u201c' + mapConfig.selectedBays[0].street + '\u201d before selecting another street');
+    return;
+  }
+
+  // Block clicking on fully-booked streets
+  var troCheck = mapConfig.troTmoData[streetName];
+  if (troCheck) {
+    var allBooked = troCheck.every(function (bay) {
+      var overlap = checkOverlappingSuspension(streetName, bay.bayType);
+      var avail = bay.totalSpaces - bay.bookedSpaces;
+      avail = Math.min(avail, overlap.remainingSpaces);
+      return avail <= 0;
+    });
+    if (allBooked) {
+      showMapError('All bays on \u201c' + streetName + '\u201d are already suspended for the chosen date and time range');
+      return;
+    }
   }
 
   _activePopupStreet = streetName;

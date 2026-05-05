@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Car Parks — Discovery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+  <!-- Leaflet CSS for map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    /* ===== DESIGN TOKENS (from Theme_and_Design_Guidelines.md + Figma) ===== */
+    :root {
+      --primary-main: #3276CF;
+      --primary-dark: #2560A8;
+      --primary-800: #22497D;
+      --primary-25: #F2F5FA;
+      --primary-100: #A2C1EA;
+      --primary-200: #84ADE4;
+      --text-primary: #212121;
+      --text-secondary: #757575;
+      --text-disabled: #9E9E9E;
+      --grey-50: #FAFAFA;
+      --grey-100: #F5F5F5;
+      --grey-200: #EEEEEE;
+      --grey-300: #E0E0E0;
+      --grey-400: #BDBDBD;
+      --neutral-100: #CBCCCD;
+      --neutral-300: #8E9092;
+      --success: #2E7D32;
+      --warning: #ED6C02;
+      --error: #D32F2F;
+      --info: #0288D1;
+      --avatar-bg: #DC4A11;
+      --bg-page: #FFFFFF;
+      --yellow-500: #FFEB3B;
+      --shadow-card: 0px 4px 6px rgba(0,0,0,0.1), 0px 2px 4px rgba(0,0,0,0.1);
+      --shadow-toast: 0 4px 12px rgba(0,0,0,0.15);
+      --radius-btn: 10px;
+      --radius-card: 10px;
+      --radius-input: 8px;
+      --radius-chip: 16px;
+      --radius-nav: 8px;
+      --font-size-base: 16px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-size: var(--font-size-base);
+      font-family: 'Roboto', Helvetica, Arial, sans-serif;
+      color: var(--text-primary);
+      background: var(--bg-page);
+      line-height: 1.5;
+      letter-spacing: 0.15px;
+      min-height: 100vh;
+    }
+    body.font-large { zoom: 1.15; }
+    body.font-xl    { zoom: 1.3; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; }
+    }
+
+    /* ===== SKIP LINK ===== */
+    .skip-link {
+      position: absolute; left: -999px; top: 0;
+      background: var(--primary-main); color: #fff; padding: 8px 16px;
+      z-index: 1000; border-radius: 0 0 var(--radius-input) 0; font-size: 14px;
+    }
+    .skip-link:focus { left: 0; }
+
+    /* ===== HEADER ===== */
+    .site-header {
+      background: var(--primary-800);
+      border-bottom: 4px solid var(--primary-main);
+      padding: 0 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 56px; position: sticky; top: 0; z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 24px; }
+    .site-header .logo { display: flex; align-items: center; gap: 12px; }
+    .site-header .logo-icon {
+      width: 36px; height: 36px; background: var(--yellow-500);
+      border-radius: 4px; display: flex; align-items: center; justify-content: center;
+      font-weight: 500; font-size: 14px; color: var(--primary-800);
+    }
+    .header-divider { width: 1px; height: 24px; background: rgba(255,255,255,.3); }
+    .header-nav { display: flex; align-items: center; gap: 0; }
+    .header-nav a {
+      text-decoration: none; color: #fff; font-size: 14px;
+      font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px;
+      padding: 16px 20px; display: flex; align-items: center; gap: 8px;
+      transition: background 150ms ease; line-height: 24px;
+    }
+    .header-nav a:hover { background: rgba(255,255,255,.08); }
+    .header-nav a.active { color: var(--yellow-500); }
+    .header-nav a svg { width: 20px; height: 20px; }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .header-bell {
+      background: none; border: none; color: #fff; cursor: pointer;
+      padding: 8px; border-radius: var(--radius-nav); transition: background 150ms;
+    }
+    .header-bell:hover { background: rgba(255,255,255,.1); }
+    .header-bell svg { width: 24px; height: 24px; }
+    .header-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--avatar-bg); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 500; letter-spacing: 0.16px;
+    }
+    .font-toggle {
+      display: flex; gap: 2px; align-items: center;
+      border: 1px solid rgba(255,255,255,.4); border-radius: var(--radius-input);
+      padding: 2px; background: rgba(255,255,255,.08);
+    }
+    .font-toggle button {
+      background: none; border: none; padding: 3px 8px; cursor: pointer;
+      font-weight: 500; border-radius: 6px; color: rgba(255,255,255,.6);
+      font-size: 12px; transition: all 150ms; font-family: inherit;
+    }
+    .font-toggle button.active { background: rgba(255,255,255,.2); color: #fff; }
+    .font-toggle button:focus-visible { outline: 2px solid var(--primary-main); outline-offset: 1px; }
+    .hamburger-btn {
+      display: none; background: none; border: none; color: #fff;
+      cursor: pointer; padding: 8px; border-radius: var(--radius-nav);
+      transition: background 150ms; flex-shrink: 0;
+    }
+    .hamburger-btn:hover { background: rgba(255,255,255,.1); }
+    .hamburger-btn svg { width: 24px; height: 24px; }
+
+    /* ===== MAIN LAYOUT ===== */
+    .page-wrapper { margin: 0 180px; padding: 24px 0 100px; }
+    .page-heading {
+      font-size: 24px; font-weight: 400; line-height: 1.33;
+      color: var(--text-primary); margin-bottom: 24px;
+    }
+
+    /* ===== CARDS ===== */
+    .card {
+      background: #fff; border: 1px solid var(--grey-300);
+      border-radius: var(--radius-card); padding: 24px; margin-bottom: 20px;
+    }
+    .card h2 {
+      font-size: 20px; font-weight: 500; line-height: 1.6;
+      letter-spacing: 0.15px; margin-bottom: 4px; color: var(--text-primary);
+    }
+    .card .subtitle {
+      color: var(--text-secondary); font-size: 14px;
+      line-height: 1.43; letter-spacing: 0.17px; margin-bottom: 20px;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      padding: 8px 22px; border-radius: var(--radius-btn); font-size: 14px;
+      font-weight: 500; cursor: pointer; border: none;
+      text-transform: uppercase; letter-spacing: 0.4px; line-height: 24px;
+      transition: background 150ms ease; display: inline-flex; align-items: center; gap: 8px;
+      font-family: 'Roboto', Helvetica, Arial, sans-serif;
+    }
+    .btn:focus-visible { outline: 2px solid var(--primary-main); outline-offset: 2px; }
+    .btn-primary {
+      background: var(--primary-main); color: #fff; border: none;
+      font-size: 15px; line-height: 26px; letter-spacing: 0.46px; padding: 10px 24px;
+    }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-primary:disabled { background: var(--grey-400); cursor: not-allowed; }
+    .btn-secondary {
+      background: transparent; color: var(--primary-main);
+      border: 1px solid var(--primary-main);
+    }
+    .btn-secondary:hover { background: var(--primary-25); }
+    .btn-text { background: transparent; color: var(--primary-main); border: none; }
+    .btn-text:hover { background: var(--primary-25); }
+    .btn-sm { padding: 4px 10px; font-size: 13px; line-height: 22px; letter-spacing: 0.46px; }
+
+    /* ===== FORMS ===== */
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block; font-size: 14px; font-weight: 400;
+      line-height: 1.43; letter-spacing: 0.17px; margin-bottom: 6px; color: var(--text-primary);
+    }
+    input[type="text"], input[type="search"], select {
+      width: 100%; padding: 10px 14px;
+      border: 1px solid var(--grey-400); border-radius: var(--radius-input);
+      font-size: 16px; line-height: 24px; letter-spacing: 0.15px;
+      color: var(--text-primary); background: #fff;
+      font-family: 'Roboto', Helvetica, Arial, sans-serif;
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+    select {
+      padding-right: 36px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center;
+      -webkit-appearance: none; -moz-appearance: none; appearance: none;
+    }
+    input:focus, select:focus { outline: none; border-color: var(--primary-main); box-shadow: 0 0 0 1px var(--primary-main); }
+
+    /* ===== NOTICES ===== */
+    .notice {
+      display: flex; gap: 12px; padding: 12px 16px;
+      border-radius: var(--radius-input); font-size: 14px;
+      line-height: 1.43; letter-spacing: 0.17px; margin-bottom: 16px;
+    }
+    .notice-info { background: #E3F2FD; color: var(--info); }
+    .notice-warning { background: #FFF3E0; color: var(--warning); }
+    .notice svg { width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px; }
+    .notice span { color: var(--text-primary); }
+
+    /* ===== DISCOVERY TOOLBAR ===== */
+    .discovery-toolbar {
+      display: flex; align-items: center; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .search-box {
+      flex: 1; min-width: 200px; position: relative;
+    }
+    .search-box input {
+      padding-left: 40px;
+    }
+    .search-box .search-icon {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      width: 20px; height: 20px; color: var(--neutral-300); pointer-events: none;
+    }
+    .postcode-box {
+      width: 180px;
+    }
+    .postcode-box input {
+      text-transform: uppercase;
+    }
+    .sort-box {
+      width: 200px;
+    }
+
+    /* ===== VIEW TOGGLE ===== */
+    .view-toggle {
+      display: flex; border: 1px solid var(--grey-300); border-radius: var(--radius-input); overflow: hidden;
+    }
+    .view-toggle button {
+      padding: 8px 16px; background: #fff; border: none; cursor: pointer;
+      font-size: 14px; font-weight: 500; color: var(--text-secondary);
+      display: flex; align-items: center; gap: 6px;
+      transition: background 150ms, color 150ms;
+      font-family: 'Roboto', Helvetica, Arial, sans-serif;
+    }
+    .view-toggle button + button { border-left: 1px solid var(--grey-300); }
+    .view-toggle button.active { background: var(--primary-main); color: #fff; }
+    .view-toggle button:hover:not(.active) { background: var(--grey-50); }
+    .view-toggle button svg { width: 18px; height: 18px; }
+
+    /* ===== RESULTS INFO ===== */
+    .results-info {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px; font-size: 14px; color: var(--text-secondary);
+    }
+    .results-count { font-weight: 500; color: var(--text-primary); }
+
+    /* ===== CAR PARK LIST ===== */
+    .carpark-list { display: grid; grid-template-columns: 1fr; gap: 16px; }
+
+    .carpark-card {
+      background: #fff; border: 1px solid var(--grey-300);
+      border-radius: var(--radius-card); padding: 20px 24px;
+      display: grid; grid-template-columns: 1fr auto; gap: 16px;
+      align-items: start; cursor: pointer;
+      transition: border-color 200ms, box-shadow 200ms;
+    }
+    .carpark-card:hover { border-color: var(--primary-200); box-shadow: 0 2px 8px rgba(50,118,207,.12); }
+    .carpark-card:focus-within { border-color: var(--primary-main); box-shadow: 0 0 0 2px rgba(50,118,207,.25); }
+
+    .carpark-info { display: flex; flex-direction: column; gap: 8px; }
+    .carpark-name {
+      font-size: 18px; font-weight: 500; line-height: 1.4;
+      color: var(--text-primary); display: flex; align-items: center; gap: 10px;
+    }
+    .carpark-name .type-badge {
+      font-size: 11px; font-weight: 500; padding: 2px 10px;
+      border-radius: var(--radius-chip); text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .type-badge.off-street { background: #E8F5E9; color: var(--success); }
+    .type-badge.on-street  { background: #E3F2FD; color: var(--info); }
+
+    .carpark-address {
+      font-size: 14px; color: var(--text-secondary);
+      line-height: 1.43; letter-spacing: 0.17px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .carpark-address svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    .carpark-meta {
+      display: flex; flex-wrap: wrap; gap: 16px; margin-top: 4px;
+    }
+    .meta-item {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; color: var(--text-secondary); letter-spacing: 0.16px;
+    }
+    .meta-item svg { width: 16px; height: 16px; color: var(--text-disabled); }
+    .meta-item .meta-value { font-weight: 500; color: var(--text-primary); }
+
+    .carpark-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+    .bay-tag {
+      font-size: 12px; padding: 2px 10px; border-radius: var(--radius-chip);
+      background: var(--grey-100); color: var(--text-secondary);
+      letter-spacing: 0.4px;
+    }
+
+    .carpark-right {
+      display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
+      min-width: 140px;
+    }
+    .availability-badge {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; font-weight: 500; padding: 4px 12px;
+      border-radius: var(--radius-chip);
+    }
+    .availability-badge.available { background: #E8F5E9; color: var(--success); }
+    .availability-badge.limited { background: #FFF3E0; color: var(--warning); }
+    .availability-badge .dot {
+      width: 8px; height: 8px; border-radius: 50%; background: currentColor;
+    }
+    .carpark-distance {
+      font-size: 13px; color: var(--text-secondary); letter-spacing: 0.16px;
+    }
+    .carpark-price {
+      font-size: 16px; font-weight: 500; color: var(--primary-main);
+    }
+    .carpark-price small {
+      font-size: 12px; font-weight: 400; color: var(--text-secondary);
+    }
+
+    /* ===== MAP CONTAINER ===== */
+    .map-container {
+      display: none; height: 500px; border-radius: var(--radius-card);
+      border: 1px solid var(--grey-300); overflow: hidden; margin-bottom: 20px;
+      position: relative;
+    }
+    .map-container.visible { display: block; }
+    #map { width: 100%; height: 100%; }
+
+    .map-fallback {
+      display: none; padding: 40px; text-align: center;
+      background: var(--grey-50); border-radius: var(--radius-card);
+      border: 1px solid var(--grey-300); margin-bottom: 20px;
+    }
+    .map-fallback.visible { display: block; }
+    .map-fallback svg { width: 48px; height: 48px; color: var(--text-disabled); margin-bottom: 12px; }
+    .map-fallback p { color: var(--text-secondary); font-size: 14px; }
+
+    /* ===== NO RESULTS ===== */
+    .no-results {
+      text-align: center; padding: 60px 24px; color: var(--text-secondary);
+    }
+    .no-results svg { width: 64px; height: 64px; color: var(--grey-400); margin-bottom: 16px; }
+    .no-results h3 { font-size: 18px; font-weight: 500; color: var(--text-primary); margin-bottom: 8px; }
+    .no-results p { font-size: 14px; }
+
+    /* ===== NON-ENFORCEABLE TIMING ===== */
+    .timing-info {
+      font-size: 12px; color: var(--text-secondary);
+      display: flex; align-items: center; gap: 4px;
+      letter-spacing: 0.4px; margin-top: 4px;
+    }
+    .timing-info svg { width: 14px; height: 14px; }
+
+    /* ===== FOOTER ===== */
+    .site-footer {
+      background: var(--primary-800);
+      border-top: 4px solid var(--primary-main);
+      padding: 24px; text-align: center;
+    }
+    .site-footer p { font-size: 14px; line-height: 24px; letter-spacing: 0.07px; color: #fff; }
+    .site-footer a { color: #fff; text-decoration: none; }
+    .site-footer a:hover { text-decoration: underline; }
+
+    /* ===== MOBILE NAV DRAWER ===== */
+    .mobile-nav-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 300; display: none;
+    }
+    .mobile-nav-overlay.open { display: block; }
+    .mobile-nav-drawer {
+      position: fixed; top: 0; left: -280px; width: 260px;
+      height: 100vh; background: var(--primary-800);
+      z-index: 301; transition: left 250ms ease;
+      display: flex; flex-direction: column; overflow-y: auto;
+      box-shadow: 4px 0 24px rgba(0,0,0,.2);
+    }
+    .mobile-nav-drawer.open { left: 0; }
+    .mobile-nav-drawer .drawer-header {
+      padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,.15);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .mobile-nav-drawer .drawer-close {
+      background: none; border: none; color: #fff; font-size: 22px;
+      cursor: pointer; padding: 4px 8px; border-radius: var(--radius-input);
+    }
+    .mobile-nav-drawer .drawer-close:hover { background: rgba(255,255,255,.1); }
+    .mobile-nav-drawer .drawer-links { padding: 12px 0; }
+    .mobile-nav-drawer .drawer-links a {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 20px; color: #fff; text-decoration: none;
+      font-size: 15px; font-weight: 500; text-transform: uppercase;
+      letter-spacing: 0.4px; transition: background 150ms;
+    }
+    .mobile-nav-drawer .drawer-links a:hover { background: rgba(255,255,255,.08); }
+    .mobile-nav-drawer .drawer-links a.active { color: var(--yellow-500); }
+    .mobile-nav-drawer .drawer-links a svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+    /* ===== CONTRACT TOGGLE BANNER ===== */
+    .toggle-banner {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; background: var(--primary-25);
+      border: 1px solid var(--primary-100); border-radius: var(--radius-input);
+      margin-bottom: 16px; font-size: 14px;
+    }
+    .toggle-banner .toggle-label { font-weight: 500; color: var(--text-primary); }
+    .toggle-switch {
+      position: relative; width: 44px; height: 24px;
+      background: var(--grey-400); border-radius: 12px;
+      cursor: pointer; transition: background 200ms; flex-shrink: 0;
+    }
+    .toggle-switch.on { background: var(--primary-main); }
+    .toggle-switch .toggle-knob {
+      position: absolute; top: 2px; left: 2px;
+      width: 20px; height: 20px; background: #fff;
+      border-radius: 50%; transition: left 200ms;
+    }
+    .toggle-switch.on .toggle-knob { left: 22px; }
+    .toggle-desc { color: var(--text-secondary); font-size: 13px; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .page-wrapper { margin: 0 24px; }
+      .discovery-toolbar { flex-direction: column; align-items: stretch; }
+      .search-box, .postcode-box, .sort-box { width: 100%; min-width: 0; }
+    }
+    @media (max-width: 640px) {
+      .site-header { padding: 0; height: auto; min-height: 48px; }
+      .header-left { gap: 8px; flex: 1; min-width: 0; }
+      .header-divider { display: none; }
+      .header-nav { display: none; }
+      .hamburger-btn { display: flex; align-items: center; justify-content: center; }
+      .header-right { gap: 0; }
+      .font-toggle { display: none; }
+      .page-wrapper { margin: 0; padding: 8px 16px 88px; }
+      .page-heading { font-size: 14px; font-weight: 400; line-height: 1.43; letter-spacing: 0.17px; }
+      .carpark-card { grid-template-columns: 1fr; gap: 12px; padding: 16px; }
+      .carpark-right { flex-direction: row; align-items: center; min-width: 0; gap: 12px; flex-wrap: wrap; }
+      .map-container { height: 300px; }
+      .view-toggle button { padding: 6px 12px; font-size: 13px; }
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- Skip Navigation -->
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<!-- ===== HEADER ===== -->
+<header class="site-header" role="banner">
+  <div class="header-left">
+    <button class="hamburger-btn" aria-label="Open navigation menu" onclick="openMobileNav()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+    <div class="logo">
+      <div class="logo-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" width="20" height="20"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor" opacity=".9"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+      </div>
+    </div>
+    <div class="header-divider"></div>
+    <nav class="header-nav" aria-label="Main navigation">
+      <a href="#" onclick="return false;">
+        <span class="nav-text">My Applications</span>
+      </a>
+      <a href="#" class="active" onclick="return false;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+        <span class="nav-text">Car Parks</span>
+      </a>
+      <a href="#" onclick="return false;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        <span class="nav-text">Vehicles</span>
+      </a>
+      <a href="#" onclick="return false;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+        <span class="nav-text">Payment</span>
+      </a>
+    </nav>
+  </div>
+  <div class="header-right">
+    <div class="font-toggle" role="group" aria-label="Adjust text size">
+      <button onclick="setFontSize('normal')" class="active" aria-label="Normal text" id="font-normal">A</button>
+      <button onclick="setFontSize('large')" aria-label="Large text" id="font-large">A+</button>
+      <button onclick="setFontSize('xl')" aria-label="Extra large text" id="font-xl">A++</button>
+    </div>
+    <button class="header-bell" aria-label="Notifications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+    </button>
+    <div class="header-avatar" aria-label="User account" style="background:rgba(255,255,255,.9); color:var(--text-primary); font-size:12px; letter-spacing:1.5px;">SN</div>
+  </div>
+</header>
+
+<!-- Mobile Nav Drawer -->
+<div class="mobile-nav-overlay" id="mobile-nav-overlay" onclick="closeMobileNav()"></div>
+<div class="mobile-nav-drawer" id="mobile-nav-drawer" role="dialog" aria-label="Navigation">
+  <div class="drawer-header">
+    <div class="logo-icon" aria-hidden="true" style="width:32px;height:32px;background:var(--yellow-500);border-radius:4px;display:flex;align-items:center;justify-content:center;">
+      <svg viewBox="0 0 24 24" fill="none" width="18" height="18" style="color:var(--primary-800)"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor" opacity=".9"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+    </div>
+    <button class="drawer-close" onclick="closeMobileNav()" aria-label="Close menu">&times;</button>
+  </div>
+  <div class="drawer-links">
+    <a href="#" onclick="closeMobileNav(); return false;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      My Applications
+    </a>
+    <a href="#" class="active" onclick="closeMobileNav(); return false;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+      Car Parks
+    </a>
+    <a href="#" onclick="closeMobileNav(); return false;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      Vehicles
+    </a>
+    <a href="#" onclick="closeMobileNav(); return false;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+      Payment
+    </a>
+  </div>
+</div>
+
+<!-- ===== MAIN ===== -->
+<main id="main-content">
+  <div class="page-wrapper">
+
+    <!-- Page Heading -->
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0; flex-wrap:nowrap; gap:8px;">
+      <h1 class="page-heading" style="margin-bottom:0; flex:1; min-width:0;">Car Parks</h1>
+    </div>
+    <hr style="border:none; border-top:1px solid var(--grey-300); margin:16px 0 16px;">
+
+    <!-- Contract Toggle Demo (US 277543) -->
+    <div class="notice notice-warning" style="margin-bottom:16px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      <span style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <strong>Demo:</strong> Map Integration Toggle &mdash;
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+          <span>Off</span>
+          <div class="toggle-switch on" id="mapToggle" onclick="toggleMapIntegration()" role="switch" aria-checked="true" tabindex="0" aria-label="Map Integration toggle">
+            <div class="toggle-knob"></div>
+          </div>
+          <span>On</span>
+        </label>
+      </span>
+    </div>
+
+    <!-- Search & Filter Toolbar (US 209079, 209082) -->
+    <div class="discovery-toolbar">
+      <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="search" id="searchInput" placeholder="Search car parks by name or address…" aria-label="Search car parks" oninput="filterCarParks()">
+      </div>
+      <div class="postcode-box" id="postcodeBox">
+        <input type="text" id="postcodeInput" placeholder="Enter postcode" aria-label="Postcode for distance" maxlength="8" oninput="calculateDistances()">
+      </div>
+      <div class="sort-box">
+        <select id="sortSelect" aria-label="Sort car parks" onchange="sortCarParks()">
+          <option value="name">Sort by Name</option>
+          <option value="distance">Sort by Distance</option>
+          <option value="capacity">Sort by Available Bays</option>
+        </select>
+      </div>
+      <div class="view-toggle" id="viewToggle">
+        <button class="active" id="listViewBtn" onclick="setView('list')" aria-label="List view">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+          List
+        </button>
+        <button id="mapViewBtn" onclick="setView('map')" aria-label="Map view">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Map
+        </button>
+      </div>
+    </div>
+
+    <!-- Results Info -->
+    <div class="results-info">
+      <span><span class="results-count" id="resultsCount">6</span> car parks found</span>
+    </div>
+
+    <!-- Map Container (US 209082, 277543) -->
+    <div class="map-container" id="mapContainer">
+      <div id="map"></div>
+    </div>
+    <div class="map-fallback" id="mapFallback">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <p>Map is currently unavailable. Please use the list view below.</p>
+    </div>
+
+    <!-- Car Park List (US 209076, 209079, 209080) -->
+    <div class="carpark-list" id="carparkList">
+
+      <!-- Car Park 1 -->
+      <a href="car-park-details.html?id=1" class="carpark-card" tabindex="0" role="article" aria-label="Central Multi-Storey Car Park" data-name="Central Multi-Storey Car Park" data-address="High Street, Town Centre, AB1 2CD" data-available="42" data-total="120" data-type="off-street" data-lat="51.505" data-lng="-0.09" data-price="45.00" style="text-decoration:none; color:inherit;">
+        <div class="carpark-info">
+          <div class="carpark-name">
+            Central Multi-Storey Car Park
+            <span class="type-badge off-street">Off-Street</span>
+          </div>
+          <div class="carpark-address">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            High Street, Town Centre, AB1 2CD
+          </div>
+          <div class="carpark-meta">
+            <div class="meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
+              <span>Bays:</span> <span class="meta-value">42 / 120</span>
+            </div>
+            <div class="meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              <span>24/7 Access</span>
+            </div>
+          </div>
+          <div class="carpark-tags">
+            <span class="bay-tag">Standard</span>
+            <span class="bay-tag">Disabled</span>
+            <span class="bay-tag">Electric</span>
+          </div>
+          <div class="timing-info">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            Non-enforceable: Sun 00:00 – 08:00
+          </div>
+        </div>
+        <div class="carpark-right">
+          <div class="availability-badge available">
+            <span class="dot"></span> Available
+          </div>
+          <div class="carpark-distance" id="dist-1">—</div>
+          <div class="carpark-price">
+            £45.00 <small>/ month</small>
+          </div>
+        </div>
+      </a>
+
+      <!-- Car Park 2 -->
+      <a href="car-park-details.html?id=2" class="carpark-card" tabindex="0" role="article" aria-label="Riverside Surface Car Park" data-name="Riverside Surface Car Park" data-address="River Lane, Waterside, AB3 4EF" data-available="8" data-total="60" data-type="off-street" data-lat="51.510" data-lng="-0.08" data-price="35.00" style="text-decoration:none; color:inherit;">
+        <div class="carpark-info">
+          <div class="carpark-name">
+            Riverside Surface Car Park
+            <span class="type-badge off-street">Off-Street</span>
+          </div>
+          <div class="carpark-address">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            River Lane, Waterside, AB3 4EF
+          </div>
+          <div class="carpark-meta">
+            <div class="meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
+              <span>Bays:</span> <span class="meta-value">8 / 60</span>
+            </div>
+            <div class="meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              <span>Mon – Sat, 06:00 – 22:00</span>
+            </div>
+          </div>
+          <div class="carpark-tags">
+            <span class="bay-tag">Standard</span>
+            <span class="bay-tag">Disabled</span>
+          </div>
+          <div class="timing-info">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            Non-enforceable: Daily 22:00 – 06:00
+          </div>
+        </div>
+        <div class="carpark-right">
+          <div class="availability-badge limited">
+            <span class="dot"></span> Limited
+          </div>
+          <div class="carpark-distance" id="dist-2">—</div>
+          <div class="carpark-price">
+            £35.00 <small>/ month</small>
+          </div>
+        </div>
+      </a>
+
+      <!-- Car Park 3 -->
+      <a href="car-park-details.html?id=3" class="carpark-card" tabindex="0" role="article" aria-label="Market Square On-Street Parking" data-name="Market Square On-Street Parking" data-address="Market Square, Old Town, AB5 6GH" data-available="15" data-total="30" data-type="on-street" data-lat="51.500" data-lng="-0.10" data-price="25.00" style="text-decoration:none; color:inherit;">
+        <div class="carpark-info">
+          <div class="carpark-name">
+            Market Square On-Street Parking
+            <span class="type-badge on-street">On-Street</span>
+          </div>
+          <div class="carpark-address">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Market Square, Old Town, AB5 6GH
+          </div>
+          <div class="carpark-meta">
+            <div class="meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
+              <span>Bays:</span> <span class="meta-value">15 / 30</span>
+            </div>
+            <div class="meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              <span>Mon – Fri, 08:00 – 18:00</span>
+            </div>
+          </div>
+          <div class="carpark-tags">
+            <span class="bay-tag">Standard</span>
+          </div>
+        </div>
+        <div class="carpark-right">
+          <div class="availability-badge available">
+            <span class="dot"></span> Available
+          </div>
+          <div class="carpark-distance" id="dist-3">—</div>
+          <div class="carpark-price">
+            £25.00 <small>/ month</small>
+          </div>
+        </div>
+      </a>
+
+      <!-- Car Park 4 -->
+      <a href="car-park-details.html?id=4" class="carpark-card" tabindex="0" role="article" aria-label="Station Road Car Park" data-name="Station Road Car Park" data-address="Station Road, Railway Quarter, AB7 8IJ" data-available="25" data-total="80" data-type="off-street" data-lat="51.515" data-lng="-0.07" data-price="40.00" style="text-decoration:none; color:inherit;">
+        <div class="carpark-info">
+          <div class="carpark-name">
+            Station Road Car Park
+            <span class="type-badge off-street">Off-Street</span>
+          </div>
+          <div class="carpark-address">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Station Road, Railway Quarter, AB7 8IJ
+          </div>
+          <div class="carpark-meta">
+            <div class="meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
+              <span>Bays:</span> <span class="meta-value">25 / 80</span>
+            </div>
+            <div class="meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              <span>24/7 Access</span>
+            </div>
+          </div>
+          <div class="carpark-tags">
+            <span class="bay-tag">Standard</span>
+            <span class="bay-tag">Electric</span>
+          </div>
+        </div>
+        <div class="carpark-right">
+          <div class="availability-badge available">
+            <span class="dot"></span> Available
+          </div>
+          <div class="carpark-distance" id="dist-4">—</div>
+          <div class="carpark-price">
+            £40.00 <small>/ month</small>
+          </div>
+        </div>
+      </a>
+
+      <!-- Car Park 5 -->
+      <a href="car-park-details.html?id=5" class="carpark-card" tabindex="0" role="article" aria-label="Park Lane Surface Lot" data-name="Park Lane Surface Lot" data-address="Park Lane, Green District, AB9 0KL" data-available="50" data-total="100" data-type="off-street" data-lat="51.508" data-lng="-0.12" data-price="30.00" style="text-decoration:none; color:inherit;">
+        <div class="carpark-info">
+          <div class="carpark-name">
+            Park Lane Surface Lot
+            <span class="type-badge off-street">Off-Street</span>
+          </div>
+          <div class="carpark-address">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Park Lane, Green District, AB9 0KL
+          </div>
+          <div class="carpark-meta">
+            <div class="meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
+              <span>Bays:</span> <span class="meta-value">50 / 100</span>
+            </div>
+            <div class="meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              <span>Mon – Sun, 07:00 – 21:00</span>
+            </div>
+          </div>
+          <div class="carpark-tags">
+            <span class="bay-tag">Standard</span>
+            <span class="bay-tag">Disabled</span>
+            <span class="bay-tag">Motorcycle</span>
+          </div>
+        </div>
+        <div class="carpark-right">
+          <div class="availability-badge available">
+            <span class="dot"></span> Available
+          </div>
+          <div class="carpark-distance" id="dist-5">—</div>
+          <div class="carpark-price">
+            £30.00 <small>/ month</small>
+          </div>
+        </div>
+      </a>
+
+      <!-- Car Park 6 -->
+      <a href="car-park-details.html?id=6" class="carpark-card" tabindex="0" role="article" aria-label="Church Street Bays" data-name="Church Street Bays" data-address="Church Street, Cathedral Ward, AB2 3MN" data-available="5" data-total="20" data-type="on-street" data-lat="51.502" data-lng="-0.11" data-price="20.00" style="text-decoration:none; color:inherit;">
+        <div class="carpark-info">
+          <div class="carpark-name">
+            Church Street Bays
+            <span class="type-badge on-street">On-Street</span>
+          </div>
+          <div class="carpark-address">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Church Street, Cathedral Ward, AB2 3MN
+          </div>
+          <div class="carpark-meta">
+            <div class="meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
+              <span>Bays:</span> <span class="meta-value">5 / 20</span>
+            </div>
+            <div class="meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              <span>Mon – Sat, 08:00 – 18:00</span>
+            </div>
+          </div>
+          <div class="carpark-tags">
+            <span class="bay-tag">Standard</span>
+          </div>
+          <div class="timing-info">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            Non-enforceable: Sun all day
+          </div>
+        </div>
+        <div class="carpark-right">
+          <div class="availability-badge limited">
+            <span class="dot"></span> Limited
+          </div>
+          <div class="carpark-distance" id="dist-6">—</div>
+          <div class="carpark-price">
+            £20.00 <small>/ month</small>
+          </div>
+        </div>
+      </a>
+
+    </div><!-- /carpark-list -->
+
+    <!-- No Results Message -->
+    <div class="no-results hidden" id="noResults">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <h3>No car parks found</h3>
+      <p>Try adjusting your search or filters to find available car parks.</p>
+    </div>
+
+  </div>
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer" role="contentinfo">
+  <p>&copy; 2026 Customer Portal &mdash; Car Parks Discovery &bull;
+    <a href="#">Privacy Policy</a> &bull; <a href="#">Terms</a> &bull; <a href="#">Accessibility</a>
+  </p>
+</footer>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+  /* ===== STATE ===== */
+  let currentView = 'list';
+  let mapEnabled = true;
+  let mapInstance = null;
+  let mapMarkers = [];
+
+  /* ===== FONT SIZE ===== */
+  function setFontSize(size) {
+    document.body.classList.remove('font-large', 'font-xl');
+    if (size === 'large') document.body.classList.add('font-large');
+    if (size === 'xl') document.body.classList.add('font-xl');
+    document.querySelectorAll('.font-toggle button').forEach(b => b.classList.remove('active'));
+    document.getElementById('font-' + size)?.classList.add('active');
+  }
+
+  /* ===== MOBILE NAV ===== */
+  function openMobileNav() {
+    document.getElementById('mobile-nav-overlay').classList.add('open');
+    document.getElementById('mobile-nav-drawer').classList.add('open');
+  }
+  function closeMobileNav() {
+    document.getElementById('mobile-nav-overlay').classList.remove('open');
+    document.getElementById('mobile-nav-drawer').classList.remove('open');
+  }
+
+  /* ===== MAP INTEGRATION TOGGLE (US 277543) ===== */
+  function toggleMapIntegration() {
+    const toggle = document.getElementById('mapToggle');
+    mapEnabled = !mapEnabled;
+    toggle.classList.toggle('on', mapEnabled);
+    toggle.setAttribute('aria-checked', mapEnabled);
+
+    const viewToggle = document.getElementById('viewToggle');
+    const postcodeBox = document.getElementById('postcodeBox');
+    const sortSelect = document.getElementById('sortSelect');
+    const distanceOpt = sortSelect.querySelector('option[value="distance"]');
+
+    if (!mapEnabled) {
+      // Hide map UI, distance sorting
+      viewToggle.style.display = 'none';
+      postcodeBox.style.display = 'none';
+      distanceOpt.disabled = true;
+      if (sortSelect.value === 'distance') { sortSelect.value = 'name'; sortCarParks(); }
+      setView('list');
+    } else {
+      viewToggle.style.display = 'flex';
+      postcodeBox.style.display = 'block';
+      distanceOpt.disabled = false;
+    }
+  }
+
+  /* ===== VIEW TOGGLE ===== */
+  function setView(view) {
+    currentView = view;
+    const listBtn = document.getElementById('listViewBtn');
+    const mapBtn = document.getElementById('mapViewBtn');
+    const listEl = document.getElementById('carparkList');
+    const mapEl = document.getElementById('mapContainer');
+
+    listBtn.classList.toggle('active', view === 'list');
+    mapBtn.classList.toggle('active', view === 'map');
+
+    if (view === 'map') {
+      mapEl.classList.add('visible');
+      listEl.style.display = 'none';
+      initMap();
+    } else {
+      mapEl.classList.remove('visible');
+      listEl.style.display = 'grid';
+    }
+  }
+
+  /* ===== MAP INIT (Leaflet) ===== */
+  function initMap() {
+    if (mapInstance) { mapInstance.invalidateSize(); return; }
+    try {
+      mapInstance = L.map('map').setView([51.505, -0.09], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(mapInstance);
+      addMapMarkers();
+    } catch (e) {
+      // Fallback if map fails (US 277543 - FR-11)
+      document.getElementById('mapContainer').classList.remove('visible');
+      document.getElementById('mapFallback').classList.add('visible');
+      setView('list');
+    }
+  }
+
+  function addMapMarkers() {
+    if (!mapInstance) return;
+    mapMarkers.forEach(m => mapInstance.removeLayer(m));
+    mapMarkers = [];
+    document.querySelectorAll('.carpark-card').forEach(card => {
+      const lat = parseFloat(card.dataset.lat);
+      const lng = parseFloat(card.dataset.lng);
+      if (!isNaN(lat) && !isNaN(lng)) {
+        const name = card.dataset.name;
+        const avail = card.dataset.available;
+        const price = card.dataset.price;
+        const marker = L.marker([lat, lng]).addTo(mapInstance);
+        marker.bindPopup(`
+          <strong>${name}</strong><br>
+          Available bays: ${avail}<br>
+          From £${price}/month<br>
+          <a href="${card.href}" style="color:var(--primary-main);">View Details →</a>
+        `);
+        mapMarkers.push(marker);
+      }
+    });
+  }
+
+  /* ===== SEARCH & FILTER (US 209079) ===== */
+  function filterCarParks() {
+    const query = document.getElementById('searchInput').value.toLowerCase();
+    const cards = document.querySelectorAll('.carpark-card');
+    let visibleCount = 0;
+    cards.forEach(card => {
+      const name = (card.dataset.name || '').toLowerCase();
+      const address = (card.dataset.address || '').toLowerCase();
+      const match = name.includes(query) || address.includes(query);
+      card.style.display = match ? '' : 'none';
+      if (match) visibleCount++;
+    });
+    document.getElementById('resultsCount').textContent = visibleCount;
+    document.getElementById('noResults').classList.toggle('hidden', visibleCount > 0);
+    if (mapInstance) addMapMarkers();
+  }
+
+  /* ===== SORT (US 209082) ===== */
+  function sortCarParks() {
+    const list = document.getElementById('carparkList');
+    const cards = Array.from(list.querySelectorAll('.carpark-card'));
+    const sortBy = document.getElementById('sortSelect').value;
+    cards.sort((a, b) => {
+      if (sortBy === 'name') return (a.dataset.name || '').localeCompare(b.dataset.name || '');
+      if (sortBy === 'capacity') return parseInt(b.dataset.available || 0) - parseInt(a.dataset.available || 0);
+      if (sortBy === 'distance') {
+        const dA = parseFloat(a.querySelector('[id^="dist-"]')?.textContent) || 9999;
+        const dB = parseFloat(b.querySelector('[id^="dist-"]')?.textContent) || 9999;
+        return dA - dB;
+      }
+      return 0;
+    });
+    cards.forEach(c => list.appendChild(c));
+  }
+
+  /* ===== DISTANCE CALCULATION (US 209082) ===== */
+  function calculateDistances() {
+    const postcode = document.getElementById('postcodeInput').value.trim();
+    const cards = document.querySelectorAll('.carpark-card');
+    if (postcode.length < 3) {
+      cards.forEach((c, i) => {
+        const el = document.getElementById('dist-' + (i + 1));
+        if (el) el.textContent = '—';
+      });
+      return;
+    }
+    // Simulated distances for prototype
+    const distances = [0.3, 0.8, 1.2, 1.5, 2.1, 2.8];
+    cards.forEach((c, i) => {
+      const el = document.getElementById('dist-' + (i + 1));
+      if (el) el.textContent = distances[i] + ' miles';
+    });
+  }
+</script>
+</body>
+</html>

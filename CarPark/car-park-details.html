@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Car Park Details</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    /* ===== DESIGN TOKENS ===== */
+    :root {
+      --primary-main: #3276CF;
+      --primary-dark: #2560A8;
+      --primary-800: #22497D;
+      --primary-25: #F2F5FA;
+      --primary-100: #A2C1EA;
+      --primary-200: #84ADE4;
+      --text-primary: #212121;
+      --text-secondary: #757575;
+      --text-disabled: #9E9E9E;
+      --grey-50: #FAFAFA;
+      --grey-100: #F5F5F5;
+      --grey-200: #EEEEEE;
+      --grey-300: #E0E0E0;
+      --grey-400: #BDBDBD;
+      --neutral-100: #CBCCCD;
+      --neutral-300: #8E9092;
+      --success: #2E7D32;
+      --warning: #ED6C02;
+      --error: #D32F2F;
+      --info: #0288D1;
+      --avatar-bg: #DC4A11;
+      --bg-page: #FFFFFF;
+      --yellow-500: #FFEB3B;
+      --shadow-card: 0px 4px 6px rgba(0,0,0,0.1), 0px 2px 4px rgba(0,0,0,0.1);
+      --radius-btn: 10px;
+      --radius-card: 10px;
+      --radius-input: 8px;
+      --radius-chip: 16px;
+      --radius-nav: 8px;
+      --font-size-base: 16px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-size: var(--font-size-base);
+      font-family: 'Roboto', Helvetica, Arial, sans-serif;
+      color: var(--text-primary); background: var(--bg-page);
+      line-height: 1.5; letter-spacing: 0.15px; min-height: 100vh;
+    }
+    body.font-large { zoom: 1.15; }
+    body.font-xl    { zoom: 1.3; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; }
+    }
+
+    .skip-link {
+      position: absolute; left: -999px; top: 0;
+      background: var(--primary-main); color: #fff; padding: 8px 16px;
+      z-index: 1000; border-radius: 0 0 var(--radius-input) 0; font-size: 14px;
+    }
+    .skip-link:focus { left: 0; }
+
+    /* ===== HEADER ===== */
+    .site-header {
+      background: var(--primary-800); border-bottom: 4px solid var(--primary-main);
+      padding: 0 40px; display: flex; align-items: center; justify-content: space-between;
+      height: 56px; position: sticky; top: 0; z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 24px; }
+    .site-header .logo { display: flex; align-items: center; gap: 12px; }
+    .site-header .logo-icon {
+      width: 36px; height: 36px; background: var(--yellow-500);
+      border-radius: 4px; display: flex; align-items: center; justify-content: center;
+      font-weight: 500; font-size: 14px; color: var(--primary-800);
+    }
+    .header-divider { width: 1px; height: 24px; background: rgba(255,255,255,.3); }
+    .header-nav { display: flex; align-items: center; gap: 0; }
+    .header-nav a {
+      text-decoration: none; color: #fff; font-size: 14px;
+      font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px;
+      padding: 16px 20px; display: flex; align-items: center; gap: 8px;
+      transition: background 150ms ease; line-height: 24px;
+    }
+    .header-nav a:hover { background: rgba(255,255,255,.08); }
+    .header-nav a.active { color: var(--yellow-500); }
+    .header-nav a svg { width: 20px; height: 20px; }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .header-bell {
+      background: none; border: none; color: #fff; cursor: pointer;
+      padding: 8px; border-radius: var(--radius-nav); transition: background 150ms;
+    }
+    .header-bell:hover { background: rgba(255,255,255,.1); }
+    .header-bell svg { width: 24px; height: 24px; }
+    .header-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--avatar-bg); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 500; letter-spacing: 0.16px;
+    }
+    .font-toggle {
+      display: flex; gap: 2px; align-items: center;
+      border: 1px solid rgba(255,255,255,.4); border-radius: var(--radius-input);
+      padding: 2px; background: rgba(255,255,255,.08);
+    }
+    .font-toggle button {
+      background: none; border: none; padding: 3px 8px; cursor: pointer;
+      font-weight: 500; border-radius: 6px; color: rgba(255,255,255,.6);
+      font-size: 12px; transition: all 150ms; font-family: inherit;
+    }
+    .font-toggle button.active { background: rgba(255,255,255,.2); color: #fff; }
+    .hamburger-btn {
+      display: none; background: none; border: none; color: #fff;
+      cursor: pointer; padding: 8px; border-radius: var(--radius-nav);
+      transition: background 150ms; flex-shrink: 0;
+    }
+    .hamburger-btn:hover { background: rgba(255,255,255,.1); }
+    .hamburger-btn svg { width: 24px; height: 24px; }
+
+    /* ===== LAYOUT ===== */
+    .page-wrapper { margin: 0 180px; padding: 24px 0 100px; }
+    .page-layout { display: grid; grid-template-columns: 1fr 360px; gap: 24px; align-items: start; }
+
+    /* ===== BREADCRUMB ===== */
+    .breadcrumb {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;
+      letter-spacing: 0.17px;
+    }
+    .breadcrumb a { color: var(--primary-main); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .breadcrumb svg { width: 16px; height: 16px; }
+
+    /* ===== CARDS ===== */
+    .card {
+      background: #fff; border: 1px solid var(--grey-300);
+      border-radius: var(--radius-card); padding: 24px; margin-bottom: 20px;
+    }
+    .card h2 {
+      font-size: 20px; font-weight: 500; line-height: 1.6;
+      letter-spacing: 0.15px; margin-bottom: 4px; color: var(--text-primary);
+    }
+    .card .subtitle {
+      color: var(--text-secondary); font-size: 14px;
+      line-height: 1.43; letter-spacing: 0.17px; margin-bottom: 20px;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      padding: 8px 22px; border-radius: var(--radius-btn); font-size: 14px;
+      font-weight: 500; cursor: pointer; border: none;
+      text-transform: uppercase; letter-spacing: 0.4px; line-height: 24px;
+      transition: background 150ms ease; display: inline-flex; align-items: center; gap: 8px;
+      font-family: 'Roboto', Helvetica, Arial, sans-serif;
+    }
+    .btn:focus-visible { outline: 2px solid var(--primary-main); outline-offset: 2px; }
+    .btn-primary {
+      background: var(--primary-main); color: #fff;
+      font-size: 15px; line-height: 26px; letter-spacing: 0.46px; padding: 10px 24px;
+    }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-secondary { background: transparent; color: var(--primary-main); border: 1px solid var(--primary-main); }
+    .btn-secondary:hover { background: var(--primary-25); }
+    .btn-sm { padding: 4px 10px; font-size: 13px; line-height: 22px; letter-spacing: 0.46px; }
+
+    /* ===== DETAIL HEADER ===== */
+    .detail-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 24px; gap: 16px; flex-wrap: wrap;
+    }
+    .detail-title {
+      font-size: 28px; font-weight: 500; line-height: 1.3; color: var(--text-primary);
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .type-badge {
+      font-size: 12px; font-weight: 500; padding: 4px 14px;
+      border-radius: var(--radius-chip); text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .type-badge.off-street { background: #E8F5E9; color: var(--success); }
+    .type-badge.on-street  { background: #E3F2FD; color: var(--info); }
+
+    .availability-badge {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 14px; font-weight: 500; padding: 6px 16px;
+      border-radius: var(--radius-chip);
+    }
+    .availability-badge.available { background: #E8F5E9; color: var(--success); }
+    .availability-badge.limited { background: #FFF3E0; color: var(--warning); }
+    .availability-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+
+    /* ===== INFO GRID ===== */
+    .info-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;
+    }
+    .info-item { display: flex; align-items: flex-start; gap: 12px; }
+    .info-item .info-icon {
+      width: 40px; height: 40px; border-radius: 50%; background: var(--primary-25);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .info-item .info-icon svg { width: 20px; height: 20px; color: var(--primary-main); }
+    .info-item .info-label { font-size: 12px; color: var(--text-secondary); letter-spacing: 0.4px; margin-bottom: 2px; }
+    .info-item .info-value { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+
+    /* ===== BAY TABLE ===== */
+    .bay-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .bay-table th {
+      text-align: left; padding: 8px 16px; border-bottom: 1px solid var(--grey-300);
+      font-size: 14px; font-weight: 500; color: var(--text-secondary);
+      line-height: 24px; letter-spacing: 0.17px;
+    }
+    .bay-table td {
+      padding: 8px 16px; border-bottom: 1px solid var(--grey-200);
+      font-size: 14px; line-height: 1.43; letter-spacing: 0.17px;
+    }
+    .bay-table tfoot td { font-weight: 500; border-top: 1px solid var(--grey-300); border-bottom: none; }
+
+    /* ===== MINI MAP ===== */
+    .mini-map {
+      height: 200px; border-radius: var(--radius-card);
+      border: 1px solid var(--grey-300); overflow: hidden; margin-bottom: 16px;
+    }
+    #detailMap { width: 100%; height: 100%; }
+
+    /* ===== PRICING TABLE ===== */
+    .pricing-table {
+      border: 1px solid var(--grey-300); border-radius: var(--radius-card); overflow: hidden;
+    }
+    .pricing-table-header {
+      display: flex; justify-content: space-between; padding: 10px 16px;
+      font-size: 13px; font-weight: 500; color: var(--text-secondary);
+      border-bottom: 1px solid var(--grey-300); background: var(--grey-50);
+    }
+    .pricing-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 16px; border-bottom: 1px solid var(--grey-200);
+      cursor: pointer; transition: background 150ms; margin: 0;
+    }
+    .pricing-row:last-child { border-bottom: none; }
+    .pricing-row:hover { background: var(--grey-50); }
+    .pricing-row.selected { background: #EBF3FC; }
+    .pricing-row-left {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 14px; color: var(--text-primary);
+    }
+    .pricing-row-left input[type="radio"] {
+      width: 18px; height: 18px; accent-color: var(--primary-main); margin: 0; cursor: pointer;
+    }
+    .pricing-row-price { font-size: 14px; font-weight: 500; color: var(--primary-main); }
+    .pricing-row:not(.selected) .pricing-row-price { color: var(--text-primary); }
+
+    /* ===== SIDEBAR ===== */
+    .summary-sidebar { position: sticky; top: 80px; }
+    .summary-card {
+      background: #fff; border: 1px solid var(--primary-25);
+      border-radius: var(--radius-card); padding: 0;
+      box-shadow: 0px 1px 21.4px 0px rgba(81,85,110,0.12); overflow: hidden;
+    }
+    .summary-card h3 {
+      font-size: 20px; font-weight: 500; line-height: 1.6;
+      letter-spacing: 0.15px; margin: 0; padding: 12px 16px;
+      color: var(--text-primary); border-bottom: 1px solid var(--grey-400);
+    }
+    .summary-body { padding: 16px; }
+    .summary-row {
+      display: flex; justify-content: space-between;
+      padding: 6px 0; font-size: 14px; line-height: 1.43; letter-spacing: 0.17px;
+    }
+    .summary-row .s-label { color: var(--text-secondary); }
+    .summary-row .s-value { font-weight: 500; color: var(--text-primary); text-align: right; max-width: 55%; }
+    .summary-divider { height: 1px; background: var(--grey-200); margin: 8px 0; }
+    .summary-total {
+      display: flex; justify-content: space-between;
+      padding: 12px 0 0; font-size: 16px; font-weight: 500;
+    }
+    .summary-total .s-value { color: var(--primary-main); font-size: 20px; }
+
+    /* ===== LOGIN PROMPT ===== */
+    .login-prompt {
+      text-align: center; padding: 20px;
+      background: var(--grey-50); border-radius: var(--radius-card);
+      border: 1px solid var(--grey-300); margin-top: 16px;
+    }
+    .login-prompt p { font-size: 14px; color: var(--text-secondary); margin-bottom: 12px; }
+
+    /* ===== NOTICES ===== */
+    .notice {
+      display: flex; gap: 12px; padding: 12px 16px;
+      border-radius: var(--radius-input); font-size: 14px;
+      line-height: 1.43; letter-spacing: 0.17px; margin-bottom: 16px;
+    }
+    .notice-info { background: #E3F2FD; color: var(--info); }
+    .notice svg { width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px; }
+    .notice span { color: var(--text-primary); }
+
+    /* ===== FOOTER ===== */
+    .site-footer {
+      background: var(--primary-800); border-top: 4px solid var(--primary-main);
+      padding: 24px; text-align: center;
+    }
+    .site-footer p { font-size: 14px; line-height: 24px; letter-spacing: 0.07px; color: #fff; }
+    .site-footer a { color: #fff; text-decoration: none; }
+    .site-footer a:hover { text-decoration: underline; }
+
+    /* ===== MOBILE NAV ===== */
+    .mobile-nav-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 300; display: none; }
+    .mobile-nav-overlay.open { display: block; }
+    .mobile-nav-drawer {
+      position: fixed; top: 0; left: -280px; width: 260px; height: 100vh;
+      background: var(--primary-800); z-index: 301; transition: left 250ms ease;
+      display: flex; flex-direction: column; overflow-y: auto; box-shadow: 4px 0 24px rgba(0,0,0,.2);
+    }
+    .mobile-nav-drawer.open { left: 0; }
+    .mobile-nav-drawer .drawer-header {
+      padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,.15);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .mobile-nav-drawer .drawer-close {
+      background: none; border: none; color: #fff; font-size: 22px;
+      cursor: pointer; padding: 4px 8px; border-radius: var(--radius-input);
+    }
+    .mobile-nav-drawer .drawer-links { padding: 12px 0; }
+    .mobile-nav-drawer .drawer-links a {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 20px; color: #fff; text-decoration: none;
+      font-size: 15px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px; transition: background 150ms;
+    }
+    .mobile-nav-drawer .drawer-links a:hover { background: rgba(255,255,255,.08); }
+    .mobile-nav-drawer .drawer-links a.active { color: var(--yellow-500); }
+    .mobile-nav-drawer .drawer-links a svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .page-wrapper { margin: 0 24px; }
+      .page-layout { grid-template-columns: 1fr; }
+      .info-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .site-header { padding: 0; height: auto; min-height: 48px; }
+      .header-left { gap: 8px; flex: 1; min-width: 0; }
+      .header-divider { display: none; }
+      .header-nav { display: none; }
+      .hamburger-btn { display: flex; align-items: center; justify-content: center; }
+      .header-right { gap: 0; }
+      .font-toggle { display: none; }
+      .page-wrapper { margin: 0; padding: 8px 16px 88px; }
+      .detail-title { font-size: 20px; }
+      .info-grid { grid-template-columns: 1fr; }
+    }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<!-- ===== HEADER ===== -->
+<header class="site-header" role="banner">
+  <div class="header-left">
+    <button class="hamburger-btn" aria-label="Open navigation menu" onclick="openMobileNav()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+    <div class="logo">
+      <div class="logo-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" width="20" height="20"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor" opacity=".9"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+      </div>
+    </div>
+    <div class="header-divider"></div>
+    <nav class="header-nav" aria-label="Main navigation">
+      <a href="#" onclick="return false;"><span class="nav-text">My Applications</span></a>
+      <a href="car-park-discovery.html" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+        <span class="nav-text">Car Parks</span>
+      </a>
+      <a href="#" onclick="return false;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        <span class="nav-text">Vehicles</span>
+      </a>
+      <a href="#" onclick="return false;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+        <span class="nav-text">Payment</span>
+      </a>
+    </nav>
+  </div>
+  <div class="header-right">
+    <div class="font-toggle" role="group" aria-label="Adjust text size">
+      <button onclick="setFontSize('normal')" class="active" id="font-normal">A</button>
+      <button onclick="setFontSize('large')" id="font-large">A+</button>
+      <button onclick="setFontSize('xl')" id="font-xl">A++</button>
+    </div>
+    <button class="header-bell" aria-label="Notifications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+    </button>
+    <div class="header-avatar" aria-label="User account" style="background:rgba(255,255,255,.9); color:var(--text-primary); font-size:12px; letter-spacing:1.5px;">SN</div>
+  </div>
+</header>
+
+<!-- Mobile Nav Drawer -->
+<div class="mobile-nav-overlay" id="mobile-nav-overlay" onclick="closeMobileNav()"></div>
+<div class="mobile-nav-drawer" id="mobile-nav-drawer" role="dialog" aria-label="Navigation">
+  <div class="drawer-header">
+    <div class="logo-icon" aria-hidden="true" style="width:32px;height:32px;background:var(--yellow-500);border-radius:4px;display:flex;align-items:center;justify-content:center;">
+      <svg viewBox="0 0 24 24" fill="none" width="18" height="18" style="color:var(--primary-800)"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor" opacity=".9"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+    </div>
+    <button class="drawer-close" onclick="closeMobileNav()" aria-label="Close menu">&times;</button>
+  </div>
+  <div class="drawer-links">
+    <a href="#" onclick="closeMobileNav(); return false;">My Applications</a>
+    <a href="car-park-discovery.html" class="active" onclick="closeMobileNav();">Car Parks</a>
+    <a href="#" onclick="closeMobileNav(); return false;">Vehicles</a>
+    <a href="#" onclick="closeMobileNav(); return false;">Payment</a>
+  </div>
+</div>
+
+<!-- ===== MAIN ===== -->
+<main id="main-content">
+  <div class="page-wrapper">
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="car-park-discovery.html">Car Parks</a>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,18 15,12 9,6"/></svg>
+      <span>Central Multi-Storey Car Park</span>
+    </nav>
+
+    <div class="page-layout">
+      <!-- LEFT COLUMN: Details -->
+      <div>
+
+        <!-- Detail Header -->
+        <div class="detail-header">
+          <div>
+            <div class="detail-title">
+              Central Multi-Storey Car Park
+              <span class="type-badge off-street">Off-Street</span>
+            </div>
+            <p style="color:var(--text-secondary); font-size:14px; margin-top:8px; display:flex; align-items:center; gap:6px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              High Street, Town Centre, AB1 2CD
+            </p>
+          </div>
+          <div class="availability-badge available">
+            <span class="dot"></span> 42 Bays Available
+          </div>
+        </div>
+
+        <!-- Mini Map -->
+        <div class="mini-map">
+          <div id="detailMap"></div>
+        </div>
+
+        <!-- Car Park Information (US 209079, 209076) -->
+        <div class="card">
+          <h2>Car Park Information</h2>
+          <div class="info-grid" style="margin-top:16px;">
+            <div class="info-item">
+              <div class="info-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
+              </div>
+              <div>
+                <div class="info-label">Total Capacity</div>
+                <div class="info-value">120 bays</div>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>
+              </div>
+              <div>
+                <div class="info-label">Available Bays</div>
+                <div class="info-value" style="color:var(--success);">42 bays</div>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              </div>
+              <div>
+                <div class="info-label">Operating Hours</div>
+                <div class="info-value">24/7 Access</div>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0112 2a8 8 0 018 8.2c0 7.3-8 11.8-8 11.8z"/></svg>
+              </div>
+              <div>
+                <div class="info-label">Non-Enforceable</div>
+                <div class="info-value">Sun 00:00 – 08:00</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bay Breakdown -->
+        <div class="card">
+          <h2>Bay Breakdown</h2>
+          <table class="bay-table" style="margin-top:12px;">
+            <thead>
+              <tr>
+                <th>Bay Type</th>
+                <th>Total</th>
+                <th>Available</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Standard</td>
+                <td>90</td>
+                <td>32</td>
+                <td><span style="color:var(--success); font-weight:500;">Available</span></td>
+              </tr>
+              <tr>
+                <td>Disabled</td>
+                <td>15</td>
+                <td>6</td>
+                <td><span style="color:var(--success); font-weight:500;">Available</span></td>
+              </tr>
+              <tr>
+                <td>Electric Vehicle</td>
+                <td>15</td>
+                <td>4</td>
+                <td><span style="color:var(--warning); font-weight:500;">Limited</span></td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td>Total</td>
+                <td>120</td>
+                <td>42</td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- Seasonal Ticket Pricing (US 209082 - Feature 9: viewable without login) -->
+        <div class="card">
+          <h2>Seasonal Ticket Durations & Pricing</h2>
+          <p class="subtitle">Select a permit duration to proceed with purchase.</p>
+
+          <div class="pricing-table">
+            <div class="pricing-table-header">
+              <span>Duration</span>
+              <span>Price</span>
+            </div>
+            <label class="pricing-row" onclick="selectDuration(this)">
+              <div class="pricing-row-left">
+                <input type="radio" name="duration" value="1week" aria-label="1 Week — £15.00">
+                <span>1 Week</span>
+              </div>
+              <div class="pricing-row-price">£15.00</div>
+            </label>
+            <label class="pricing-row" onclick="selectDuration(this)">
+              <div class="pricing-row-left">
+                <input type="radio" name="duration" value="1month" aria-label="1 Month — £45.00">
+                <span>1 Month</span>
+              </div>
+              <div class="pricing-row-price">£45.00</div>
+            </label>
+            <label class="pricing-row selected" onclick="selectDuration(this)">
+              <div class="pricing-row-left">
+                <input type="radio" name="duration" value="3months" checked aria-label="3 Months — £120.00">
+                <span>3 Months</span>
+              </div>
+              <div class="pricing-row-price">£120.00</div>
+            </label>
+            <label class="pricing-row" onclick="selectDuration(this)">
+              <div class="pricing-row-left">
+                <input type="radio" name="duration" value="6months" aria-label="6 Months — £210.00">
+                <span>6 Months</span>
+              </div>
+              <div class="pricing-row-price">£210.00</div>
+            </label>
+            <label class="pricing-row" onclick="selectDuration(this)">
+              <div class="pricing-row-left">
+                <input type="radio" name="duration" value="12months" aria-label="12 Months — £380.00">
+                <span>12 Months</span>
+              </div>
+              <div class="pricing-row-price">£380.00</div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Purchase Action -->
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <a href="car-park-purchase.html?id=1&duration=3months" class="btn btn-primary" id="purchaseBtn" style="text-decoration:none;">
+            PROCEED TO PURCHASE
+          </a>
+          <a href="car-park-discovery.html" class="btn btn-secondary" style="text-decoration:none;">
+            BACK TO CAR PARKS
+          </a>
+        </div>
+
+        <!-- Login Prompt (US 209082 - Feature 9: login required to purchase) -->
+        <div class="login-prompt" id="loginPrompt" style="display:none;">
+          <p>You must be logged in to purchase a car park permit.</p>
+          <button class="btn btn-primary" onclick="alert('Redirect to login page')">LOG IN OR CREATE ACCOUNT</button>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: Summary Sidebar -->
+      <aside class="summary-sidebar">
+        <div class="summary-card">
+          <h3>Permit Summary</h3>
+          <div class="summary-body">
+            <div class="summary-row">
+              <span class="s-label">Car Park</span>
+              <span class="s-value">Central Multi-Storey</span>
+            </div>
+            <div class="summary-row">
+              <span class="s-label">Type</span>
+              <span class="s-value">Off-Street</span>
+            </div>
+            <div class="summary-row">
+              <span class="s-label">Address</span>
+              <span class="s-value">High Street, AB1 2CD</span>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-row">
+              <span class="s-label">Duration</span>
+              <span class="s-value" id="summaryDuration">3 Months</span>
+            </div>
+            <div class="summary-row">
+              <span class="s-label">Available Bays</span>
+              <span class="s-value" style="color:var(--success);">42 / 120</span>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-total">
+              <span class="s-label">Total</span>
+              <span class="s-value" id="summaryPrice">£120.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Info Card -->
+        <div class="card" style="margin-top:16px;">
+          <h2 style="font-size:16px;">Need Help?</h2>
+          <p style="color:var(--text-secondary); font-size:14px; margin-top:8px;">
+            Contact our support team for assistance with car park permits.
+          </p>
+          <p style="margin-top:12px;">
+            <a href="mailto:support@portal.example.com" style="color:var(--primary-main); font-size:14px;">support@portal.example.com</a>
+          </p>
+          <p>
+            <a href="tel:+441234567890" style="color:var(--primary-main); font-size:14px;">01234 567 890</a>
+          </p>
+        </div>
+      </aside>
+    </div>
+
+  </div>
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer" role="contentinfo">
+  <p>&copy; 2026 Customer Portal &mdash; Car Park Details &bull;
+    <a href="#">Privacy Policy</a> &bull; <a href="#">Terms</a> &bull; <a href="#">Accessibility</a>
+  </p>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  /* ===== FONT SIZE ===== */
+  function setFontSize(size) {
+    document.body.classList.remove('font-large', 'font-xl');
+    if (size === 'large') document.body.classList.add('font-large');
+    if (size === 'xl') document.body.classList.add('font-xl');
+    document.querySelectorAll('.font-toggle button').forEach(b => b.classList.remove('active'));
+    document.getElementById('font-' + size)?.classList.add('active');
+  }
+
+  /* ===== MOBILE NAV ===== */
+  function openMobileNav() {
+    document.getElementById('mobile-nav-overlay').classList.add('open');
+    document.getElementById('mobile-nav-drawer').classList.add('open');
+  }
+  function closeMobileNav() {
+    document.getElementById('mobile-nav-overlay').classList.remove('open');
+    document.getElementById('mobile-nav-drawer').classList.remove('open');
+  }
+
+  /* ===== DURATION SELECTION (US 209081) ===== */
+  const priceMap = {
+    '1week': { label: '1 Week', price: '£15.00' },
+    '1month': { label: '1 Month', price: '£45.00' },
+    '3months': { label: '3 Months', price: '£120.00' },
+    '6months': { label: '6 Months', price: '£210.00' },
+    '12months': { label: '12 Months', price: '£380.00' },
+  };
+
+  function selectDuration(row) {
+    document.querySelectorAll('.pricing-row').forEach(r => r.classList.remove('selected'));
+    row.classList.add('selected');
+    const radio = row.querySelector('input[type="radio"]');
+    radio.checked = true;
+    const key = radio.value;
+    const info = priceMap[key];
+    if (info) {
+      document.getElementById('summaryDuration').textContent = info.label;
+      document.getElementById('summaryPrice').textContent = info.price;
+      document.getElementById('purchaseBtn').href = 'car-park-purchase.html?id=1&duration=' + key;
+    }
+  }
+
+  /* ===== MINI MAP ===== */
+  document.addEventListener('DOMContentLoaded', function() {
+    try {
+      const map = L.map('detailMap').setView([51.505, -0.09], 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+      L.marker([51.505, -0.09]).addTo(map).bindPopup('<strong>Central Multi-Storey Car Park</strong>').openPopup();
+    } catch(e) { /* graceful fallback */ }
+  });
+</script>
+</body>
+</html>
