@@ -884,7 +884,8 @@
     <!-- Tab Navigation -->
     <div class="tab-nav-wrapper">
       <nav class="tab-nav" role="tablist" aria-label="Application details tabs">
-        <button class="tab-btn active" role="tab" aria-selected="true" onclick="switchTab('overview')" id="tab-overview">Overview</button>
+        <button class="tab-btn active" role="tab" aria-selected="true" onclick="switchTab('applicant')" id="tab-applicant">Applicant</button>
+        <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('dispensation')" id="tab-dispensation">Dispensation</button>
         <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('vehicle')" id="tab-vehicle">Vehicles</button>
         <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('documents')" id="tab-documents">Documents</button>
       </nav>
@@ -895,9 +896,9 @@
     </div>
 
     <!-- ======================== -->
-    <!-- TAB: OVERVIEW            -->
+    <!-- TAB: APPLICANT           -->
     <!-- ======================== -->
-    <section id="panel-overview" role="tabpanel" aria-labelledby="tab-overview">
+    <section id="panel-applicant" role="tabpanel" aria-labelledby="tab-applicant">
 
       <!-- Applicant Details -->
       <h3 class="overview-section-title">Applicant Details</h3>
@@ -923,10 +924,49 @@
           <span class="li-value">Dispensation</span>
         </div>
         <div class="list-item-row">
-          <span class="li-label">Applicant Address</span>
-          <span class="li-value">42 Victoria Road, Southend-on-Sea, SS2 6EZ</span>
+          <span class="li-label">Property Name / No</span>
+          <span class="li-value">42</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Street</span>
+          <span class="li-value">Victoria Road</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Town</span>
+          <span class="li-value">Southend-on-Sea</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Postcode</span>
+          <span class="li-value">SS2 6EZ</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Business Name</span>
+          <span class="li-value">Donovan Maintenance Ltd</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Business Property Name / No</span>
+          <span class="li-value">10</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Business Street</span>
+          <span class="li-value">High Street</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Business Town</span>
+          <span class="li-value">Southend-on-Sea</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Business Postcode</span>
+          <span class="li-value">SS1 1AB</span>
         </div>
       </div>
+
+    </section>
+
+    <!-- ======================== -->
+    <!-- TAB: DISPENSATION        -->
+    <!-- ======================== -->
+    <section id="panel-dispensation" role="tabpanel" aria-labelledby="tab-dispensation" class="hidden">
 
       <!-- Dispensation Details -->
       <h3 class="overview-section-title">Dispensation Details</h3>
@@ -943,6 +983,18 @@
           <span class="li-label">Duration</span>
           <span class="li-value" id="overview-duration">30 Days</span>
         </div>
+        <div class="list-item-row">
+          <span class="li-label">Street</span>
+          <span class="li-value">High Street</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Town</span>
+          <span class="li-value">Southend</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Application Mode</span>
+          <span class="li-value">Physical</span>
+        </div>
         <!-- Dispensation-specific: Number of Bays (#250230) -->
         <div class="list-item-row" id="dispensation-bays-row">
           <span class="li-label">Number of Bays Provided</span>
@@ -956,41 +1008,6 @@
         <div class="list-item-row">
           <span class="li-label">Payment Method</span>
           <span class="li-value" id="overview-payment-method">Online (Card)</span>
-        </div>
-      </div>
-
-      <!-- Street & Bay Groups — shown for Suspension template (#250230) -->
-      <div id="suspension-streets-section" class="hidden">
-        <h3 class="overview-section-title">Streets &amp; Bay Selection</h3>
-        <div style="padding-left:16px;">
-          <div class="street-group">
-            <div class="street-group-header">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              High Street, <span style="color:var(--text-secondary); font-weight:400;">Southend</span>
-            </div>
-            <div class="street-group-body">
-              <div class="bay-row">
-                <span class="bay-type">Paid Bay</span>
-                <span class="bay-spaces">2 Bay Spaces</span>
-              </div>
-              <div class="bay-row">
-                <span class="bay-type">Resident Parking Bay</span>
-                <span class="bay-spaces">1 Bay Space</span>
-              </div>
-            </div>
-          </div>
-          <div class="street-group">
-            <div class="street-group-header">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              Queens Road, <span style="color:var(--text-secondary); font-weight:400;">Southend</span>
-            </div>
-            <div class="street-group-body">
-              <div class="bay-row">
-                <span class="bay-type">Disabled Bay</span>
-                <span class="bay-spaces">1 Bay Space</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 

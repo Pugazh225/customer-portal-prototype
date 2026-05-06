@@ -1131,7 +1131,8 @@
     <!-- Tab Navigation (Figma: sticky sub-menu tabs) -->
     <div class="tab-nav-wrapper">
       <nav class="tab-nav" role="tablist" aria-label="Application details tabs">
-        <button class="tab-btn active" role="tab" aria-selected="true" onclick="switchTab('overview')" id="tab-overview">Overview</button>
+        <button class="tab-btn active" role="tab" aria-selected="true" onclick="switchTab('applicant')" id="tab-applicant">Applicant</button>
+        <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('suspension')" id="tab-suspension">Suspension</button>
         <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('vehicle')" id="tab-vehicle">Vehicles</button>
         <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('documents')" id="tab-documents">Documents <span class="tab-badge">!</span></button>
       </nav>
@@ -1142,9 +1143,9 @@
     </div>
 
     <!-- ======================== -->
-    <!-- TAB: OVERVIEW            -->
+    <!-- TAB: APPLICANT           -->
     <!-- ======================== -->
-    <section id="panel-overview" role="tabpanel" aria-labelledby="tab-overview">
+    <section id="panel-applicant" role="tabpanel" aria-labelledby="tab-applicant">
 
       <!-- Extensions Section (#249941 / #258125) - visible when extension exists -->
       <div id="extensions-section" class="hidden">
@@ -1190,10 +1191,49 @@
           <span class="li-value">Suspension</span>
         </div>
         <div class="list-item-row">
-          <span class="li-label">Applicant Address</span>
-          <span class="li-value">17 Abbey Hill, Kenilworth, CV8 1LU</span>
+          <span class="li-label">Property Name / No</span>
+          <span class="li-value">17</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Street</span>
+          <span class="li-value">Abbey Hill</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Town</span>
+          <span class="li-value">Kenilworth</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Postcode</span>
+          <span class="li-value">CV8 1LU</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Business Name</span>
+          <span class="li-value">Nicholson &amp; Co. Ltd</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Business Property Name / No</span>
+          <span class="li-value">42</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Business Street</span>
+          <span class="li-value">High Street</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Business Town</span>
+          <span class="li-value">Kenilworth</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Business Postcode</span>
+          <span class="li-value">CV8 1LY</span>
         </div>
       </div>
+
+    </section>
+
+    <!-- ======================== -->
+    <!-- TAB: SUSPENSION          -->
+    <!-- ======================== -->
+    <section id="panel-suspension" role="tabpanel" aria-labelledby="tab-suspension" class="hidden">
 
       <!-- Suspension Details -->
       <h3 class="overview-section-title">Suspension Details</h3>
@@ -1214,6 +1254,18 @@
         <div class="list-item-row" id="p3-flex-duration-row" style="display:none;">
           <span class="li-label">Configured Duration</span>
           <span class="li-value" id="p3-flex-duration-value">10 Days <span style="font-size:12px; color:var(--text-secondary);">(P3 Flexible — selected from Permission Builder)</span></span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Street</span>
+          <span class="li-value">High Street</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Town</span>
+          <span class="li-value">Slough</span>
+        </div>
+        <div class="list-item-row">
+          <span class="li-label">Application Mode</span>
+          <span class="li-value">Physical</span>
         </div>
         <div class="list-item-row">
           <span class="li-label">Purchase Reason</span>
@@ -1254,116 +1306,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Street & Bay Groups (#261259) -->
-      <h3 class="overview-section-title">Streets &amp; Bay Selection</h3>
-      <div style="padding-left:16px;">
-
-      <!-- Default view: no Town, no Map toggle -->
-      <div id="streets-default" class="hidden">
-      <div class="street-group">
-        <div class="street-group-header">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          High Street
-        </div>
-        <div class="street-group-body">
-          <div class="bay-row">
-            <span class="bay-type">Paid Bay</span>
-            <span class="bay-spaces">3 Bay Spaces</span>
-          </div>
-          <div class="bay-row">
-            <span class="bay-type">Resident Parking Bay</span>
-            <span class="bay-spaces">2 Bay Spaces</span>
-          </div>
-        </div>
-      </div>
-      <div class="street-group">
-        <div class="street-group-header">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          Church Lane
-        </div>
-        <div class="street-group-body">
-          <div class="bay-row">
-            <span class="bay-type">Disabled Bay</span>
-            <span class="bay-spaces">1 Bay Space</span>
-          </div>
-        </div>
-      </div>
-      </div><!-- /streets-default -->
-
-      <!-- Town variant: shows Town next to street name in header (#249734 AC — Town field) -->
-      <div id="streets-town">
-      <div class="street-group">
-        <div class="street-group-header">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          High Street, <span class="street-town">Slough</span>
-        </div>
-        <div class="street-group-body">
-          <div class="bay-row">
-            <span class="bay-type">Paid Bay</span>
-            <span class="bay-spaces">3 Bay Spaces</span>
-          </div>
-          <div class="bay-row">
-            <span class="bay-type">Resident Parking Bay</span>
-            <span class="bay-spaces">2 Bay Spaces</span>
-          </div>
-        </div>
-      </div>
-      <div class="street-group">
-        <div class="street-group-header">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          Church Lane, <span class="street-town">Slough</span>
-        </div>
-        <div class="street-group-body">
-          <div class="bay-row">
-            <span class="bay-type">Disabled Bay</span>
-            <span class="bay-spaces">1 Bay Space</span>
-          </div>
-        </div>
-      </div>
-      </div><!-- /streets-town -->
-
-      <!-- Map toggle variant: different streets per bay (#261254 — Map toggle) -->
-      <div id="streets-map" class="hidden">
-      <div class="street-group">
-        <div class="street-group-header">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          High Land — Slough
-        </div>
-        <div class="street-group-body">
-          <div class="bay-row">
-            <span class="bay-type">Paid Bay</span>
-            <span class="bay-spaces">3 Bay Spaces</span>
-          </div>
-        </div>
-      </div>
-      <div class="street-group">
-        <div class="street-group-header">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          High Land — York
-        </div>
-        <div class="street-group-body">
-          <div class="bay-row">
-            <span class="bay-type">Resident Parking Bay</span>
-            <span class="bay-spaces">2 Bay Spaces</span>
-          </div>
-        </div>
-      </div>
-      <div class="street-group">
-        <div class="street-group-header">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          Church Lane — Slough
-        </div>
-        <div class="street-group-body">
-          <div class="bay-row">
-            <span class="bay-type">Disabled Bay</span>
-            <span class="bay-spaces">1 Bay Space</span>
-          </div>
-        </div>
-      </div>
-      </div><!-- /streets-map -->
-
-      </div><!-- /streets indent -->
 
       <!-- Pricing & Payment Details -->
       <h3 class="overview-section-title">Price Breakdown</h3>
